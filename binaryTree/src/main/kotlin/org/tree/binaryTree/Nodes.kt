@@ -15,6 +15,17 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
         }
         return res
     }
+
+    fun countNullChild(): Int {
+        var res = 0
+        if (left == null) {
+            res += 1
+        }
+        if (right == null) {
+            res += 1
+        }
+        return res
+    }
 }
 
 class Node<T : Comparable<T>>(v: T) : TemplateNode<T, Node<T>>(v)
