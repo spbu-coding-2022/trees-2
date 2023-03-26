@@ -38,4 +38,23 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
     fun insert(obj: T) {
         insert(root, obj)
     }
+
+    //Find
+    protected fun find(curNode: NODE_T?, obj: T): NODE_T? {
+        if (curNode == null) {
+            return null
+        }
+
+        if (curNode.elem == obj) {
+            return curNode
+        } else if (obj < curNode.elem) {
+            return find(curNode.left, obj)
+        } else {
+            return find(curNode.right, obj)
+        }
+    }
+
+    fun find(obj: T): NODE_T? {
+        return find(root, obj)
+    }
 }
