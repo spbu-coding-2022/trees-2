@@ -57,4 +57,19 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
     fun find(obj: T): NODE_T? {
         return find(root, obj)
     }
+
+    //Additional
+    protected fun findNext(curNode: NODE_T): NODE_T? {
+        var res = curNode.right
+        if (res == null) {
+            return null
+        } else {
+            var nextNode = res.left
+            while (nextNode != null) {
+                res = nextNode
+                nextNode = res.left
+            }
+            return res
+        }
+    }
 }
