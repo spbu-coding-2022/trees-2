@@ -4,6 +4,17 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
     var elem: T = v
     var left: NODE_T? = null
     var right: NODE_T? = null
+
+    fun getNonNullChild(): NODE_T? {
+        val res = if (left != null) {
+            left
+        } else if (right != null) {
+            right
+        } else {
+            null
+        }
+        return res
+    }
 }
 
 class Node<T : Comparable<T>>(v: T) : TemplateNode<T, Node<T>>(v)
