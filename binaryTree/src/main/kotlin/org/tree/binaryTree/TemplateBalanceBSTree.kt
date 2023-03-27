@@ -31,4 +31,33 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         }
         return insNode
     }
+
+    override fun remove(curNode: NODE_T?, parentNode: NODE_T?, obj: T): Int? {
+        if (curNode == null) {
+            return null
+        }
+
+        val targetNode: NODE_T?
+        val isRec: BalanceCase.Recursive
+        val res = if (curNode.elem == obj) {
+            isRec = BalanceCase.Recursive.END
+            targetNode = parentNode
+            deleteNode(curNode, parentNode)
+        } else if (obj < curNode.elem) {
+            isRec = BalanceCase.Recursive.RECURSIVE_CALL
+            targetNode = curNode
+            remove(curNode.left, curNode, obj)
+        } else {
+            isRec = BalanceCase.Recursive.RECURSIVE_CALL
+            targetNode = curNode
+            remove(curNode.right, curNode, obj)
+        }
+
+        if (res != null) {
+            if (targetNode != null) {
+                balance(targetNode, getBalanceRemoveType(res), isRec)
+            }
+        }
+        return res
+    }
 }
