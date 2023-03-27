@@ -20,5 +20,15 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
 
     protected abstract fun balance(curNode: NODE_T, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive)
 
-
+    override fun insertNode(curNode: NODE_T?, newNode: NODE_T): NODE_T? {
+        val insNode = super.insertNode(curNode, newNode)
+        if (curNode != null) { // STTK: maybe if cur_node = root, and root = null
+            if ((curNode.left === insNode) or (curNode.right === insNode)) {
+                balance(curNode, BalanceCase.OpType.INSERT, BalanceCase.Recursive.END)
+            } else {
+                balance(curNode, BalanceCase.OpType.INSERT, BalanceCase.Recursive.RECURSIVE_CALL)
+            }
+        }
+        return insNode
+    }
 }
