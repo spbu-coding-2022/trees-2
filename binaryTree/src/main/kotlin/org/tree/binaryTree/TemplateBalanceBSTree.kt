@@ -6,7 +6,12 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
 
     //Balance
     protected class BalanceCase {
+        // RECURSIVE_CALL - the function was called recursively for traverse
+        // END - the last, significant call
         enum class Recursive { RECURSIVE_CALL, END }
+
+        // INSERT - with the insert method
+        // REMOVE_X - with the remove method when current node had X null children
         enum class OpType { INSERT, REMOVE_0, REMOVE_1, REMOVE_2 }
     }
 
@@ -18,6 +23,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         }
     }
 
+    // curNode - this is parent of changed node
     protected abstract fun balance(curNode: NODE_T, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive)
 
     override fun insertNode(curNode: NODE_T?, newNode: NODE_T): NODE_T? {
