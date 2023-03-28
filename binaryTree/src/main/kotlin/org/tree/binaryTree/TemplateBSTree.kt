@@ -59,24 +59,6 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
     }
 
     //Remove
-    private fun replaceDeletedNode(deletedNode: NODE_T, parentNode: NODE_T?, replaceNode: NODE_T?) {
-        if (parentNode == null) {
-            if (root === deletedNode) {
-                root = replaceNode
-            } else {
-                throw IllegalArgumentException("Received a non-root node with a null parent")
-            }
-        } else {
-            if (parentNode.right == deletedNode) {
-                parentNode.right = replaceNode
-            } else if (parentNode.left == deletedNode) {
-                parentNode.left = replaceNode
-            } else {
-                throw IllegalArgumentException("Received a node with a wrong parent")
-            }
-        }
-    }
-
     protected open fun deleteNode(curNode: NODE_T, parentNode: NODE_T?): Int {
         val res = curNode.countNullChild()
         when (res) {
@@ -89,11 +71,11 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             }
 
             1 -> {
-                replaceDeletedNode(curNode, parentNode, curNode.getNonNullChild())
+                replaceNode(curNode, parentNode, curNode.getNonNullChild())
             }
 
             else -> {
-                replaceDeletedNode(curNode, parentNode, null)
+                replaceNode(curNode, parentNode, null)
             }
         }
         return res
@@ -129,6 +111,24 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
                 nextNode = res.left
             }
             return res
+        }
+    }
+
+    protected fun replaceNode(replacedNode: NODE_T, parentNode: NODE_T?, newNode: NODE_T?) {
+        if (parentNode == null) {
+            if (root === replacedNode) {
+                root = newNode
+            } else {
+                throw IllegalArgumentException("Received a non-root node with a null parent")
+            }
+        } else {
+            if (parentNode.right == replacedNode) {
+                parentNode.right = newNode
+            } else if (parentNode.left == replacedNode) {
+                parentNode.left = newNode
+            } else {
+                throw IllegalArgumentException("Received a node with a wrong parent")
+            }
         }
     }
 }
