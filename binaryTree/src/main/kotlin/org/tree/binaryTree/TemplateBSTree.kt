@@ -8,7 +8,7 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
         if (curNode == null) {
             if (root === curNode) {
                 root = newNode
-                return newNode
+                return null
             } else {
                 throw IllegalArgumentException("Received a non-root null node")
             }
@@ -16,17 +16,17 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             if (newNode.elem < curNode.elem) {
                 if (curNode.left == null) {
                     curNode.left = newNode
+                    return curNode
                 } else {
-                    insertNode(curNode.left, newNode)
+                    return insertNode(curNode.left, newNode)
                 }
-                return curNode.left
             } else if (newNode.elem > curNode.elem) {
                 if (curNode.right == null) {
                     curNode.right = newNode
+                    return curNode
                 } else {
-                    insertNode(curNode.right, newNode)
+                    return insertNode(curNode.right, newNode)
                 }
-                return curNode.right
             } else {
                 return null // STTK: 10%
             }
