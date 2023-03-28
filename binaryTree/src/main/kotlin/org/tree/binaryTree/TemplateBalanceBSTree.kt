@@ -24,7 +24,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
     }
 
     // curNode - this is parent of changed node
-    protected abstract fun balance(curNode: NODE_T, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive)
+    protected abstract fun balance(curNode: NODE_T, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive): Int
 
     override fun insertNode(curNode: NODE_T?, newNode: NODE_T): NODE_T? {
         val insNode = super.insertNode(curNode, newNode)
@@ -65,5 +65,22 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
             }
         }
         return res
+    }
+
+    //Rotates
+    protected fun rotateRight(curNode: NODE_T, parentNode: NODE_T?) {
+        val replacementNode = curNode.left ?: throw IllegalArgumentException("Received a node with a null left child")
+        curNode.left = replacementNode.right
+        replacementNode.right = curNode
+
+        replaceNode(curNode, parentNode, replacementNode)
+    }
+
+    protected fun rotateLeft(curNode: NODE_T, parentNode: NODE_T?) {
+        val replacementNode = curNode.right ?: throw IllegalArgumentException("Received a node with a null right child")
+        curNode.right = replacementNode.left
+        replacementNode.left = curNode
+
+        replaceNode(curNode, parentNode, replacementNode)
     }
 }
