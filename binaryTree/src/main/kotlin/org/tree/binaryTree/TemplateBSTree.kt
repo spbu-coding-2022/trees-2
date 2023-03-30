@@ -122,9 +122,9 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
                 throw IllegalArgumentException("Received a non-root node with a null parent")
             }
         } else {
-            if (parentNode.right == replacedNode) {
+            if (parentNode.right === replacedNode) {
                 parentNode.right = newNode
-            } else if (parentNode.left == replacedNode) {
+            } else if (parentNode.left === replacedNode) {
                 parentNode.left = newNode
             } else {
                 throw IllegalArgumentException("Received a node with a wrong parent")
