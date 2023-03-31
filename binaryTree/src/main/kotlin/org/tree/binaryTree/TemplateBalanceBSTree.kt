@@ -74,7 +74,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
     }
 
     //Rotates
-    protected fun rotateRight(curNode: NODE_T, parentNode: NODE_T?) {
+    protected open fun rotateRight(curNode: NODE_T, parentNode: NODE_T?) {
         val replacementNode = curNode.left ?: throw IllegalArgumentException("Received a node with a null left child")
         curNode.left = replacementNode.right
         replacementNode.right = curNode
@@ -82,7 +82,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         replaceNode(curNode, parentNode, replacementNode)
     }
 
-    protected fun rotateLeft(curNode: NODE_T, parentNode: NODE_T?) {
+    protected open fun rotateLeft(curNode: NODE_T, parentNode: NODE_T?) {
         val replacementNode = curNode.right ?: throw IllegalArgumentException("Received a node with a null right child")
         curNode.right = replacementNode.left
         replacementNode.left = curNode
