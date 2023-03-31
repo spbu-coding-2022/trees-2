@@ -65,5 +65,5 @@ class RBNode<T : Comparable<T>>(p: RBNode<T>?, v: T) : TemplateNode<T, RBNode<T>
 }
 
 class AVLNode<T : Comparable<T>>(v: T) : TemplateNode<T, AVLNode<T>>(v) {
-    var height: Int = 0
+    var height: Int = 1
 }
