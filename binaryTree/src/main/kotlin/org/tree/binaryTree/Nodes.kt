@@ -26,6 +26,33 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
         }
         return res
     }
+
+    //Traversal
+    enum class Traversal {
+        INORDER,
+        PREORDER,
+        POSTORDER
+    }
+
+    private fun traversal(res: MutableList<T>, cs: Traversal) {
+        if (cs == Traversal.PREORDER) {
+            res.add(elem)
+        }
+        left?.traversal(res, cs)
+        if (cs == Traversal.INORDER) {
+            res.add(elem)
+        }
+        right?.traversal(res, cs)
+        if (cs == Traversal.POSTORDER) {
+            res.add(elem)
+        }
+    }
+
+    fun traversal(order: Traversal): MutableList<T> {
+        val res: MutableList<T> = mutableListOf()
+        traversal(res, order)
+        return res
+    }
 }
 
 class Node<T : Comparable<T>>(v: T) : TemplateNode<T, Node<T>>(v)
