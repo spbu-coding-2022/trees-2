@@ -59,7 +59,7 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     }
 
     override fun balance(curNode: AVLNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
-        if (curNode === null) {
+        if (curNode == null) {
             root?.let { balanceNode(it, curNode) }
             return
         }
