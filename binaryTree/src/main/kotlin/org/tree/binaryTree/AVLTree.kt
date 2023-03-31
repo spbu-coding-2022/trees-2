@@ -39,7 +39,34 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         return super.insertNode(curNode, AVLNode(obj))
     }
 
+    private fun balanceNode(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
+        fixheight(curNode)
+        if (bfactor(curNode) == 2) {
+            if (bfactor(curNode.right) < 0) {
+                curNode.right?.let { rotateRight(it, curNode) }
+            }
+            rotateLeft(curNode, parentNode)
+        }
+
+        if (bfactor(curNode) == -2) {
+            if (bfactor(curNode.left) > 0) {
+                curNode.left?.let { rotateLeft(it, curNode) }
+            }
+            rotateRight(curNode, parentNode)
+        }
+    }
+
     override fun balance(curNode: AVLNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
-        TODO("Not yet implemented")
+        when (operationType) {
+            BalanceCase.OpType.REMOVE_0 -> {}
+            else -> {
+                curNode?.right?.let { balanceNode(it, curNode) }
+                curNode?.left?.let { balanceNode(it, curNode) }
+            }
+        }
+
+        if (curNode === null) {
+            root?.let { balanceNode(it, curNode) }
+        }
     }
 }
