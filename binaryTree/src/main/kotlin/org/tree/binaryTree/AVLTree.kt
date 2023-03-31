@@ -1,5 +1,7 @@
 package org.tree.binaryTree
 
+import kotlin.math.max
+
 class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     private fun height(avlNode: AVLNode<T>?): Int {
         return avlNode?.height ?: 0
@@ -17,7 +19,7 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         if (avlNode != null) {
             val hl = height(avlNode.left)
             val hr = height(avlNode.right)
-            avlNode.height = (if (hl > hr) hl else hr) + 1
+            avlNode.height = max(hl, hr) + 1
         }
     }
 
@@ -57,16 +59,12 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     }
 
     override fun balance(curNode: AVLNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
-        when (operationType) {
-            BalanceCase.OpType.REMOVE_0 -> {}
-            else -> {
-                curNode?.right?.let { balanceNode(it, curNode) }
-                curNode?.left?.let { balanceNode(it, curNode) }
-            }
-        }
-
         if (curNode === null) {
             root?.let { balanceNode(it, curNode) }
+            return
         }
+
+        curNode.right?.let { balanceNode(it, curNode) }
+        curNode.right?.let { balanceNode(it, curNode) }
     }
 }
