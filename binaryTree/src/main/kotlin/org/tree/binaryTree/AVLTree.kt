@@ -21,6 +21,20 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         }
     }
 
+    override fun rotateRight(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
+        val replacementNode = curNode.left
+        super.rotateRight(curNode, parentNode)
+        fixheight(curNode)
+        fixheight(replacementNode)
+    }
+
+    override fun rotateLeft(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
+        val replacementNode = curNode.right
+        super.rotateLeft(curNode, parentNode)
+        fixheight(replacementNode)
+        fixheight(curNode)
+    }
+
     override fun insert(curNode: AVLNode<T>?, obj: T): AVLNode<T>? {
         return super.insertNode(curNode, AVLNode(obj))
     }
