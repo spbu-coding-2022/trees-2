@@ -68,7 +68,7 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
                 }
 
                 curNode.right?.let { balanceNode(it, curNode) }
-                curNode.right?.let { balanceNode(it, curNode) }
+                curNode.left?.let { balanceNode(it, curNode) }
             }
         }
     }
