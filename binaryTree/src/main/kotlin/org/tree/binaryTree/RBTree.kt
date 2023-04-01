@@ -1,6 +1,6 @@
 package org.tree.binaryTree
 
-class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>(){
+class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun findParentForNewNode(curNode: RBNode<T>?, obj: T): RBNode<T>? {
         if (curNode == null) { // impossible, but check for null is needed
             return null
@@ -19,8 +19,10 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>(){
             return null
         }
     }
+
     override fun insert(curNode: RBNode<T>?, obj: T): RBNode<T>? {
-        TODO("Not yet implemented")
+        val parentForObj = findParentForNewNode(curNode, obj)
+        return insertNode(parentForObj, RBNode(parentForObj, obj)) // "в прод"
     }
 
     override fun balance(curNode: RBNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
