@@ -60,7 +60,7 @@ class Node<T : Comparable<T>>(v: T) : TemplateNode<T, Node<T>>(v)
 class RBNode<T : Comparable<T>>(p: RBNode<T>?, v: T) : TemplateNode<T, RBNode<T>>(v) {
     var parent: RBNode<T>? = p
     var col: Colour = Colour.RED
-
+    var blackHeight: Int = 0
     enum class Colour { RED, BLACK }
 }
 
