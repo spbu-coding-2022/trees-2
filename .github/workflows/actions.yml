@@ -14,6 +14,7 @@ jobs:
         run: ./gradlew build
 
       - name: Upload reports for library
+        if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: library-reports
@@ -21,6 +22,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload reports for app
+        if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: app-reports
