@@ -7,6 +7,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm")
+
+    id("jacoco")
 }
 
 repositories {
@@ -37,5 +39,15 @@ tasks {
             events.add(TestLogEvent.PASSED)
             events.add(TestLogEvent.SKIPPED)
         }
+    }
+}
+
+//Jacoco
+tasks{
+    test {
+        finalizedBy(jacocoTestReport)
+    }
+    jacocoTestReport {
+        dependsOn(test)
     }
 }
