@@ -16,13 +16,13 @@ jobs:
     - name: Upload test report for library
       uses: actions/upload-artifact@v3
       with:
-        name: library-test-report
-        path: binaryTree/build/reports/tests/test/
+        name: library-reports
+        path: binaryTree/build/reports/
         if-no-files-found: ignore
-        
+
     - name: Upload test report for app
       uses: actions/upload-artifact@v3
       with:
-        name: app-test-report
-        path: app/build/reports/tests/test/
+        name: app-report
+        path: app/build/reports/
         if-no-files-found: ignore
