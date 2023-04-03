@@ -7,13 +7,13 @@ mergeable:
         pull_request:
           title:
             must_exclude:
-              regex: ^Feedback$
+              regex: '^Feedback$'
 
     validate:
       # Work in progress
       - do: title
         must_exclude:
-          regex: ^\[WIP\]
+          regex: '^\[WIP\]'
       - do: label
         must_exclude:
           regex: 'wip'
@@ -31,21 +31,14 @@ mergeable:
         required:
           assignees: true
 
-  # Git flow
-  # Pull request to main only from release and hotfix branches
-  - when: pull_request.*
-    filter:
-      - do: payload
-        pull_request:
-          baseRef:
-            must_include:
-              regex: 'main'
-          # ignore 'Feedback' PR
-          title:
+
+      # Pull request to main only from release and hotfix branches
+      - do: or
+        validate:
+          - do: baseRef
             must_exclude:
-              regex: ^Feedback$
-    validate:
-      - do: headRef
-        must_include:
-          regex: '^(release|hotfix)\/.+$'
-          message: "Create PR to main only from release and hotfix branches"
+              regex: '^main$'
+          - do: headRef
+            must_include:
+              regex: '^(release|hotfix)\/.+$'
+        message: "Create PR to main only from release and hotfix branches"
