@@ -23,9 +23,9 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     override fun insert(curNode: RBNode<T>?, obj: T): RBNode<T>? {
         val parentForObj = findParentForNewNode(curNode, obj)
         if (parentForObj == null) {
-            val RB_root = RBNode(parentForObj, obj)
-            RB_root.col = RBNode.Colour.BLACK
-            return insertNode(parentForObj, RB_root)
+            val rootOfRB = RBNode(parentForObj, obj)
+            rootOfRB.col = RBNode.Colour.BLACK
+            return insertNode(parentForObj, rootOfRB)
         }
         return insertNode(parentForObj, RBNode(parentForObj, obj)) // "в прод"
     }
