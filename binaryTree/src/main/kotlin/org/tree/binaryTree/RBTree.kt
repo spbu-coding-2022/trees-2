@@ -3,7 +3,7 @@ package org.tree.binaryTree
 class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun findParentForNewNode(curNode: RBNode<T>?, obj: T): RBNode<T>? {
         if (curNode == null) { // impossible, but check for null is needed
-            return null
+            throw IllegalArgumentException("Received null as root")
         }
         if (obj > curNode.elem) {
             if (curNode.right == null) {
@@ -30,87 +30,96 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     }
 
     override fun balance(curNode: RBNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
-        if (operationType == BalanceCase.OpType.INSERT) {
+        if (recursive == BalanceCase.Recursive.END) {
             if (curNode != null) {
-                if (recursive == BalanceCase.Recursive.END) { // curNode is parent Node of inserted Node
-                    if (curNode.col == RBNode.Colour.RED) {
-                        val grandParent = curNode.parent
-                        if (grandParent != null) { // in case when grandparent is null, there is no need to balance a tree
-                            val uncle_position: balancePosition
-                            val uncle = if (curNode.elem < grandParent.elem) {
-                                uncle_position = balancePosition.RIGHT_UNCLE
-                                grandParent.right
-                            } else {
-                                uncle_position = balancePosition.LEFT_UNCLE
-                                grandParent.left
-                            }
-                            if (uncle != null) {
-                                if (uncle.col == RBNode.Colour.RED) {
-                                    balanceInsertCaseOfRedUncle(curNode, grandParent, uncle)
-                                } else {
-                                    balanceInsertCaseOfBLackUncle(curNode, grandParent, uncle_position)
-                                }
-                            } else { // null uncle means that he is black
-                                balanceInsertCaseOfBLackUncle(curNode, grandParent, uncle_position)
-                            }
-                        }
+                when (operationType) {
+                    BalanceCase.OpType.INSERT -> { // curNode is parent Node of inserted Node
+                        balanceInsert(curNode)
                     }
+                    BalanceCase.OpType.REMOVE_0 -> TODO()
+                    BalanceCase.OpType.REMOVE_1 -> TODO()
+                    BalanceCase.OpType.REMOVE_2 -> TODO()
                 }
             }
         }
     }
 
-    enum class balancePosition {
+    enum class BalancePosition {
         LEFT_UNCLE, RIGHT_UNCLE
     }
 
-    private fun balanceInsertCaseOfRedUncle(curNode: RBNode<T>, grandParent: RBNode<T>, uncle: RBNode<T>) {
+    private fun balanceInsert(parentNode: RBNode<T>) {
+        if (parentNode.col == RBNode.Colour.RED) {
+            val grandParent = parentNode.parent
+            if (grandParent != null) { // in case when grandparent is null, there is no need to balance a tree
+                val unclePosition: BalancePosition
+                val uncle = if (parentNode.elem < grandParent.elem) {
+                    unclePosition = BalancePosition.RIGHT_UNCLE
+                    grandParent.right
+                } else {
+                    unclePosition = BalancePosition.LEFT_UNCLE
+                    grandParent.left
+                }
+                if (uncle != null) {
+                    if (uncle.col == RBNode.Colour.RED) {
+                        balanceInsertCaseOfRedUncle(parentNode, grandParent, uncle)
+                    } else {
+                        balanceInsertCaseOfBLackUncle(parentNode, grandParent, unclePosition)
+                    }
+                } else { // null uncle means that he is black
+                    balanceInsertCaseOfBLackUncle(parentNode, grandParent, unclePosition)
+                }
+            }
+        }
+    }
+
+    private fun balanceInsertCaseOfRedUncle(parentNode: RBNode<T>, grandParent: RBNode<T>, uncle: RBNode<T>) {
         val grandGrandParent = grandParent.parent
         uncle.col = RBNode.Colour.BLACK
-        curNode.col = RBNode.Colour.BLACK
+        parentNode.col = RBNode.Colour.BLACK
         if (grandGrandParent != null) {
             grandParent.col = RBNode.Colour.RED
             // https://skr.sh/sJ9LBQU2IGg, when y is curNode
             if (grandGrandParent.col == RBNode.Colour.RED) {
-                balance(grandGrandParent, BalanceCase.OpType.INSERT, BalanceCase.Recursive.END)
+                balanceInsert(grandGrandParent)
             }
         }
     }
 
     private fun balanceInsertCaseOfBLackUncle(
-        curNode: RBNode<T>,
+        parentNode: RBNode<T>,
         grandParent: RBNode<T>,
-        position: balancePosition
+        position: BalancePosition
     ) { // can be null uncle
-        if (position == balancePosition.LEFT_UNCLE) {
-            val leftSon = curNode.left
+        if (position == BalancePosition.LEFT_UNCLE) {
+            val leftSon = parentNode.left
             if (leftSon != null) {
                 if (leftSon.col == RBNode.Colour.RED) {
-                    rotateRight(curNode, grandParent)
-                    balance(curNode.parent, BalanceCase.OpType.INSERT, BalanceCase.Recursive.END)
+                    rotateRight(parentNode, grandParent)
+                    parentNode.parent?.let { balanceInsert(it) }
                 }
             } else {
-                val rightSon = curNode.right
+                val rightSon = parentNode.right
                 if (rightSon != null) {
-                    curNode.col = RBNode.Colour.BLACK
+                    parentNode.col = RBNode.Colour.BLACK
                     grandParent.col = RBNode.Colour.RED
                     rotateLeft(grandParent, grandParent.parent)
                 }
             }
         } else {
-            val leftSon = curNode.left
+            val leftSon = parentNode.left
             if (leftSon != null) {
                 if (leftSon.col == RBNode.Colour.RED) {
-                    curNode.col = RBNode.Colour.BLACK
+                    parentNode.col = RBNode.Colour.BLACK
                     grandParent.col = RBNode.Colour.RED
                     rotateRight(grandParent, grandParent.parent)
                 }
             } else {
-                val rightSon = curNode.right
+                val rightSon = parentNode.right
                 if (rightSon != null) {
                     if (rightSon.col == RBNode.Colour.RED) {
-                        rotateLeft(curNode, grandParent)
-                        balance(curNode.parent, BalanceCase.OpType.INSERT, BalanceCase.Recursive.END)
+                        rotateLeft(parentNode, grandParent)
+                        parentNode.parent?.let { balanceInsert(it) }
                     }
                 }
             }
