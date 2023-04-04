@@ -31,4 +31,28 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>(){
     override fun balance(curNode: RBNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
         TODO("Not yet implemented")
     }
+    override fun replaceNode(replacedNode: RBNode<T>, parentNode: RBNode<T>?, newNode: RBNode<T>?) {
+        newNode?.parent = parentNode
+        super.replaceNode(replacedNode, parentNode, newNode)
+    }
+
+    override fun rotateRight(curNode: RBNode<T>, parentNode: RBNode<T>?) {
+        curNode.parent = curNode.left
+        curNode.left?.parent = parentNode
+        curNode.left?.right?.parent = curNode
+        if (curNode === root) {
+            curNode.left?.col = RBNode.Colour.BLACK
+        }
+        super.rotateRight(curNode, parentNode)
+    }
+
+    override fun rotateLeft(curNode: RBNode<T>, parentNode: RBNode<T>?) {
+        curNode.parent = curNode.right
+        curNode.right?.parent = parentNode
+        curNode.right?.left?.parent = curNode
+        if (curNode === root) {
+            curNode.right?.col = RBNode.Colour.BLACK
+        }
+        super.rotateLeft(curNode, parentNode)
+    }
 }
