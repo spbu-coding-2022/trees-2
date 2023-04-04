@@ -2,29 +2,31 @@ package org.tree.binaryTree
 
 class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun findParentForNewNode(curNode: RBNode<T>?, obj: T): RBNode<T>? {
-        if (curNode == null) { // impossible, but check for null is needed
-            throw IllegalArgumentException("Received null as root")
-        }
-        if (obj > curNode.elem) {
-            if (curNode.right == null) {
-                return curNode
+        if (curNode != null) {
+            if (obj > curNode.elem) {
+                if (curNode.right == null) {
+                    return curNode
+                }
+                return findParentForNewNode(curNode.right, obj)
+            } else if (obj < curNode.elem) {
+                if (curNode.left == null) {
+                    return curNode
+                }
+                return findParentForNewNode(curNode.left, obj)
             }
-            return findParentForNewNode(curNode.right, obj)
-        } else if (obj < curNode.elem) {
-            if (curNode.left == null) {
-                return curNode
-            }
-            return findParentForNewNode(curNode.left, obj)
-        } else {  // the element already exist
-            return null
         }
+        return null
     }
 
     override fun insert(curNode: RBNode<T>?, obj: T): RBNode<T>? {
         val parentForObj = findParentForNewNode(curNode, obj)
         val newNode = RBNode(parentForObj, obj)
         if (parentForObj == null) { // in case of root insert | node already exist (nothing will be changed)
-            newNode.col = RBNode.Colour.BLACK
+            if (root == null) {
+                newNode.col = RBNode.Colour.BLACK
+            } else {
+                return null
+            }
         }
         return insertNode(parentForObj, newNode)
     }
@@ -36,6 +38,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                     BalanceCase.OpType.INSERT -> { // curNode is parent Node of inserted Node
                         balanceInsert(curNode)
                     }
+
                     BalanceCase.OpType.REMOVE_0 -> TODO()
                     BalanceCase.OpType.REMOVE_1 -> TODO()
                     BalanceCase.OpType.REMOVE_2 -> TODO()
