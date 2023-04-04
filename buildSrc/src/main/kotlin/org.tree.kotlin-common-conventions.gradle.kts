@@ -24,6 +24,8 @@ dependencies {
 
     // Use JUnit Jupiter for testing.
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+    // Use hamcrest for convenient testing
+    testImplementation("org.hamcrest:hamcrest:2.2")
 }
 
 tasks.named<Test>("test") {
