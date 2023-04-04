@@ -114,7 +114,7 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
         }
     }
 
-    protected fun replaceNode(replacedNode: NODE_T, parentNode: NODE_T?, newNode: NODE_T?) {
+    protected open fun replaceNode(replacedNode: NODE_T, parentNode: NODE_T?, newNode: NODE_T?) {
         if (parentNode == null) {
             if (root === replacedNode) {
                 root = newNode
