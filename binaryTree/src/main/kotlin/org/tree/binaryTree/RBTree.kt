@@ -20,7 +20,12 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>(){
         }
     }
     override fun insert(curNode: RBNode<T>?, obj: T): RBNode<T>? {
-        TODO("Not yet implemented")
+        val parentForObj = findParentForNewNode(curNode, obj)
+        val newNode = RBNode(parentForObj, obj)
+        if (parentForObj == null) { // in case of root insert | node already exist (nothing will be changed)
+            newNode.col = RBNode.Colour.BLACK
+        }
+        return insertNode(parentForObj, newNode)
     }
 
     override fun balance(curNode: RBNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
