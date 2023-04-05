@@ -9,7 +9,7 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
 
     private fun bfactor(avlNode: AVLNode<T>?): Int {
         return if (avlNode != null) {
-            height(avlNode.right)-height(avlNode.left)
+            height(avlNode.right) - height(avlNode.left)
         } else {
             0
         }
@@ -58,7 +58,12 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         }
     }
 
-    override fun balance(curNode: AVLNode<T>?, operationType: BalanceCase.OpType, recursive: BalanceCase.Recursive) {
+    override fun balance(
+        curNode: AVLNode<T>?,
+        changedChild: BalanceCase.ChangedChild,
+        operationType: BalanceCase.OpType,
+        recursive: BalanceCase.Recursive
+    ) {
         when (operationType) {
             BalanceCase.OpType.REMOVE_0 -> {}
             else -> {
