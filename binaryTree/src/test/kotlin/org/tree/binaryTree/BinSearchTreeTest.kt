@@ -203,4 +203,77 @@ class BinSearchTreeTest {
             assertNotEquals(null, testTree.root?.right)
         }
     }
+
+    @DisplayName("DeleteNode tests")
+    @Nested
+    inner class DeleteNodeTests {
+        @Test
+        fun zeroChildrenDeleteTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                    null, null, null, null,
+                )
+            )
+            val ok = testTree.remove(60)
+
+            assertEquals(true, ok)
+            assertNotEquals(null, testTree.root)
+            assertEquals(null, testTree.root?.right)
+        }
+
+        @Test
+        fun oneChildrenDeleteTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                    null, null, 55, null,
+                )
+            )
+            val ok = testTree.remove(60)
+
+            assertEquals(true, ok)
+            assertEquals(55, testTree.root?.right?.elem)
+            assertEquals(null, testTree.root?.right?.left)
+        }
+
+        @Test
+        fun twoChildrenDeleteTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                    null, null, 55, 70,
+                )
+            )
+            val ok = testTree.remove(60)
+
+            assertEquals(true, ok)
+            assertEquals(70, testTree.root?.right?.elem)
+            assertEquals(null, testTree.root?.right?.right)
+            assertEquals(55, testTree.root?.right?.left?.elem)
+        }
+
+        @Test
+        fun twoChildrenBigDeleteTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                    null, null, 55, 70,
+                    null, null, null, null, 53, 57, 67, 71,
+                )
+            )
+            val ok = testTree.remove(60)
+
+            assertEquals(true, ok)
+            assertEquals(67, testTree.root?.right?.elem)
+            assertEquals(55, testTree.root?.right?.left?.elem)
+            assertEquals(70, testTree.root?.right?.right?.elem)
+            assertEquals(null, testTree.root?.right?.right?.left)
+        }
+
+    }
 }
