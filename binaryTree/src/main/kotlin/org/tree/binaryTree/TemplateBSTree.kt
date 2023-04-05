@@ -35,8 +35,10 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
 
     protected abstract fun insert(curNode: NODE_T?, obj: T): NODE_T?
 
-    fun insert(obj: T) {
-        insert(root, obj)
+    fun insert(obj: T): Boolean {
+        val rootInsert = root == null
+        // insert returns null if the same element is found or when the root is inserted
+        return ((insert(root, obj) != null) or rootInsert)
     }
 
     //Find
@@ -95,8 +97,8 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
         }
     }
 
-    fun remove(obj: T) {
-        remove(root, null, obj)
+    fun remove(obj: T): Boolean {
+        return remove(root, null, obj) != null
     }
 
     //Additional
