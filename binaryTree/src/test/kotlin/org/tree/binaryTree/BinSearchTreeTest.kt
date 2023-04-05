@@ -97,4 +97,46 @@ class BinSearchTreeTest {
             assertEquals(false, ok)
         }
     }
+
+    @DisplayName("Find tests")
+    @Nested
+    inner class FindTests {
+        @BeforeEach
+        fun init() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60
+                )
+            )
+        }
+
+        @Test
+        fun rootFindTest() {
+            val act = testTree.find(40)
+
+            assertEquals(testTree.root, act)
+        }
+
+        @Test
+        fun leftFindTest() {
+            val act = testTree.find(20)
+
+            assertEquals(testTree.root?.left, act)
+        }
+
+        @Test
+        fun rightFindTest() {
+            val act = testTree.find(60)
+
+            assertEquals(testTree.root?.right, act)
+        }
+
+        @Test
+        fun emptyFindTest() {
+            val act = testTree.find(50)
+
+            assertEquals(null, act)
+        }
+    }
 }
