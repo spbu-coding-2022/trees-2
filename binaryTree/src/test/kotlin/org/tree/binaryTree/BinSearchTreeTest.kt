@@ -139,4 +139,68 @@ class BinSearchTreeTest {
             assertEquals(null, act)
         }
     }
+
+    @DisplayName("Remove tests")
+    @Nested
+    inner class RemoveTests {
+
+
+        @Test
+        fun rootRemoveTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                )
+            )
+            val ok = testTree.remove(40)
+
+            assertEquals(true, ok)
+            assertEquals(null, testTree.root)
+        }
+
+        @Test
+        fun leftRemoveTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                )
+            )
+            val ok = testTree.remove(20)
+
+            assertEquals(true, ok)
+            assertNotEquals(null, testTree.root)
+            assertEquals(null, testTree.root?.left)
+        }
+
+        @Test
+        fun rightRemoveTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                )
+            )
+            val ok = testTree.remove(60)
+
+            assertEquals(true, ok)
+            assertNotEquals(null, testTree.root)
+            assertEquals(null, testTree.root?.right)
+        }
+
+        @Test
+        fun emptyRemoveTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                )
+            )
+            val ok = testTree.remove(33)
+
+            assertEquals(false, ok)
+            assertNotEquals(null, testTree.root?.left)
+            assertNotEquals(null, testTree.root?.right)
+        }
+    }
 }
