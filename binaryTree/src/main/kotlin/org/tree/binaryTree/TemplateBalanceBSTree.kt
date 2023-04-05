@@ -6,6 +6,11 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
 
     //Balance
     protected class BalanceCase {
+        // LEFT - left child was changed
+        // RIGHT - right child was changed
+        // ROOT - root was changed
+        enum class ChangedChild { LEFT, RIGHT, ROOT }
+
         // RECURSIVE_CALL - the function was called recursively for traverse
         // END - the last, significant call
         enum class Recursive { RECURSIVE_CALL, END }
