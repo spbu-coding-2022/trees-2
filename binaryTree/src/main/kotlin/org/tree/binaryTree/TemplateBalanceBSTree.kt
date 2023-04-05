@@ -42,6 +42,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
     // if curNode == null -> changed node = root
     protected abstract fun balance(
         curNode: NODE_T?,
+        changedChild: BalanceCase.ChangedChild,
         operationType: BalanceCase.OpType,
         recursive: BalanceCase.Recursive
     )
@@ -50,11 +51,26 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         val parNode = super.insertNode(curNode, newNode)
         if (curNode != null) { // STTK: maybe if cur_node = root, and root = null
             if (curNode === parNode) {
-                balance(curNode, BalanceCase.OpType.INSERT, BalanceCase.Recursive.END)
+                balance(
+                    curNode,
+                    getDirectionChangedChild(curNode, newNode.elem),
+                    BalanceCase.OpType.INSERT,
+                    BalanceCase.Recursive.END
+                )
             } else {
-                balance(curNode, BalanceCase.OpType.INSERT, BalanceCase.Recursive.RECURSIVE_CALL)
+                balance(
+                    curNode,
+                    getDirectionChangedChild(curNode, newNode.elem),
+                    BalanceCase.OpType.INSERT,
+                    BalanceCase.Recursive.RECURSIVE_CALL
+                )
                 if (curNode === root) {
-                    balance(null, BalanceCase.OpType.INSERT, BalanceCase.Recursive.RECURSIVE_CALL)
+                    balance(
+                        null,
+                        BalanceCase.ChangedChild.ROOT,
+                        BalanceCase.OpType.INSERT,
+                        BalanceCase.Recursive.RECURSIVE_CALL
+                    )
                 }
             }
         }
@@ -83,7 +99,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         }
 
         if (res != null) {
-            balance(targetNode, getBalanceRemoveType(res), isRec)
+            balance(targetNode, getDirectionChangedChild(targetNode, obj), getBalanceRemoveType(res), isRec)
         }
         return res
     }
