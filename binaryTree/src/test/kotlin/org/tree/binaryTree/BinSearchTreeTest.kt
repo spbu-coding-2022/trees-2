@@ -274,6 +274,30 @@ class BinSearchTreeTest {
             assertEquals(70, testTree.root?.right?.right?.elem)
             assertEquals(null, testTree.root?.right?.right?.left)
         }
+    }
 
+    @DisplayName("Traversal tests")
+    @Nested
+    inner class TraversalTests {
+        @Test
+        fun preorderTraversalTest() {
+            testTree.root = generateBinSearchTree(
+                listOf(
+                    40,
+                    20, 60,
+                    15, null, null, 67,
+                )
+            )
+            val act = testTree.traversal(TemplateNode.Traversal.PREORDER)
+            val exp = listOf(40, 20, 15, 60, 67)
+            assertEquals(exp, act)
+        }
+
+        @Test
+        fun nullTraversalTest() {
+            testTree.root = null
+            val act = testTree.traversal(TemplateNode.Traversal.PREORDER)
+            assertEquals(null, act)
+        }
     }
 }
