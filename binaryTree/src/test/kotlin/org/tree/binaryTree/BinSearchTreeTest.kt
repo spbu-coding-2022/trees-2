@@ -4,16 +4,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import java.util.*
 
-fun <T : Comparable<T>> generateBinSearchTree(objects: List<T?>): Node<T>? {
-    val new = objects.map {
-        if (it != null) {
-            Node(it)
-        } else {
-            null
-        }
-    }
-    return generateTree(new)
-}
 
 class BinSearchTreeTest {
     val testTree = BinSearchTree<Int>()
@@ -31,7 +21,7 @@ class BinSearchTreeTest {
 
         @Test
         fun leftInsertTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                 )
@@ -44,7 +34,7 @@ class BinSearchTreeTest {
 
         @Test
         fun rightInsertTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                 )
@@ -57,7 +47,7 @@ class BinSearchTreeTest {
 
         @Test
         fun leftRecInsertTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -71,7 +61,7 @@ class BinSearchTreeTest {
 
         @Test
         fun rightRecInsertTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -85,7 +75,7 @@ class BinSearchTreeTest {
 
         @Test
         fun sameInsertTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     null, 60,
@@ -103,7 +93,7 @@ class BinSearchTreeTest {
     inner class FindTests {
         @BeforeEach
         fun init() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60
@@ -147,7 +137,7 @@ class BinSearchTreeTest {
 
         @Test
         fun rootRemoveTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                 )
@@ -160,7 +150,7 @@ class BinSearchTreeTest {
 
         @Test
         fun leftRemoveTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -175,7 +165,7 @@ class BinSearchTreeTest {
 
         @Test
         fun rightRemoveTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -190,7 +180,7 @@ class BinSearchTreeTest {
 
         @Test
         fun emptyRemoveTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -209,7 +199,7 @@ class BinSearchTreeTest {
     inner class DeleteNodeTests {
         @Test
         fun zeroChildrenDeleteTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -225,7 +215,7 @@ class BinSearchTreeTest {
 
         @Test
         fun oneChildrenDeleteTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -241,7 +231,7 @@ class BinSearchTreeTest {
 
         @Test
         fun twoChildrenDeleteTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -258,7 +248,7 @@ class BinSearchTreeTest {
 
         @Test
         fun twoChildrenBigDeleteTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,
@@ -281,7 +271,7 @@ class BinSearchTreeTest {
     inner class TraversalTests {
         @Test
         fun preorderTraversalTest() {
-            testTree.root = generateBinSearchTree(
+            testTree.root = generateNodeTree(
                 listOf(
                     40,
                     20, 60,

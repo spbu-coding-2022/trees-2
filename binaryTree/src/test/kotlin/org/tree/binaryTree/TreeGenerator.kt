@@ -26,3 +26,13 @@ fun <T, NODE_T : TemplateNode<T, NODE_T>> generateTree(nodes: List<NODE_T?>): NO
     return root
 }
 
+fun <T : Comparable<T>> generateNodeTree(objects: List<T?>): Node<T>? {
+    val new = objects.map {
+        if (it != null) {
+            Node(it)
+        } else {
+            null
+        }
+    }
+    return generateTree(new)
+}
