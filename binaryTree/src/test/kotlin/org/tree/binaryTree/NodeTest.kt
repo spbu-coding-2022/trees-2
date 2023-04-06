@@ -41,4 +41,58 @@ class NodeTest {
         }
 
     }
+
+    @DisplayName("Get non null child tests")
+    @Nested
+    inner class GetNonNullChildTests {
+
+        @Test
+        fun leftChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    20, null
+                )
+            )
+            val act = root?.getNonNullChild()
+            Assertions.assertEquals(root?.left, act)
+        }
+
+        @Test
+        fun rightChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    null, 60
+                )
+            )
+            val act = root?.getNonNullChild()
+            Assertions.assertEquals(root?.right, act)
+        }
+
+        @Test
+        fun noChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    null, null
+                )
+            )
+            val act = root?.getNonNullChild()
+            Assertions.assertEquals(null, act)
+        }
+
+        @Test
+        fun twoChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    20, 60
+                )
+            )
+            val act = root?.getNonNullChild()
+            Assertions.assertNotEquals(null, act)
+        }
+
+    }
 }
