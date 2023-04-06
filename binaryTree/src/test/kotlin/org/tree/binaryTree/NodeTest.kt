@@ -95,4 +95,58 @@ class NodeTest {
         }
 
     }
+
+    @DisplayName("Count null children tests")
+    @Nested
+    inner class CountNullChildrenTests {
+
+        @Test
+        fun leftChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    20, null
+                )
+            )
+            val act = root?.countNullChildren()
+            Assertions.assertEquals(1, act)
+        }
+
+        @Test
+        fun rightChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    null, 60
+                )
+            )
+            val act = root?.countNullChildren()
+            Assertions.assertEquals(1, act)
+        }
+
+        @Test
+        fun noChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    null, null
+                )
+            )
+            val act = root?.countNullChildren()
+            Assertions.assertEquals(2, act)
+        }
+
+        @Test
+        fun twoChildrenTest() {
+            root = generateNodeTree(
+                listOf(
+                    40,
+                    20, 60
+                )
+            )
+            val act = root?.countNullChildren()
+            Assertions.assertEquals(0, act)
+        }
+
+    }
 }
