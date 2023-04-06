@@ -31,7 +31,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
     protected fun getDirectionChangedChild(curNode: NODE_T?, obj: T): BalanceCase.ChangedChild {
         return if (curNode == null) {
             BalanceCase.ChangedChild.ROOT
-        } else if (curNode.elem < obj) {
+        } else if (obj < curNode.elem) {
             BalanceCase.ChangedChild.LEFT
         } else {
             BalanceCase.ChangedChild.RIGHT
