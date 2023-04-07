@@ -143,6 +143,32 @@ class BinSearchTreeTest {
                 )
             }
         }
+
+        @Test
+        fun bigRemoveTest() {
+            val tree = BinSearchTree<Int>()
+            val values = mutableSetOf<Int>()
+            val randomizer = Random(0xdeadbeef)
+
+            for (i in 0..100) {
+                val newVal = randomizer.nextInt()
+                values.add(newVal)
+                tree.insert(newVal)
+            }
+
+            for (i in 0..150) {
+                val curVal = if ((i % 2 == 0) and (values.isNotEmpty())) {
+                    values.first()
+                } else {
+                    randomizer.nextInt()
+                }
+                val exp = values.remove(curVal)
+                val act = tree.remove(curVal)
+
+                assertThat(act, equalTo(exp))
+                checkBinSearchTree(tree, values.toTypedArray())
+            }
+        }
     }
 
     @DisplayName("find() tests")
