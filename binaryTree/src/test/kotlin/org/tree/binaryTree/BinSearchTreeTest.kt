@@ -74,4 +74,56 @@ class BinSearchTreeTest {
             }
         }
     }
+
+    @DisplayName("remove() tests")
+    class RemoveTests {
+        @ParameterizedTest(name = "[{index}]: tree = {0}, remove = {1}")
+        @MethodSource("testRemoveArgs")
+        fun testRemove(values: List<Int?>, remVal: Int) {
+            val tree = BinSearchTree<Int>()
+            tree.root = generateNodeTree(values)
+            val valuesSet = values.filterNotNull().toMutableSet()
+            val exp = valuesSet.remove(remVal)
+            val act = tree.remove(remVal)
+
+            assertThat(act, equalTo(exp))
+            checkBinSearchTree(tree, valuesSet.toTypedArray())
+        }
+
+        companion object {
+            @JvmStatic
+            fun testRemoveArgs(): Stream<Arguments> {
+                return Stream.of(
+                    //[1] root remove
+                    Arguments.of(
+                        listOf(
+                            40,
+                        ), 40
+                    ),
+                    //[2] left remove
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60,
+                        ), 20
+                    ),
+                    //[3] right remove
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60,
+                        ), 40
+                    ),
+                    //[4] empty remove
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60,
+                            null, null, null, null,
+                        ), 42
+                    ),
+                )
+            }
+        }
+    }
 }
