@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
+import kotlin.random.Random
 
 class BinSearchTreeTest {
     @DisplayName("insert() tests")
@@ -71,6 +72,23 @@ class BinSearchTreeTest {
                         45
                     ),
                 )
+            }
+        }
+
+        @Test
+        fun bigInsertTest() {
+            val tree = BinSearchTree<Int>()
+            val values = mutableSetOf<Int>()
+            val randomizer = Random(0xdeadbeef)
+
+            for (i in 0..100) {
+                val newVal = randomizer.nextInt()
+                val exp = values.add(newVal)
+                val act = tree.insert(newVal)
+                //println("Insert $newVal")
+
+                assertThat(act, equalTo(exp))
+                checkBinSearchTree(tree, values.toTypedArray())
             }
         }
     }
