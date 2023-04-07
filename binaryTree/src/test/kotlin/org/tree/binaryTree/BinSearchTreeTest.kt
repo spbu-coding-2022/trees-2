@@ -126,4 +126,58 @@ class BinSearchTreeTest {
             }
         }
     }
+
+    @DisplayName("find() tests")
+    class FindTests {
+        @ParameterizedTest(name = "[{index}]: tree = {0}, find = {1}")
+        @MethodSource("testFindArgs")
+        fun testFind(values: List<Int?>, fndVal: Int) {
+            val tree = BinSearchTree<Int>()
+            tree.root = generateNodeTree(values)
+            val valuesSet = values.filterNotNull().toMutableSet()
+            val exp = valuesSet.contains(fndVal)
+            val act = tree.find(fndVal)
+
+            assertThat(act != null, equalTo(exp))
+            if (act != null) {
+                assertThat(act.elem, equalTo(fndVal))
+            }
+        }
+
+        companion object {
+            @JvmStatic
+            fun testFindArgs(): Stream<Arguments> {
+                return Stream.of(
+                    //[1] root find
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60
+                        ), 40
+                    ),
+                    //[2] left find
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60
+                        ), 20
+                    ),
+                    //[3] right find
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60,
+                        ), 60
+                    ),
+                    //[4] impossible find
+                    Arguments.of(
+                        listOf(
+                            40,
+                            20, 60
+                        ), 42
+                    ),
+                )
+            }
+        }
+    }
 }
