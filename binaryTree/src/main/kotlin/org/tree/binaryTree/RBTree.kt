@@ -384,6 +384,11 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
 
     override fun replaceNode(replacedNode: RBNode<T>, parentNode: RBNode<T>?, newNode: RBNode<T>?) {
         newNode?.parent = parentNode
+        if (parentNode == null) {
+            if (newNode != null) {
+                newNode.col = RBNode.Colour.BLACK
+            }
+        }
         super.replaceNode(replacedNode, parentNode, newNode)
     }
 
