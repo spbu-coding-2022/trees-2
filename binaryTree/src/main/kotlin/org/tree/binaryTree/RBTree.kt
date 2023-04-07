@@ -44,9 +44,18 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                         balanceInsert(curNode)
                     }
 
-                    BalanceCase.OpType.REMOVE_0 -> TODO()
-                    BalanceCase.OpType.REMOVE_1 -> TODO()
-                    BalanceCase.OpType.REMOVE_2 -> TODO()
+                    BalanceCase.OpType.REMOVE_0 -> {
+                        // does nothing
+                    }
+
+                    BalanceCase.OpType.REMOVE_1 -> {
+                        balanceRemove1(curNode, changedChild)
+
+                    }
+
+                    BalanceCase.OpType.REMOVE_2 -> {
+                        balanceRemove2(curNode, changedChild)
+                    }
                 }
             }
         }
@@ -80,6 +89,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
             }
         }
     }
+
 
     private fun balanceInsertCaseOfRedUncle(parentNode: RBNode<T>, grandParent: RBNode<T>, uncle: RBNode<T>) {
         val grandGrandParent = grandParent.parent
@@ -132,6 +142,253 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 }
             }
         }
+    }
+
+    private fun balanceRemove1(parentNode: RBNode<T>?, removedChild: BalanceCase.ChangedChild) {
+        if (removedChild == BalanceCase.ChangedChild.RIGHT) {
+            val rightChild = parentNode?.right
+            if (rightChild != null) {
+                rightChild.col = RBNode.Colour.BLACK
+            }
+        } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
+            val leftChild = parentNode?.left
+            if (leftChild != null) {
+                leftChild.col = RBNode.Colour.BLACK
+            }
+        } else {
+            val rbRoot = root
+            if (rbRoot != null) {
+                rbRoot.col = RBNode.Colour.BLACK
+            }
+        }
+    }
+
+    private fun balanceRemove2(parentNode: RBNode<T>, removedChild: BalanceCase.ChangedChild) {
+        if (getColourOfRemovedNode(parentNode) == RBNode.Colour.BLACK) { // red => no need to balance
+            if (parentNode.col == RBNode.Colour.RED) { // then other child is black
+                if (removedChild == BalanceCase.ChangedChild.RIGHT) {
+                    balanceRemove2InRightChildWithRedParent(parentNode)
+                } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
+                    balanceRemove2InLeftChildWithRedParent(parentNode)
+                }
+            } else {
+                if (removedChild == BalanceCase.ChangedChild.RIGHT) {
+                    balanceRemove2InRightChildWithBlackParent(parentNode)
+                } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
+                    balanceRemove2InLeftChildWithBlackParent(parentNode)
+                }
+            }
+        }
+    }
+
+    private fun balanceRemove2InRightChildWithRedParent(parentNode: RBNode<T>): Int {
+        val otherChild = parentNode.left
+        if (otherChild != null) {
+            val leftChildOfOtherChild = otherChild.left
+            if (leftChildOfOtherChild != null) {
+                if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
+                    otherChild.col = RBNode.Colour.RED
+                    parentNode.col = RBNode.Colour.BLACK
+                    leftChildOfOtherChild.col = RBNode.Colour.BLACK
+                    rotateRight(parentNode, parentNode.parent)
+                    return 0
+                }
+            }
+            val rightChildOfOtherChild = otherChild.right
+            if (rightChildOfOtherChild != null) {
+                if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
+                    parentNode.col = RBNode.Colour.BLACK
+                    rotateLeft(otherChild, parentNode)
+                    rotateRight(rightChildOfOtherChild, parentNode)
+                }
+            }
+        }
+        return 0
+    }
+
+    private fun balanceRemove2InLeftChildWithRedParent(parentNode: RBNode<T>): Int {
+        val otherChild = parentNode.right
+        if (otherChild != null) {
+            val leftChildOfOtherChild = otherChild.left
+            if (leftChildOfOtherChild != null) {
+                if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
+                    parentNode.col = RBNode.Colour.BLACK
+                    rotateRight(otherChild, parentNode)
+                    rotateLeft(leftChildOfOtherChild, parentNode)
+                    return 0
+                }
+            }
+            val rightChildOfOtherChild = otherChild.right
+            if (rightChildOfOtherChild != null) {
+                if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
+                    otherChild.col = RBNode.Colour.RED
+                    parentNode.col = RBNode.Colour.BLACK
+                    rightChildOfOtherChild.col = RBNode.Colour.BLACK
+                    rotateLeft(parentNode, parentNode.parent)
+                }
+            }
+        }
+        return 0
+    }
+
+    private fun balanceRemove2InRightChildWithBlackParent(parentNode: RBNode<T>) {
+        val otherChild = parentNode.left
+        if (otherChild != null) {
+            if (otherChild.col == RBNode.Colour.RED) {
+                balanceRemove2InRightChildWithBlackParentRedOtherChild(parentNode, otherChild)
+            } else {
+                balanceRemove2InRightChildWithBlackParentBlackOtherChild(parentNode, otherChild)
+            }
+        }
+    }
+
+    private fun balanceRemove2InLeftChildWithBlackParent(parentNode: RBNode<T>) {
+        val otherChild = parentNode.right
+        if (otherChild != null) {
+            if (otherChild.col == RBNode.Colour.RED) {
+                balanceRemove2InLeftChildWithBlackParentRedOtherChild(parentNode, otherChild)
+            } else {
+                balanceRemove2InLeftChildWithBlackParentBlackOtherChild(parentNode, otherChild)
+            }
+        }
+    }
+
+    private fun balanceRemove2InRightChildWithBlackParentRedOtherChild(
+        parentNode: RBNode<T>,
+        otherChild: RBNode<T>
+    ): Int {
+        val rightChildOfOtherChild = otherChild.right
+        if (rightChildOfOtherChild != null) {
+            val leftChildOfRightChildOfOtherChild =
+                rightChildOfOtherChild.left // https://skr.sh/sJD6DQ2ML5B
+            if (leftChildOfRightChildOfOtherChild != null) {
+                if (leftChildOfRightChildOfOtherChild.col == RBNode.Colour.RED) {
+                    leftChildOfRightChildOfOtherChild.col = RBNode.Colour.BLACK
+                    rotateLeft(otherChild, parentNode)
+                    rotateRight(parentNode, parentNode.parent)
+                    return 0
+                }
+            }
+            val rightChildOfRightChildOfOtherChild = rightChildOfOtherChild.right
+            if (rightChildOfRightChildOfOtherChild == null) {
+                otherChild.col = RBNode.Colour.BLACK
+                rightChildOfOtherChild.col = RBNode.Colour.RED
+                rotateRight(parentNode, parentNode.parent)
+            }
+        }
+        return 0
+    }
+
+    private fun balanceRemove2InLeftChildWithBlackParentRedOtherChild(
+        parentNode: RBNode<T>,
+        otherChild: RBNode<T>
+    ): Int {
+        val leftChildOfOtherChild = otherChild.left
+        if (leftChildOfOtherChild != null) {
+            val rightChildOfLeftChildOfOtherChild =
+                leftChildOfOtherChild.right // https://skr.sh/sJD6DQ2ML5B (inverted)
+            if (rightChildOfLeftChildOfOtherChild != null) {
+                if (rightChildOfLeftChildOfOtherChild.col == RBNode.Colour.RED) {
+                    rightChildOfLeftChildOfOtherChild.col = RBNode.Colour.BLACK
+                    rotateRight(otherChild, parentNode)
+                    rotateLeft(parentNode, parentNode.parent)
+                    return 0
+                }
+            }
+            val leftChildOfLeftChildOfOtherChild = leftChildOfOtherChild.left
+            if (leftChildOfLeftChildOfOtherChild == null) {
+                otherChild.col = RBNode.Colour.BLACK
+                leftChildOfOtherChild.col = RBNode.Colour.RED
+                rotateLeft(parentNode, parentNode.parent)
+            }
+        }
+        return 0
+    }
+
+    private fun balanceRemove2InRightChildWithBlackParentBlackOtherChild(
+        parentNode: RBNode<T>,
+        otherChild: RBNode<T>
+    ): Int {
+        val rightChildOfOtherChild = otherChild.right
+        if (rightChildOfOtherChild != null) {
+            if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
+                rightChildOfOtherChild.col = RBNode.Colour.BLACK
+                rotateLeft(otherChild, parentNode)
+                rotateRight(parentNode, parentNode.parent)
+                return 0
+            }
+        }
+        val leftChildOfOtherChild = otherChild.left
+        if (leftChildOfOtherChild != null) {
+            if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
+                leftChildOfOtherChild.col = RBNode.Colour.BLACK
+                rotateRight(parentNode, parentNode.parent)
+                return 0
+            }
+        }
+        otherChild.col = RBNode.Colour.RED
+        val grandParent = parentNode.parent
+        if (grandParent != null) {
+            if (parentNode.elem < grandParent.elem) {
+                balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
+            } else {
+                balanceRemove2(grandParent, BalanceCase.ChangedChild.LEFT)
+            }
+        }
+        return 0
+    }
+
+
+    private fun balanceRemove2InLeftChildWithBlackParentBlackOtherChild(
+        parentNode: RBNode<T>,
+        otherChild: RBNode<T>
+    ): Int {
+        val leftChildOfOtherChild = otherChild.left
+        if (leftChildOfOtherChild != null) {
+            if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
+                leftChildOfOtherChild.col = RBNode.Colour.BLACK
+                rotateRight(otherChild, parentNode)
+                rotateLeft(parentNode, parentNode.parent)
+                return 0
+            }
+        }
+        val rightChildOfOtherChild = otherChild.right
+        if (rightChildOfOtherChild != null) {
+            if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
+                rightChildOfOtherChild.col = RBNode.Colour.BLACK
+                rotateLeft(parentNode, parentNode.parent)
+                return 0
+            }
+        }
+        otherChild.col = RBNode.Colour.RED
+        val grandParent = parentNode.parent
+        if (grandParent != null) {
+            if (parentNode.elem < grandParent.elem) {
+                balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
+            } else {
+                balanceRemove2(grandParent, BalanceCase.ChangedChild.LEFT)
+            }
+        }
+        return 0
+    }
+
+    private fun getColourOfRemovedNode(parentNode: RBNode<T>): RBNode.Colour {
+        return if (getBlackHeight(parentNode.left) != getBlackHeight(parentNode.right)) {
+            RBNode.Colour.BLACK
+        } else {
+            RBNode.Colour.RED
+        }
+    }
+
+    private fun getBlackHeight(curNode: RBNode<T>?, blackHeight: Int = 0): Int {
+        var blackHeightVar = blackHeight
+        if (curNode != null) {
+            if (curNode.col == RBNode.Colour.BLACK) {
+                blackHeightVar += 1
+                return getBlackHeight(curNode.left, blackHeightVar)
+            }
+        }
+        return blackHeightVar
     }
 
     override fun replaceNode(replacedNode: RBNode<T>, parentNode: RBNode<T>?, newNode: RBNode<T>?) {
