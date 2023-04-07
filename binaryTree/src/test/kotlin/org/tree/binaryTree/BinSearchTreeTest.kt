@@ -252,4 +252,49 @@ class BinSearchTreeTest {
             }
         }
     }
+
+    @DisplayName("traversal() tests")
+    class TraversalTests {
+        private var tree = BinSearchTree<Int>()
+
+        @BeforeEach
+        fun init() {
+            tree.root = generateNodeTree(
+                listOf(
+                    40,
+                    20, 60,
+                    15, null, null, 67,
+                )
+            )
+        }
+
+        @Test
+        fun preorderTraversalTest() {
+            val act = tree.traversal(TemplateNode.Traversal.PREORDER)
+            val exp = listOf(40, 20, 15, 60, 67)
+            assertThat(act, equalTo(exp))
+        }
+
+        @Test
+        fun inorderTraversalTest() {
+            val act = tree.traversal(TemplateNode.Traversal.INORDER)
+            val exp = listOf(15, 20, 40, 60, 67)
+            assertThat(act, equalTo(exp))
+        }
+
+        @Test
+        fun postorderTraversalTest() {
+            val act = tree.traversal(TemplateNode.Traversal.POSTORDER)
+            val exp = listOf(15, 20, 67, 60, 40)
+            assertThat(act, equalTo(exp))
+        }
+
+        @Test
+        fun emptyTraversalTest() {
+            tree.root = null
+            val act = tree.traversal(TemplateNode.Traversal.PREORDER)
+            val exp = listOf<Int>()
+            assertThat(act, equalTo(exp))
+        }
+    }
 }
