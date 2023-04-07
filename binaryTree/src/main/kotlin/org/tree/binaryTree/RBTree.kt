@@ -155,11 +155,6 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
             if (leftChild != null) {
                 leftChild.col = RBNode.Colour.BLACK
             }
-        } else {
-            val rbRoot = root
-            if (rbRoot != null) {
-                rbRoot.col = RBNode.Colour.BLACK
-            }
         }
     }
 
