@@ -223,5 +223,33 @@ class BinSearchTreeTest {
                 )
             }
         }
+
+        @Test
+        fun bigFindTest() {
+            val tree = BinSearchTree<Int>()
+            val values = mutableSetOf<Int>()
+            val randomizer = Random(0xdeadbeef)
+
+            for (i in 0..100) {
+                val newVal = randomizer.nextInt()
+                values.add(newVal)
+                tree.insert(newVal)
+            }
+
+            for (i in 0..150) {
+                val curVal = if ((i % 2 == 0) and (values.isNotEmpty())) {
+                    values.random(randomizer)
+                } else {
+                    randomizer.nextInt()
+                }
+                val exp = values.contains(curVal)
+                val act = tree.find(curVal)
+
+                assertThat(act != null, equalTo(exp))
+                if (act != null) {
+                    assertThat(act.elem, equalTo(curVal))
+                }
+            }
+        }
     }
 }
