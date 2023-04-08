@@ -100,28 +100,28 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         position: BalancePosition
     ) { // can be null uncle
         if (position == BalancePosition.LEFT_UNCLE) {
-            val leftSon = parentNode.left
-            if (leftSon?.col == RBNode.Colour.RED) {
+            val leftChild = parentNode.left
+            if (leftChild?.col == RBNode.Colour.RED) {
                 rotateRight(parentNode, grandParent)
                 parentNode.parent?.let { balanceInsert(it) }
             } else {
-                val rightSon = parentNode.right
-                if (rightSon != null) {
+                val rightChild = parentNode.right
+                if (rightChild != null) {
                     parentNode.col = RBNode.Colour.BLACK
                     grandParent.col = RBNode.Colour.RED
                     rotateLeft(grandParent, grandParent.parent)
                 }
             }
         } else {
-            val leftSon = parentNode.left
-            if (leftSon?.col == RBNode.Colour.RED) {
+            val leftChild = parentNode.left
+            if (leftChild?.col == RBNode.Colour.RED) {
                 parentNode.col = RBNode.Colour.BLACK
                 grandParent.col = RBNode.Colour.RED
                 rotateRight(grandParent, grandParent.parent)
             } else {
-                val rightSon = parentNode.right
-                if (rightSon != null) {
-                    if (rightSon.col == RBNode.Colour.RED) {
+                val rightChild = parentNode.right
+                if (rightChild != null) {
+                    if (rightChild.col == RBNode.Colour.RED) {
                         rotateLeft(parentNode, grandParent)
                         parentNode.parent?.let { balanceInsert(it) }
                     }
