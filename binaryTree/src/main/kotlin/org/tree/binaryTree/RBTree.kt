@@ -180,6 +180,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         val otherChild = parentNode.left
         if (otherChild != null) {
             val leftChildOfOtherChild = otherChild.left
+            val rightChildOfOtherChild = otherChild.right
             if (leftChildOfOtherChild != null) {
                 if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
                     otherChild.col = RBNode.Colour.RED
@@ -188,14 +189,15 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                     rotateRight(parentNode, parentNode.parent)
                     return 0
                 }
-            }
-            val rightChildOfOtherChild = otherChild.right
-            if (rightChildOfOtherChild != null) {
+            } else if (rightChildOfOtherChild != null) {
                 if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
                     parentNode.col = RBNode.Colour.BLACK
                     rotateLeft(otherChild, parentNode)
                     rotateRight(parentNode, parentNode.parent)
                 }
+            } else {
+                otherChild.col = RBNode.Colour.RED
+                parentNode.col = RBNode.Colour.BLACK
             }
         }
         return 0
@@ -205,6 +207,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         val otherChild = parentNode.right
         if (otherChild != null) {
             val leftChildOfOtherChild = otherChild.left
+            val rightChildOfOtherChild = otherChild.right
             if (leftChildOfOtherChild != null) {
                 if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
                     parentNode.col = RBNode.Colour.BLACK
@@ -212,15 +215,16 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                     rotateLeft(parentNode, parentNode.parent)
                     return 0
                 }
-            }
-            val rightChildOfOtherChild = otherChild.right
-            if (rightChildOfOtherChild != null) {
+            } else if (rightChildOfOtherChild != null) {
                 if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
                     otherChild.col = RBNode.Colour.RED
                     parentNode.col = RBNode.Colour.BLACK
                     rightChildOfOtherChild.col = RBNode.Colour.BLACK
                     rotateLeft(parentNode, parentNode.parent)
                 }
+            } else {
+                otherChild.col = RBNode.Colour.RED
+                parentNode.col = RBNode.Colour.BLACK
             }
         }
         return 0
