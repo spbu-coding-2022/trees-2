@@ -329,9 +329,9 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         val grandParent = parentNode.parent
         if (grandParent != null) {
             if (parentNode.elem < grandParent.elem) {
-                balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
-            } else {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.LEFT)
+            } else {
+                balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
             }
         }
         return 0
@@ -363,9 +363,9 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         val grandParent = parentNode.parent
         if (grandParent != null) {
             if (parentNode.elem < grandParent.elem) {
-                balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
-            } else {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.LEFT)
+            } else {
+                balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
             }
         }
         return 0
