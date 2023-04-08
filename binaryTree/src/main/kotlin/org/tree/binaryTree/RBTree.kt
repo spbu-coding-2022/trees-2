@@ -194,7 +194,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
                     parentNode.col = RBNode.Colour.BLACK
                     rotateLeft(otherChild, parentNode)
-                    rotateRight(rightChildOfOtherChild, parentNode)
+                    rotateRight(parentNode, parentNode.parent)
                 }
             }
         }
@@ -209,7 +209,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
                     parentNode.col = RBNode.Colour.BLACK
                     rotateRight(otherChild, parentNode)
-                    rotateLeft(leftChildOfOtherChild, parentNode)
+                    rotateLeft(parentNode, parentNode.parent)
                     return 0
                 }
             }
