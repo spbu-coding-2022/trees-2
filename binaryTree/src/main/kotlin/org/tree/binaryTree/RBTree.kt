@@ -380,8 +380,8 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         if (curNode != null) {
             if (curNode.col == RBNode.Colour.BLACK) {
                 blackHeightVar += 1
-                return getBlackHeight(curNode.left, blackHeightVar)
             }
+            return getBlackHeight(curNode.left, blackHeightVar)
         }
         return blackHeightVar
     }
