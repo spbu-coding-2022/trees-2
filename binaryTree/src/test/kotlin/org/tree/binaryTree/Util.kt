@@ -65,3 +65,49 @@ fun <T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>> checkBinSearchTree(
     assertThat(tree.traversal(TemplateNode.Traversal.INORDER), containsInAnyOrder(*contain))
     checkTreeNode(tree.root)
 }
+
+fun <T : Comparable<T>> checkRBTreeNode(curNode: RBNode<T>?, parNode: RBNode<T>?): Int {
+    var blackHeight = 0
+    if (curNode != null) {
+        // two red nodes in row
+        if (parNode?.col == RBNode.Colour.RED) {
+            assertThat(curNode.col, equalTo(RBNode.Colour.BLACK))
+        }
+
+        // right parent
+        assertThat(curNode.parent, equalTo(parNode))
+
+        var lBlackHeight = 0
+        val l = curNode.left
+        if (l != null) {
+            assertThat(curNode.elem, greaterThanOrEqualTo(l.elem))
+            lBlackHeight = checkRBTreeNode(l, curNode)
+        }
+
+        var rBlackHeight = 0
+        val r = curNode.right
+        if (r != null) {
+            assertThat(curNode.elem, lessThanOrEqualTo(r.elem))
+            rBlackHeight = checkRBTreeNode(r, curNode)
+        }
+
+        // same black height
+        assertThat(lBlackHeight, equalTo(rBlackHeight))
+        blackHeight = lBlackHeight
+
+        if (curNode.col == RBNode.Colour.BLACK) {
+            blackHeight += 1
+        }
+    }
+
+    return blackHeight
+}
+
+fun <T : Comparable<T>> checkRBTree(
+    tree: RBTree<T>,
+    contain: Array<T>
+) {
+    assertThat(tree.traversal(TemplateNode.Traversal.INORDER), containsInAnyOrder(*contain))
+    checkRBTreeNode(tree.root, null)
+}
+
