@@ -253,7 +253,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 }
             }
             val rightChildOfRightChildOfOtherChild = rightChildOfOtherChild.right
-            if (rightChildOfRightChildOfOtherChild == null) {
+            if (rightChildOfRightChildOfOtherChild?.col != RBNode.Colour.RED) {
                 otherChild.col = RBNode.Colour.BLACK
                 rightChildOfOtherChild.col = RBNode.Colour.RED
                 rotateRight(parentNode, parentNode.parent)
@@ -279,7 +279,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 }
             }
             val leftChildOfLeftChildOfOtherChild = leftChildOfOtherChild.left
-            if (leftChildOfLeftChildOfOtherChild == null) {
+            if (leftChildOfLeftChildOfOtherChild?.col != RBNode.Colour.RED) {
                 otherChild.col = RBNode.Colour.BLACK
                 leftChildOfOtherChild.col = RBNode.Colour.RED
                 rotateLeft(parentNode, parentNode.parent)
