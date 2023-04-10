@@ -10,7 +10,7 @@ import java.util.stream.Stream
 import kotlin.random.Random
 
 class RBTreeTest {
-    @DisplayName("insert() tests")
+    @DisplayName("RBTree.insert() tests")
     class InsertTests {
         @ParameterizedTest(name = "[{index}]: insertCount = {1}, seed = {0}")
         @MethodSource("testInsertArgs")
@@ -53,7 +53,7 @@ class RBTreeTest {
     }
 
 
-    @DisplayName("remove() tests")
+    @DisplayName("RBTree.remove() tests")
     class RemoveTests {
         @ParameterizedTest(name = "[{index}]: treeSize = {1}, removeCount = {2}, seed = {0}")
         @MethodSource("testRemoveArgs")
