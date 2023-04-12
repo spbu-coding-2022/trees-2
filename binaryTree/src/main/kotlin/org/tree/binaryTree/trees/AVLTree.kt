@@ -1,5 +1,7 @@
-package org.tree.binaryTree
+package org.tree.binaryTree.trees
 
+import org.tree.binaryTree.AVLNode
+import org.tree.binaryTree.TemplateBalanceBSTree
 import kotlin.math.max
 
 class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
