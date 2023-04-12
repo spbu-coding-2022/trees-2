@@ -1,7 +1,7 @@
 package org.tree.binaryTree.trees
 
 import org.tree.binaryTree.RBNode
-import org.tree.binaryTree.TemplateBalanceBSTree
+import org.tree.binaryTree.templates.TemplateBalanceBSTree
 
 class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun findParentForNewNode(curNode: RBNode<T>?, obj: T): RBNode<T>? {
