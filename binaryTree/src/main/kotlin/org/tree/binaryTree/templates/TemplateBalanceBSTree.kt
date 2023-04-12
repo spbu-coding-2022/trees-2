@@ -1,4 +1,4 @@
-package org.tree.binaryTree
+package org.tree.binaryTree.templates
 
 
 abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>> :
