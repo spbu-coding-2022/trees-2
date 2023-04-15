@@ -7,11 +7,13 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.tree.binaryTree.templates.TemplateNode
+import org.tree.binaryTree.trees.BinSearchTree
 import java.util.stream.Stream
 import kotlin.random.Random
 
 class BinSearchTreeTest {
-    @DisplayName("insert() tests")
+    @DisplayName("BinSearchTree.insert() tests")
     class InsertTests {
         @ParameterizedTest(name = "[{index}]: tree = {0}, insert = {1}")
         @MethodSource("testInsertArgs")
@@ -92,7 +94,7 @@ class BinSearchTreeTest {
         }
     }
 
-    @DisplayName("remove() tests")
+    @DisplayName("BinSearchTree.remove() tests")
     class RemoveTests {
         @ParameterizedTest(name = "[{index}]: tree = {0}, remove = {1}")
         @MethodSource("testRemoveArgs")
@@ -170,7 +172,7 @@ class BinSearchTreeTest {
         }
     }
 
-    @DisplayName("find() tests")
+    @DisplayName("BinSearchTree.find() tests")
     class FindTests {
         @ParameterizedTest(name = "[{index}]: tree = {0}, find = {1}")
         @MethodSource("testFindArgs")
@@ -252,7 +254,7 @@ class BinSearchTreeTest {
         }
     }
 
-    @DisplayName("traversal() tests")
+    @DisplayName("BinSearchTree.traversal() tests")
     class TraversalTests {
         private var tree = BinSearchTree<Int>()
 
