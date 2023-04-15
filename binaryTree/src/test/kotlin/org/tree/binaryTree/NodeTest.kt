@@ -3,6 +3,7 @@ package org.tree.binaryTree
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.*
+import org.tree.binaryTree.templates.TemplateNode
 
 class NodeTest {
     var root: Node<Int>? = null
