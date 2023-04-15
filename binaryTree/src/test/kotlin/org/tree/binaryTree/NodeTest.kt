@@ -1,5 +1,7 @@
 package org.tree.binaryTree
 
+import org.hamcrest.MatcherAssert
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.*
 
 class NodeTest {
@@ -23,21 +25,21 @@ class NodeTest {
         fun preorderTraversalTest() {
             val act = root?.traversal(TemplateNode.Traversal.PREORDER)
             val exp = listOf(40, 20, 15, 60, 67)
-            Assertions.assertEquals(exp, act)
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
         fun inorderTraversalTest() {
             val act = root?.traversal(TemplateNode.Traversal.INORDER)
             val exp = listOf(15, 20, 40, 60, 67)
-            Assertions.assertEquals(exp, act)
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
         fun postorderTraversalTest() {
             val act = root?.traversal(TemplateNode.Traversal.POSTORDER)
             val exp = listOf(15, 20, 67, 60, 40)
-            Assertions.assertEquals(exp, act)
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
     }
@@ -55,7 +57,8 @@ class NodeTest {
                 )
             )
             val act = root?.getNonNullChild()
-            Assertions.assertEquals(root?.left, act)
+            val exp = root?.left
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
@@ -67,7 +70,8 @@ class NodeTest {
                 )
             )
             val act = root?.getNonNullChild()
-            Assertions.assertEquals(root?.right, act)
+            val exp = root?.right
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
@@ -79,7 +83,8 @@ class NodeTest {
                 )
             )
             val act = root?.getNonNullChild()
-            Assertions.assertEquals(null, act)
+            val exp = null
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
@@ -91,7 +96,7 @@ class NodeTest {
                 )
             )
             val act = root?.getNonNullChild()
-            Assertions.assertNotEquals(null, act)
+            MatcherAssert.assertThat(act, Matchers.anyOf(Matchers.equalTo(root?.left), Matchers.equalTo(root?.right)))
         }
 
     }
@@ -109,7 +114,8 @@ class NodeTest {
                 )
             )
             val act = root?.countNullChildren()
-            Assertions.assertEquals(1, act)
+            val exp = 1
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
@@ -121,7 +127,8 @@ class NodeTest {
                 )
             )
             val act = root?.countNullChildren()
-            Assertions.assertEquals(1, act)
+            val exp = 1
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
@@ -133,7 +140,8 @@ class NodeTest {
                 )
             )
             val act = root?.countNullChildren()
-            Assertions.assertEquals(2, act)
+            val exp = 2
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
         @Test
@@ -145,7 +153,8 @@ class NodeTest {
                 )
             )
             val act = root?.countNullChildren()
-            Assertions.assertEquals(0, act)
+            val exp = 0
+            MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
 
     }
