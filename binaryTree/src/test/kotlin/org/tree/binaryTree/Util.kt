@@ -2,6 +2,9 @@ package org.tree.binaryTree
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
+import org.tree.binaryTree.templates.TemplateBSTree
+import org.tree.binaryTree.templates.TemplateNode
+import org.tree.binaryTree.trees.RBTree
 import java.util.*
 import kotlin.math.log2
 
