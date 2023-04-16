@@ -21,6 +21,15 @@ class Neo4jIO() : Closeable {
         session.close()
     }
 
+    fun importRBTree(): NodeView<RBNode<KVP<String, String>>> {  // when we have treeView, fun will be rewritten
+        val session = driver?.session() ?: throw IOException("Driver is not open")
+        var res: NodeView<RBNode<KVP<String, String>>> = session.executeRead { tx ->
+            importRBNode(null, tx)
+        }
+        session.close()
+        return res
+    }
+
     private fun cleanDataBase(tx: TransactionContext) {
         tx.run("MATCH (n: RBNode) DETACH DELETE n")
     }
