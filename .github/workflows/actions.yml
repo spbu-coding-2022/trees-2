@@ -20,7 +20,7 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: library-reports
+          name: library-reports (${{ matrix.os }})
           path: binaryTree/build/reports/
           if-no-files-found: ignore
 
@@ -28,6 +28,6 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: app-reports
+          name: app-reports (${{ matrix.os }})
           path: app/build/reports/
           if-no-files-found: ignore
