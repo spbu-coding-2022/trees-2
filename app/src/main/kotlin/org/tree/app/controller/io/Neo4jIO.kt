@@ -20,12 +20,14 @@ class Neo4jIO() : Closeable {
             tx.run(
                 "MATCH (p: RBNode) " +
                         "MATCH (l: RBNode {key: p.lkey}) " +
-                        "CREATE (p)-[:LEFT_CHILD]->(l) "
+                        "CREATE (p)-[:LEFT_CHILD]->(l) " +
+                        "REMOVE p.lkey"
             ) // connect parent and left child
             tx.run(
                 "MATCH (p: RBNode) " +
                         "MATCH (r: RBNode {key: p.rkey}) " +
-                        "CREATE (p)-[:RIGHT_CHILD]->(r) "
+                        "CREATE (p)-[:RIGHT_CHILD]->(r) " +
+                        "REMOVE p.rkey"
             )// connect parent and right child
         }
         session.close()
@@ -47,23 +49,17 @@ class Neo4jIO() : Closeable {
 
     private fun genExportRBNodes(root: NodeView<RBNode<KVP<String, String>>>): String {
         val sb = StringBuilder()
-        traverseExportRBNode(sb, root, true)
+        traverseExportRBNode(sb, root)
         return sb.toString()
     }
 
     private fun traverseExportRBNode(
         sb: StringBuilder,
         nodeView: NodeView<RBNode<KVP<String, String>>>,
-        isRoot: Boolean = false
     ) {
-        val rootCase = if (isRoot) {
-            ":ROOT"
-        } else {
-            ""
-        }
         with(nodeView) {
             sb.append(
-                "CREATE (:RBNode" + rootCase + "{key : \"${node.elem.key}\", " +
+                "CREATE (:RBNode {key : \"${node.elem.key}\", " +
                         "value: \"${node.elem.v ?: ""}\", " +
                         "x: $x, y: $y, " +
                         "isBlack: ${node.col == RBNode.Colour.BLACK}, " +
