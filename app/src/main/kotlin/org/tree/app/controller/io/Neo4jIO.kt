@@ -34,9 +34,9 @@ class Neo4jIO() : Closeable {
     }
 
 
-    fun importRBTree(): NodeView<RBNode<KVP<String, String>>> {  // when we have treeView, fun will be rewritten
+    fun importRBTree(): NodeView<RBNode<KVP<String, String>>>? {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
-        val res: NodeView<RBNode<KVP<String, String>>> = session.executeRead { tx ->
+        val res: NodeView<RBNode<KVP<String, String>>>? = session.executeRead { tx ->
             importRBNodes(tx)
         }
         session.close()
@@ -75,7 +75,7 @@ class Neo4jIO() : Closeable {
         }
     }
 
-    private fun importRBNodes(tx: TransactionContext): NodeView<RBNode<KVP<String, String>>> {
+    private fun importRBNodes(tx: TransactionContext): NodeView<RBNode<KVP<String, String>>>? {
         val nodeAndKeysRecords = tx.run(
             "MATCH (p: RBNode)" +
                     "OPTIONAL MATCH (p)-[:LEFT_CHILD]->(l: RBNode) " +
@@ -92,7 +92,7 @@ class Neo4jIO() : Closeable {
         val rkey: String?
     )
 
-    private fun parseRBNodes(nodeAndKeysRecords: Result): NodeView<RBNode<KVP<String, String>>> {
+    private fun parseRBNodes(nodeAndKeysRecords: Result): NodeView<RBNode<KVP<String, String>>>? {
         val key2nk = mutableMapOf<String, NodeAndKeys>()
         for (nkRecord in nodeAndKeysRecords) {
             try {
@@ -127,6 +127,10 @@ class Neo4jIO() : Closeable {
             }
         }
         val nks = key2nk.values.toTypedArray()
+        if (nks.isEmpty()) { // if nodeAndKeysRecords was empty
+            return null
+        }
+
         for (nk in nks) {
             nk.lkey?.let {
                 nk.nv.l = key2nk[it]?.nv
