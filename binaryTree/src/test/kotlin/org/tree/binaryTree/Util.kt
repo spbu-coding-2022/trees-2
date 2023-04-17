@@ -4,9 +4,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.tree.binaryTree.templates.TemplateBSTree
 import org.tree.binaryTree.templates.TemplateNode
+import org.tree.binaryTree.trees.AVLTree
 import org.tree.binaryTree.trees.RBTree
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.log2
+import kotlin.math.max
 
 
 // Generate
@@ -114,3 +117,34 @@ fun <T : Comparable<T>> checkRBTree(
     checkRBTreeNode(tree.root, null)
 }
 
+private fun <T : Comparable<T>> checkHeight(curNode: AVLNode<T>?): Int{
+    if (curNode == null) {
+        return 0
+    }
+    val leftHeight = checkHeight(curNode.left)
+    val rightHeight = checkHeight(curNode.right)
+    return 1 + max(leftHeight, rightHeight)
+}
+
+private fun <T : Comparable<T>> checkAVLTreeNode(node: AVLNode<T>?) {
+    if (node == null) {
+        return
+    }
+
+    val leftHeight = checkHeight(node.left)
+    val rightHeight = checkHeight(node.right)
+
+    assertThat(abs(leftHeight - rightHeight), lessThanOrEqualTo(1))
+
+    checkAVLTreeNode(node.left)
+    checkAVLTreeNode(node.right)
+
+}
+
+fun <T : Comparable<T>> checkAVLTree(
+    tree: AVLTree<T>,
+    contain: Array<T>
+) {
+    assertThat(tree.traversal(TemplateNode.Traversal.INORDER), containsInAnyOrder(*contain))
+    checkAVLTreeNode(tree.root)
+}
