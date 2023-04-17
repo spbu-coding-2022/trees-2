@@ -16,10 +16,21 @@ class Neo4jIO() : Closeable {
         val session = driver?.session() ?: throw IOException("Driver is not open")
         session.executeWrite { tx ->
             cleanDataBase(tx)
-            exportRBNode(root, tx, true)
+            tx.run(genExportRBNodes(root))
+            tx.run(
+                "MATCH (p: RBNode) " +
+                        "MATCH (l: RBNode {key: p.lkey}) " +
+                        "CREATE (p)-[:LEFT_CHILD]->(l) "
+            ) // connect parent and left child
+            tx.run(
+                "MATCH (p: RBNode) " +
+                        "MATCH (r: RBNode {key: p.rkey}) " +
+                        "CREATE (p)-[:RIGHT_CHILD]->(r) "
+            )// connect parent and right child
         }
         session.close()
     }
+
 
     fun importRBTree(): NodeView<RBNode<KVP<String, String>>> {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
@@ -34,9 +45,15 @@ class Neo4jIO() : Closeable {
         tx.run("MATCH (n: RBNode) DETACH DELETE n")
     }
 
-    private fun exportRBNode(
+    private fun genExportRBNodes(root: NodeView<RBNode<KVP<String, String>>>): String {
+        val sb = StringBuilder()
+        traverseExportRBNode(sb, root, true)
+        return sb.toString()
+    }
+
+    private fun traverseExportRBNode(
+        sb: StringBuilder,
         nodeView: NodeView<RBNode<KVP<String, String>>>,
-        tx: TransactionContext,
         isRoot: Boolean = false
     ) {
         val rootCase = if (isRoot) {
@@ -45,29 +62,19 @@ class Neo4jIO() : Closeable {
             ""
         }
         with(nodeView) {
-            tx.run(
-                "MERGE (n: RBNode" + rootCase + "{key : \"${node.elem.key}\", " +
+            sb.append(
+                "CREATE (:RBNode" + rootCase + "{key : \"${node.elem.key}\", " +
                         "value: \"${node.elem.v ?: ""}\", " +
                         "x: $x, y: $y, " +
-                        "isBlack: ${node.col == RBNode.Colour.BLACK}})"
+                        "isBlack: ${node.col == RBNode.Colour.BLACK}, " +
+                        "lkey: \"${l?.node?.elem?.key ?: ""}\", " +
+                        "rkey: \"${r?.node?.elem?.key ?: ""}\"}) "
             )
             l?.let {
-                exportRBNode(it, tx)
-                tx.run(
-                    "MATCH" +
-                            "  (p:RBNode {key: \"${node.elem.key}\"}), " +
-                            "  (c:RBNode {key: \"${it.node.elem.key}\"}) " +
-                            "MERGE (p)-[:LEFT_CHILD]->(c)"
-                )
+                traverseExportRBNode(sb, it)
             }
             r?.let {
-                exportRBNode(it, tx)
-                tx.run(
-                    "MATCH" +
-                            "  (p:RBNode {key: \"${node.elem.key}\"}), " +
-                            "  (c:RBNode {key: \"${it.node.elem.key}\"}) " +
-                            "MERGE (p)-[:RIGHT_CHILD]->(c)"
-                )
+                traverseExportRBNode(sb, it)
             }
         }
     }
