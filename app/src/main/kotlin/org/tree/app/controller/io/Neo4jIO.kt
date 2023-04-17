@@ -37,7 +37,7 @@ class Neo4jIO() : Closeable {
     fun importRBTree(): NodeView<RBNode<KVP<String, String>>> {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
         val res: NodeView<RBNode<KVP<String, String>>> = session.executeRead { tx ->
-            importRBNode(tx)
+            importRBNodes(tx)
         }
         session.close()
         return res
@@ -65,7 +65,7 @@ class Neo4jIO() : Closeable {
                         "isBlack: ${node.col == RBNode.Colour.BLACK}, " +
                         "lkey: \"${l?.node?.elem?.key ?: ""}\", " +
                         "rkey: \"${r?.node?.elem?.key ?: ""}\"}) "
-            )
+            ) // save node (lkey and rkey are needed for connection later)
             l?.let {
                 traverseExportRBNode(sb, it)
             }
@@ -75,17 +75,15 @@ class Neo4jIO() : Closeable {
         }
     }
 
-    private fun importRBNode(tx: TransactionContext): NodeView<RBNode<KVP<String, String>>> {
-
-        val ret = tx.run(
+    private fun importRBNodes(tx: TransactionContext): NodeView<RBNode<KVP<String, String>>> {
+        val nodeAndKeysRecords = tx.run(
             "MATCH (p: RBNode)" +
                     "OPTIONAL MATCH (p)-[:LEFT_CHILD]->(l: RBNode) " +
                     "OPTIONAL MATCH (p)-[:RIGHT_CHILD]->(r: RBNode) " +
                     "RETURN p.x AS x, p.y AS y, p.isBlack AS isBlack, p.key AS key, p.value AS value, " +
                     "   l.key AS lKey, r.key AS rKey"
-        )
-
-        return parseRBNode(ret)
+        ) // for all nodes get their properties + keys of their children
+        return parseRBNodes(nodeAndKeysRecords)
     }
 
     private class NodeAndKeys(
@@ -94,45 +92,45 @@ class Neo4jIO() : Closeable {
         val rkey: String?
     )
 
-    private fun parseRBNode(ret: Result): NodeView<RBNode<KVP<String, String>>> {
-        val st = mutableMapOf<String, NodeAndKeys>()
-        for (rec in ret) {
+    private fun parseRBNodes(nodeAndKeysRecords: Result): NodeView<RBNode<KVP<String, String>>> {
+        val key2nk = mutableMapOf<String, NodeAndKeys>()
+        for (nkRecord in nodeAndKeysRecords) {
             try {
-                val key = rec["key"].asString()
-                val value = rec["value"].asString()
+                val key = nkRecord["key"].asString()
+                val value = nkRecord["value"].asString()
                 val nv = NodeView(RBNode(null, KVP(key, value)))
 
-                nv.x = rec["x"].asDouble()
-                nv.y = rec["y"].asDouble()
+                nv.x = nkRecord["x"].asDouble()
+                nv.y = nkRecord["y"].asDouble()
 
-                val isBlack = rec["isBlack"].asBoolean()
+                val isBlack = nkRecord["isBlack"].asBoolean()
                 nv.node.col = if (isBlack) {
                     RBNode.Colour.BLACK
                 } else {
                     RBNode.Colour.RED
                 }
 
-                val lkey = if (rec["lKey"].isNull) {
+                val lkey = if (nkRecord["lKey"].isNull) {
                     null
                 } else {
-                    rec["lKey"].asString()
+                    nkRecord["lKey"].asString()
                 }
-                val rkey = if (rec["rKey"].isNull) {
+                val rkey = if (nkRecord["rKey"].isNull) {
                     null
                 } else {
-                    rec["rKey"].asString()
+                    nkRecord["rKey"].asString()
                 }
 
-                st[key] = NodeAndKeys(nv, lkey, rkey)
+                key2nk[key] = NodeAndKeys(nv, lkey, rkey)
             } catch (ex: Uncoercible) {
                 throw IOException("Invalid nodes label in the database", ex)
             }
         }
-        val a = st.values.toTypedArray()
-        for (nk in a) {
+        val nks = key2nk.values.toTypedArray()
+        for (nk in nks) {
             nk.lkey?.let {
-                nk.nv.l = st[it]?.nv
-                st.remove(it)
+                nk.nv.l = key2nk[it]?.nv
+                key2nk.remove(it)
             }
             nk.nv.l?.let {
                 nk.nv.node.left = it.node
@@ -140,19 +138,18 @@ class Neo4jIO() : Closeable {
             }
 
             nk.rkey?.let {
-                nk.nv.r = st[it]?.nv
-                st.remove(it)
+                nk.nv.r = key2nk[it]?.nv
+                key2nk.remove(it)
             }
             nk.nv.r?.let {
                 nk.nv.node.right = it.node
                 it.node.parent = nk.nv.node
             }
         }
-        if (st.values.size != 1) {
-            throw IOException("Found ${st.values.size} nodes without parents in database, expected 1")
+        if (key2nk.values.size != 1) {
+            throw IOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
         }
-        val root = st.values.first().nv
-        println(root.node.elem.key)
+        val root = key2nk.values.first().nv
         return root
     }
 
