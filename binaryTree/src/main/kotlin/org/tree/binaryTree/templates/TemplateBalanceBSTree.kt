@@ -90,11 +90,11 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
             deleteNode(curNode, parentNode)
         } else if (obj < curNode.elem) {
             isRec = BalanceCase.Recursive.RECURSIVE_CALL
-            targetNode = curNode
+            targetNode = parentNode
             remove(curNode.left, curNode, obj)
         } else {
             isRec = BalanceCase.Recursive.RECURSIVE_CALL
-            targetNode = curNode
+            targetNode = parentNode
             remove(curNode.right, curNode, obj)
         }
 
