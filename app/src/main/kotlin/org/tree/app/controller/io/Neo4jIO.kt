@@ -60,6 +60,16 @@ class Neo4jIO() : Closeable {
         session.close()
     }
 
+    fun getTreesNames(): MutableList<String> {
+        val session = driver?.session() ?: throw IOException("Driver is not open")
+        val res: MutableList<String> = session.executeRead { tx ->
+            val nameRecords = tx.run("MATCH (t: Tree) RETURN t.name AS name")
+            parseNames(nameRecords)
+        }
+        session.close()
+        return res
+    }
+
     private fun deleteTree(tx: TransactionContext, treeName: String) {
         tx.run(
             "MATCH (t: Tree {name: \"$treeName\"})" +
@@ -188,6 +198,19 @@ class Neo4jIO() : Closeable {
         }
         val root = key2nk.values.first().nv
         return root
+    }
+
+    private fun parseNames(nameRecords: Result): MutableList<String> {
+        val res = mutableListOf<String>()
+        for (nmRecord in nameRecords) {
+            try {
+                val name = nmRecord["name"].asString()
+                res.add(name)
+            } catch (ex: Uncoercible) {
+                throw IOException("Invalid tree label in the database", ex)
+            }
+        }
+        return res
     }
 
     fun open(uri: String, username: String, password: String) {
