@@ -52,6 +52,14 @@ class Neo4jIO() : Closeable {
         return res
     }
 
+    fun removeTree(treeName: String = "Tree") {
+        val session = driver?.session() ?: throw IOException("Driver is not open")
+        session.executeWrite { tx ->
+            deleteTree(tx, treeName)
+        }
+        session.close()
+    }
+
     private fun deleteTree(tx: TransactionContext, treeName: String) {
         tx.run(
             "MATCH (t: Tree {name: \"$treeName\"})" +
