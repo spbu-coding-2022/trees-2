@@ -12,23 +12,32 @@ import java.io.IOException
 class Neo4jIO() : Closeable {
     private var driver: Driver? = null
 
-    fun exportRBTree(root: NodeView<RBNode<KVP<Int, String>>>) {   // when we have treeView, fun will be rewritten
+    fun exportRBTree(
+        root: NodeView<RBNode<KVP<Int, String>>>,
+        treeName: String = "Tree"
+    ) {   // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
         session.executeWrite { tx ->
-            cleanDataBase(tx)
+            deleteTree(tx, treeName)
             tx.run(genExportRBNodes(root))
             tx.run(
                 "MATCH (p: RBNode) " +
-                        "MATCH (l: RBNode {key: p.lkey}) " +
+                        "MATCH (l: NewNode {key: p.lkey}) " +
                         "CREATE (p)-[:LEFT_CHILD]->(l) " +
-                        "REMOVE p.lkey"
+                        "REMOVE p.lkey, l:NewNode"
             ) // connect parent and left child
             tx.run(
                 "MATCH (p: RBNode) " +
-                        "MATCH (r: RBNode {key: p.rkey}) " +
+                        "MATCH (r: NewNode {key: p.rkey}) " +
                         "CREATE (p)-[:RIGHT_CHILD]->(r) " +
-                        "REMOVE p.rkey"
+                        "REMOVE p.rkey, r:NewNode"
             )// connect parent and right child
+
+            tx.run(
+                "MATCH (r: NewNode) " +
+                        "CREATE (t: Tree {name: \"$treeName\"})-[:ROOT]->(r) " +
+                        "REMOVE r:NewNode"
+            )
         }
         session.close()
     }
@@ -43,8 +52,12 @@ class Neo4jIO() : Closeable {
         return res
     }
 
-    private fun cleanDataBase(tx: TransactionContext) {
-        tx.run("MATCH (n: RBNode) DETACH DELETE n")
+    private fun deleteTree(tx: TransactionContext, treeName: String) {
+        tx.run(
+            "MATCH (t: Tree {name: \"$treeName\"})" +
+                    "MATCH (t)-[*]->(n:RBNode) " +
+                    "DETACH DELETE t, n"
+        )
     }
 
     private fun genExportRBNodes(root: NodeView<RBNode<KVP<Int, String>>>): String {
@@ -71,7 +84,7 @@ class Neo4jIO() : Closeable {
                 ""
             }
             sb.append(
-                "CREATE (:RBNode {key : ${node.elem.key}, " +
+                "CREATE (:RBNode:NewNode {key : ${node.elem.key}, " +
                         "value: \"${node.elem.v ?: ""}\", " +
                         "x: $x, y: $y, " +
                         "isBlack: ${node.col == RBNode.Colour.BLACK}" +
