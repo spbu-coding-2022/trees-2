@@ -12,7 +12,7 @@ import java.io.IOException
 class Neo4jIO() : Closeable {
     private var driver: Driver? = null
 
-    fun exportRBTree(root: NodeView<RBNode<KVP<String, String>>>) {   // when we have treeView, fun will be rewritten
+    fun exportRBTree(root: NodeView<RBNode<KVP<Int, String>>>) {   // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
         session.executeWrite { tx ->
             cleanDataBase(tx)
@@ -34,9 +34,9 @@ class Neo4jIO() : Closeable {
     }
 
 
-    fun importRBTree(): NodeView<RBNode<KVP<String, String>>>? {  // when we have treeView, fun will be rewritten
+    fun importRBTree(): NodeView<RBNode<KVP<Int, String>>>? {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
-        val res: NodeView<RBNode<KVP<String, String>>>? = session.executeRead { tx ->
+        val res: NodeView<RBNode<KVP<Int, String>>>? = session.executeRead { tx ->
             importRBNodes(tx)
         }
         session.close()
@@ -47,7 +47,7 @@ class Neo4jIO() : Closeable {
         tx.run("MATCH (n: RBNode) DETACH DELETE n")
     }
 
-    private fun genExportRBNodes(root: NodeView<RBNode<KVP<String, String>>>): String {
+    private fun genExportRBNodes(root: NodeView<RBNode<KVP<Int, String>>>): String {
         val sb = StringBuilder()
         traverseExportRBNode(sb, root)
         return sb.toString()
@@ -55,16 +55,28 @@ class Neo4jIO() : Closeable {
 
     private fun traverseExportRBNode(
         sb: StringBuilder,
-        nodeView: NodeView<RBNode<KVP<String, String>>>,
+        nodeView: NodeView<RBNode<KVP<Int, String>>>,
     ) {
         with(nodeView) {
+            val lkey = l?.node?.elem?.key
+            val lkeyString = if (lkey != null) {
+                ", lkey: ${lkey} "
+            } else {
+                ""
+            }
+            val rkey = r?.node?.elem?.key
+            val rkeyString = if (rkey != null) {
+                ", rkey: ${r?.node?.elem?.key}"
+            } else {
+                ""
+            }
             sb.append(
-                "CREATE (:RBNode {key : \"${node.elem.key}\", " +
+                "CREATE (:RBNode {key : ${node.elem.key}, " +
                         "value: \"${node.elem.v ?: ""}\", " +
                         "x: $x, y: $y, " +
-                        "isBlack: ${node.col == RBNode.Colour.BLACK}, " +
-                        "lkey: \"${l?.node?.elem?.key ?: ""}\", " +
-                        "rkey: \"${r?.node?.elem?.key ?: ""}\"}) "
+                        "isBlack: ${node.col == RBNode.Colour.BLACK}" +
+                        lkeyString + rkeyString +
+                        "})"
             ) // save node (lkey and rkey are needed for connection later)
             l?.let {
                 traverseExportRBNode(sb, it)
@@ -75,7 +87,7 @@ class Neo4jIO() : Closeable {
         }
     }
 
-    private fun importRBNodes(tx: TransactionContext): NodeView<RBNode<KVP<String, String>>>? {
+    private fun importRBNodes(tx: TransactionContext): NodeView<RBNode<KVP<Int, String>>>? {
         val nodeAndKeysRecords = tx.run(
             "MATCH (p: RBNode)" +
                     "OPTIONAL MATCH (p)-[:LEFT_CHILD]->(l: RBNode) " +
@@ -87,16 +99,16 @@ class Neo4jIO() : Closeable {
     }
 
     private class NodeAndKeys(
-        val nv: NodeView<RBNode<KVP<String, String>>>,
-        val lkey: String?,
-        val rkey: String?
+        val nv: NodeView<RBNode<KVP<Int, String>>>,
+        val lkey: Int?,
+        val rkey: Int?
     )
 
-    private fun parseRBNodes(nodeAndKeysRecords: Result): NodeView<RBNode<KVP<String, String>>>? {
-        val key2nk = mutableMapOf<String, NodeAndKeys>()
+    private fun parseRBNodes(nodeAndKeysRecords: Result): NodeView<RBNode<KVP<Int, String>>>? {
+        val key2nk = mutableMapOf<Int, NodeAndKeys>()
         for (nkRecord in nodeAndKeysRecords) {
             try {
-                val key = nkRecord["key"].asString()
+                val key = nkRecord["key"].asInt()
                 val value = nkRecord["value"].asString()
                 val nv = NodeView(RBNode(null, KVP(key, value)))
 
@@ -113,12 +125,12 @@ class Neo4jIO() : Closeable {
                 val lkey = if (nkRecord["lKey"].isNull) {
                     null
                 } else {
-                    nkRecord["lKey"].asString()
+                    nkRecord["lKey"].asInt()
                 }
                 val rkey = if (nkRecord["rKey"].isNull) {
                     null
                 } else {
-                    nkRecord["rKey"].asString()
+                    nkRecord["rKey"].asInt()
                 }
 
                 key2nk[key] = NodeAndKeys(nv, lkey, rkey)
