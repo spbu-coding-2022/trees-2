@@ -43,10 +43,10 @@ class Neo4jIO() : Closeable {
     }
 
 
-    fun importRBTree(): NodeView<RBNode<KVP<Int, String>>>? {  // when we have treeView, fun will be rewritten
+    fun importRBTree(treeName: String = "Tree"): NodeView<RBNode<KVP<Int, String>>>? {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
         val res: NodeView<RBNode<KVP<Int, String>>>? = session.executeRead { tx ->
-            importRBNodes(tx)
+            importRBNodes(tx, treeName)
         }
         session.close()
         return res
@@ -100,9 +100,9 @@ class Neo4jIO() : Closeable {
         }
     }
 
-    private fun importRBNodes(tx: TransactionContext): NodeView<RBNode<KVP<Int, String>>>? {
+    private fun importRBNodes(tx: TransactionContext, treeName: String): NodeView<RBNode<KVP<Int, String>>>? {
         val nodeAndKeysRecords = tx.run(
-            "MATCH (p: RBNode)" +
+            "MATCH (:Tree {name: \"$treeName\"})-[*]->(p: RBNode)" +
                     "OPTIONAL MATCH (p)-[:LEFT_CHILD]->(l: RBNode) " +
                     "OPTIONAL MATCH (p)-[:RIGHT_CHILD]->(r: RBNode) " +
                     "RETURN p.x AS x, p.y AS y, p.isBlack AS isBlack, p.key AS key, p.value AS value, " +
