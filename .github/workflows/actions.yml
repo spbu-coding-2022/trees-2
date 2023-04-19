@@ -4,7 +4,10 @@ on:
   push:
 jobs:
   build-gradle-project:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
@@ -17,7 +20,7 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: library-reports
+          name: library-reports (${{ matrix.os }})
           path: binaryTree/build/reports/
           if-no-files-found: ignore
 
@@ -25,6 +28,6 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: app-reports
+          name: app-reports (${{ matrix.os }})
           path: app/build/reports/
           if-no-files-found: ignore

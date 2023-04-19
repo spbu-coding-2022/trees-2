@@ -10,6 +10,9 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     }
 
     private fun bfactor(avlNode: AVLNode<T>?): Int {
+        fixheight(avlNode)
+        fixheight(avlNode?.left)
+        fixheight(avlNode?.right)
         return if (avlNode != null) {
             height(avlNode.right) - height(avlNode.left)
         } else {
@@ -44,12 +47,12 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     }
 
     private fun balanceNode(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
-        fixheight(curNode)
         if (bfactor(curNode) == 2) {
             if (bfactor(curNode.right) < 0) {
                 curNode.right?.let { rotateRight(it, curNode) }
             }
             rotateLeft(curNode, parentNode)
+            return
         }
 
         if (bfactor(curNode) == -2) {
@@ -57,6 +60,7 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
                 curNode.left?.let { rotateLeft(it, curNode) }
             }
             rotateRight(curNode, parentNode)
+            return
         }
     }
 
