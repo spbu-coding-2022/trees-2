@@ -69,7 +69,26 @@ TODO: write
 
 ### Neo4j
 
-TODO: write
+At neo4j database we store **RBTree**. There are 2 types of labels with the following struct:
+
+- `Tree`
+  - `name` *string*
+- `RBNode`
+  - `key` *int*
+  - `value` *string*
+  - `isBlack` *boolean* - node colour
+  - `x` *double* - node position at ui
+  - `y` *double* - node position at ui
+
+Also, there are 3 types of links:
+
+- `ROOT`: from **tree**(`Tree`) to its **root**(`RBNode`)
+- `LEFT_CHILD`: from **parent**(`RBNode`) to its **left-child**(`RBNode`)
+- `RIGHT_CHILD`: from **parent**(`RBNode`) to its **right-child**(`RBNode`)
+
+Using the `Tree` labels, we can store several trees in the database at once. But their nodes should not intersect
+(shouldn't have links between each other).
+![neo4j-example](https://user-images.githubusercontent.com/66139162/232936241-963c1213-e1ad-46fd-b134-3c137fa04b45.png)
 
 ---
 
