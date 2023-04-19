@@ -4,14 +4,22 @@
 
 plugins {
     id("org.tree.kotlin-application-conventions")
-    kotlin("plugin.serialization") version "1.8.20"
 }
 
 dependencies {
     implementation(project(":binaryTree"))
 
     implementation("org.neo4j.driver", "neo4j-java-driver", "5.7.0")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation("org.slf4j:slf4j-simple:2.0.5")
+
+    implementation("org.xerial:sqlite-jdbc:3.40.1.0")
+    implementation("org.jetbrains.exposed:exposed-core:0.40.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.40.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.40.1")
 }
 
 application {
