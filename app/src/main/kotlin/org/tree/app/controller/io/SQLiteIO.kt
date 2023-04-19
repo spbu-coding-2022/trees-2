@@ -116,7 +116,8 @@ class SQLiteIO {
             val parsedValue = node[Nodes.value]
             val parsedX: Double = node[Nodes.x].toDouble()
             val parsedY: Double = node[Nodes.y].toDouble()
-            if (parsedParentKey == curNode.node.elem.key) {
+            if (parsedParentKey == curNode.node.elem.key){
+                Nodes.deleteWhere { key eq parsedKey }
                 val newNode: NodeView<Node<KVP<Int, String>>> = NodeView(Node(KVP(parsedKey, parsedValue)))
                 newNode.x = parsedX
                 newNode.y = parsedY
@@ -126,16 +127,23 @@ class SQLiteIO {
                     if (leftChild != null) {
                         parseNodesForImport(leftChild)
                     }
+                    if (curNode.r == null){
+                        parseNodesForImport(curNode)
+                        break
+                    }
                 } else if (parsedKey > parsedParentKey) {
                     curNode.r = newNode
                     val rightChild = curNode.r
                     if (rightChild != null) {
                         parseNodesForImport(rightChild)
                     }
+                    if (curNode.l == null){
+                        parseNodesForImport(curNode)
+                        break
+                    }
                 } else {
                     throw IOException("Incorrect binary tree")
                 }
-
             }
         }
         return curNode
