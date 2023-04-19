@@ -160,10 +160,10 @@ class MyCoolTree<T : Comparable<T>> : TemplateBalanceBSTree<T, CoolNode<T>>() {
     }
 
     when (operationType) {
-      BalanceCase.OpType.REMOVE_0 -> println("remove node with 0 null children")
-      BalanceCase.OpType.REMOVE_1 -> println("remove node with 1 null child")
-      BalanceCase.OpType.REMOVE_2 -> println("remove node with 2 null children")
-      BalanceCase.OpType.INSERT -> println("insert new node")
+      BalanceCase.OpType.REMOVE_0 -> println("removed node with 0 null children")
+      BalanceCase.OpType.REMOVE_1 -> println("removed node with 1 null child")
+      BalanceCase.OpType.REMOVE_2 -> println("removed node with 2 null children")
+      BalanceCase.OpType.INSERT -> println("inserted new node")
     }
 
     when (recursive) {
