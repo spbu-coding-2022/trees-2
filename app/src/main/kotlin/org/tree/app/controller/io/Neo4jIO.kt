@@ -12,6 +12,18 @@ import java.io.IOException
 class Neo4jIO() : Closeable {
     private var driver: Driver? = null
 
+    private companion object {
+        // Labels
+        const val RBNODE = "RBNode"
+        const val TREE = "Tree"
+        const val NEW_NODE = "NewNode"
+
+        // Links
+        const val ROOT = "ROOT"
+        const val LCHILD = "LEFT_CHILD"
+        const val RCHILD = "RIGHT_CHILD"
+    }
+
     fun exportRBTree(
         root: NodeView<RBNode<KVP<Int, String>>>,
         treeName: String = "Tree"
@@ -21,22 +33,22 @@ class Neo4jIO() : Closeable {
             deleteTree(tx, treeName)
             tx.run(genExportRBNodes(root))
             tx.run(
-                "MATCH (p: RBNode) " +
-                        "MATCH (l: NewNode {key: p.lkey}) " +
-                        "CREATE (p)-[:LEFT_CHILD]->(l) " +
-                        "REMOVE p.lkey, l:NewNode"
+                "MATCH (p: $RBNODE) " +
+                        "MATCH (l: $NEW_NODE {key: p.lkey}) " +
+                        "CREATE (p)-[: $LCHILD]->(l) " +
+                        "REMOVE p.lkey, l: $NEW_NODE"
             ) // connect parent and left child
             tx.run(
-                "MATCH (p: RBNode) " +
-                        "MATCH (r: NewNode {key: p.rkey}) " +
-                        "CREATE (p)-[:RIGHT_CHILD]->(r) " +
-                        "REMOVE p.rkey, r:NewNode"
+                "MATCH (p: $RBNODE) " +
+                        "MATCH (r: $NEW_NODE {key: p.rkey}) " +
+                        "CREATE (p)-[: $RCHILD]->(r) " +
+                        "REMOVE p.rkey, r: $NEW_NODE"
             )// connect parent and right child
 
             tx.run(
-                "MATCH (r: NewNode) " +
-                        "CREATE (t: Tree {name: \"$treeName\"})-[:ROOT]->(r) " +
-                        "REMOVE r:NewNode"
+                "MATCH (r: $NEW_NODE) " +
+                        "CREATE (t: $TREE {name: \"$treeName\"})-[:$ROOT]->(r) " +
+                        "REMOVE r:$NEW_NODE"
             )
         }
         session.close()
@@ -63,7 +75,7 @@ class Neo4jIO() : Closeable {
     fun getTreesNames(): MutableList<String> {
         val session = driver?.session() ?: throw IOException("Driver is not open")
         val res: MutableList<String> = session.executeRead { tx ->
-            val nameRecords = tx.run("MATCH (t: Tree) RETURN t.name AS name")
+            val nameRecords = tx.run("MATCH (t: $TREE) RETURN t.name AS name")
             parseNames(nameRecords)
         }
         session.close()
@@ -72,8 +84,8 @@ class Neo4jIO() : Closeable {
 
     private fun deleteTree(tx: TransactionContext, treeName: String) {
         tx.run(
-            "MATCH (t: Tree {name: \"$treeName\"})" +
-                    "OPTIONAL MATCH (t)-[*]->(n:RBNode) " +
+            "MATCH (t: $TREE {name: \"$treeName\"})" +
+                    "OPTIONAL MATCH (t)-[*]->(n:$RBNODE) " +
                     "DETACH DELETE t, n"
         )
     }
@@ -102,7 +114,7 @@ class Neo4jIO() : Closeable {
                 ""
             }
             sb.append(
-                "CREATE (:RBNode:NewNode {key : ${node.elem.key}, " +
+                "CREATE (:$RBNODE:$NEW_NODE {key : ${node.elem.key}, " +
                         "value: \"${node.elem.v ?: ""}\", " +
                         "x: $x, y: $y, " +
                         "isBlack: ${node.col == RBNode.Colour.BLACK}" +
@@ -120,9 +132,9 @@ class Neo4jIO() : Closeable {
 
     private fun importRBNodes(tx: TransactionContext, treeName: String): NodeView<RBNode<KVP<Int, String>>>? {
         val nodeAndKeysRecords = tx.run(
-            "MATCH (:Tree {name: \"$treeName\"})-[*]->(p: RBNode)" +
-                    "OPTIONAL MATCH (p)-[:LEFT_CHILD]->(l: RBNode) " +
-                    "OPTIONAL MATCH (p)-[:RIGHT_CHILD]->(r: RBNode) " +
+            "MATCH (:$TREE {name: \"$treeName\"})-[*]->(p: $RBNODE)" +
+                    "OPTIONAL MATCH (p)-[: $LCHILD]->(l: $RBNODE) " +
+                    "OPTIONAL MATCH (p)-[: $RCHILD]->(r: $RBNODE) " +
                     "RETURN p.x AS x, p.y AS y, p.isBlack AS isBlack, p.key AS key, p.value AS value, " +
                     "   l.key AS lKey, r.key AS rKey"
         ) // for all nodes get their properties + keys of their children
