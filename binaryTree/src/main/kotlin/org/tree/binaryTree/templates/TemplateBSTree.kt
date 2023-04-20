@@ -47,12 +47,12 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             return null
         }
 
-        if (curNode.elem == obj) {
-            return curNode
-        } else if (obj < curNode.elem) {
+        if (obj < curNode.elem) {
             return find(curNode.left, obj)
-        } else {
+        } else if (obj > curNode.elem) {
             return find(curNode.right, obj)
+        } else {
+            return curNode
         }
     }
 
