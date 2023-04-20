@@ -24,7 +24,6 @@ class RBTreeTest {
                 val newVal = randomizer.nextInt()
                 val exp = values.add(newVal)
                 val act = tree.insert(newVal)
-                //println("Insert $newVal")
 
                 MatcherAssert.assertThat(act, Matchers.equalTo(exp))
                 checkRBTree(tree, values.toTypedArray())
