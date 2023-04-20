@@ -31,7 +31,8 @@ class Neo4jIO() : Closeable {
         val session = driver?.session() ?: throw IOException("Driver is not open")
         session.executeWrite { tx ->
             deleteTree(tx, treeName)
-            tx.run(genExportRBNodes(root))
+            //tx.run(genExportRBNodes(root))
+            exportRBNode(tx, root)
             tx.run(
                 "MATCH (p: $RBNODE) " +
                         "MATCH (l: $NEW_NODE {key: p.lkey}) " +
@@ -47,8 +48,11 @@ class Neo4jIO() : Closeable {
 
             tx.run(
                 "MATCH (r: $NEW_NODE) " +
-                        "CREATE (t: $TREE {name: \"$treeName\"})-[:$ROOT]->(r) " +
-                        "REMOVE r:$NEW_NODE"
+                        "CREATE (t: $TREE {name: \$treeName})-[:$ROOT]->(r) " +
+                        "REMOVE r:$NEW_NODE",
+                mutableMapOf(
+                    "treeName" to treeName
+                ) as Map<String, Any>?
             )
         }
         session.close()
@@ -84,9 +88,12 @@ class Neo4jIO() : Closeable {
 
     private fun deleteTree(tx: TransactionContext, treeName: String) {
         tx.run(
-            "MATCH (t: $TREE {name: \"$treeName\"})" +
+            "MATCH (t: $TREE {name: \$treeName})" +
                     "OPTIONAL MATCH (t)-[*]->(n:$RBNODE) " +
-                    "DETACH DELETE t, n"
+                    "DETACH DELETE t, n",
+            mutableMapOf(
+                "treeName" to treeName
+            ) as Map<String, Any>?
         )
     }
 
@@ -132,11 +139,14 @@ class Neo4jIO() : Closeable {
 
     private fun importRBNodes(tx: TransactionContext, treeName: String): NodeView<RBNode<KVP<Int, String>>>? {
         val nodeAndKeysRecords = tx.run(
-            "MATCH (:$TREE {name: \"$treeName\"})-[*]->(p: $RBNODE)" +
+            "MATCH (:$TREE {name: \$treeName})-[*]->(p: $RBNODE)" +
                     "OPTIONAL MATCH (p)-[: $LCHILD]->(l: $RBNODE) " +
                     "OPTIONAL MATCH (p)-[: $RCHILD]->(r: $RBNODE) " +
                     "RETURN p.x AS x, p.y AS y, p.isBlack AS isBlack, p.key AS key, p.value AS value, " +
-                    "   l.key AS lKey, r.key AS rKey"
+                    "   l.key AS lKey, r.key AS rKey",
+            mutableMapOf(
+                "treeName" to treeName
+            ) as Map<String, Any>?
         ) // for all nodes get their properties + keys of their children
         return parseRBNodes(nodeAndKeysRecords)
     }
