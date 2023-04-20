@@ -26,7 +26,7 @@ line:
 
 ```bash
 # Clone this repository
-git clone https://github.com/spbu-coding-2022/trees-2.git
+git clone https://github.com/spbu-coding-2022/trees-2.git trees-2
 
 # Go into the repository
 cd trees-2
@@ -88,8 +88,7 @@ Also, there are 3 types of links:
 
 Using the `Tree` labels, we can store several trees in the database at once. But their nodes should not intersect
 (shouldn't have links between each other).
-![neo4j-example](https://user-images.githubusercontent.com/66139162/232936241-963c1213-e1ad-46fd-b134-3c137fa04b45.png)
-
+![neo4j-example](https://user-images.githubusercontent.com/66139162/233449145-15476b7d-d1c9-4dfa-b4a6-bd500d3a25d4.png)
 ---
 
 ## Library
@@ -125,9 +124,9 @@ fun example() {
   // create common BinSearchTree with int keys and string values
   val keyValuePairTree = BinSearchTree<KVP<Int, String>>()
 
-  intTree.insert(3)  // insert new node
-  intTree.find(3)    // find node
-  intTree.remove(3)  // remove node if it exists
+  intTree.insert(3)                  // insert new node
+  intTree.remove(3)                  // remove node if it exists
+  val foundNode = intTree.find(3)    // find node
 
   for (i in 0..10) {
     stringTree.insert(i.toString())
