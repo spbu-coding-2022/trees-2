@@ -88,12 +88,12 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             return null
         }
 
-        if (curNode.elem == obj) {
-            return deleteNode(curNode, parentNode)
-        } else if (obj < curNode.elem) {
+        if (obj < curNode.elem) {
             return remove(curNode.left, curNode, obj)
-        } else {
+        } else if (obj > curNode.elem) {
             return remove(curNode.right, curNode, obj)
+        } else {
+            return deleteNode(curNode, parentNode)
         }
     }
 
