@@ -57,7 +57,7 @@ class NodeTest {
                     20, null
                 )
             )
-            val act = root?.getNonNullChild()
+            val act = root?.getChild()
             val exp = root?.left
             MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
@@ -70,7 +70,7 @@ class NodeTest {
                     null, 60
                 )
             )
-            val act = root?.getNonNullChild()
+            val act = root?.getChild()
             val exp = root?.right
             MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
@@ -83,7 +83,7 @@ class NodeTest {
                     null, null
                 )
             )
-            val act = root?.getNonNullChild()
+            val act = root?.getChild()
             val exp = null
             MatcherAssert.assertThat(act, Matchers.equalTo(exp))
         }
@@ -96,7 +96,7 @@ class NodeTest {
                     20, 60
                 )
             )
-            val act = root?.getNonNullChild()
+            val act = root?.getChild()
             MatcherAssert.assertThat(act, Matchers.anyOf(Matchers.equalTo(root?.left), Matchers.equalTo(root?.right)))
         }
 
