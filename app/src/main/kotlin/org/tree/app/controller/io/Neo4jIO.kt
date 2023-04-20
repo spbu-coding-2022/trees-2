@@ -73,7 +73,7 @@ class Neo4jIO() : Closeable {
     private fun deleteTree(tx: TransactionContext, treeName: String) {
         tx.run(
             "MATCH (t: Tree {name: \"$treeName\"})" +
-                    "MATCH (t)-[*]->(n:RBNode) " +
+                    "OPTIONAL MATCH (t)-[*]->(n:RBNode) " +
                     "DETACH DELETE t, n"
         )
     }
