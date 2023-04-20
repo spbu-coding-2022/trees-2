@@ -73,7 +73,7 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             }
 
             1 -> {
-                replaceNode(curNode, parentNode, curNode.getNonNullChild())
+                replaceNode(curNode, parentNode, curNode.getChild())
             }
 
             else -> {

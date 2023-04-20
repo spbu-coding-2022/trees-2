@@ -5,7 +5,7 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
     var left: NODE_T? = null
     var right: NODE_T? = null
 
-    fun getNonNullChild(): NODE_T? {
+    fun getChild(): NODE_T? {
         val res = if (left != null) {
             left
         } else if (right != null) {
