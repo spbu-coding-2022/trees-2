@@ -31,7 +31,6 @@ class Neo4jIO() : Closeable {
         val session = driver?.session() ?: throw IOException("Driver is not open")
         session.executeWrite { tx ->
             deleteTree(tx, treeName)
-            //tx.run(genExportRBNodes(root))
             exportRBNode(tx, root)
             tx.run(
                 "MATCH (p: $RBNODE) " +
@@ -53,7 +52,7 @@ class Neo4jIO() : Closeable {
                 mutableMapOf(
                     "treeName" to treeName
                 ) as Map<String, Any>?
-            )
+            )// connect tree and root
         }
         session.close()
     }
@@ -94,45 +93,39 @@ class Neo4jIO() : Closeable {
             mutableMapOf(
                 "treeName" to treeName
             ) as Map<String, Any>?
-        )
+        ) // delete tree and all its nodes
     }
 
-    private fun genExportRBNodes(root: NodeView<RBNode<KVP<Int, String>>>): String {
-        val sb = StringBuilder()
-        traverseExportRBNode(sb, root)
-        return sb.toString()
-    }
-
-    private fun traverseExportRBNode(
-        sb: StringBuilder,
+    private fun exportRBNode(
+        tx: TransactionContext,
         nodeView: NodeView<RBNode<KVP<Int, String>>>,
     ) {
         with(nodeView) {
             val lkey = l?.node?.elem?.key
-            val lkeyString = if (lkey != null) {
-                ", lkey: ${lkey} "
-            } else {
-                ""
-            }
             val rkey = r?.node?.elem?.key
-            val rkeyString = if (rkey != null) {
-                ", rkey: ${r?.node?.elem?.key}"
-            } else {
-                ""
-            }
-            sb.append(
-                "CREATE (:$RBNODE:$NEW_NODE {key : ${node.elem.key}, " +
-                        "value: \"${node.elem.v ?: ""}\", " +
-                        "x: $x, y: $y, " +
-                        "isBlack: ${node.col == RBNode.Colour.BLACK}" +
-                        lkeyString + rkeyString +
-                        "})"
-            ) // save node (lkey and rkey are needed for connection later)
+
+            tx.run(
+                "CREATE (:$RBNODE:$NEW_NODE {key : \$key, " +
+                        "value: \$value, " +
+                        "x: \$x, y: \$y, " +
+                        "isBlack: \$isBlack, " +
+                        "lkey: \$lkey, " +
+                        "rkey: \$rkey" +
+                        "})",
+                mutableMapOf(
+                    "key" to node.elem.key,
+                    "value" to (node.elem.v ?: ""),
+                    "x" to x, "y" to y,
+                    "isBlack" to (node.col == RBNode.Colour.BLACK),
+                    "lkey" to lkey,
+                    "rkey" to rkey
+                ) as Map<String, Any>?
+            )
             l?.let {
-                traverseExportRBNode(sb, it)
+                exportRBNode(tx, it)
             }
             r?.let {
-                traverseExportRBNode(sb, it)
+                exportRBNode(tx, it)
             }
         }
     }
