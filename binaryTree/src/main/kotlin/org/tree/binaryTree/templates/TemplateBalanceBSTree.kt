@@ -84,19 +84,20 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
 
         val targetNode: NODE_T?
         val isRec: BalanceCase.Recursive
-        val res = if (curNode.elem == obj) {
-            isRec = BalanceCase.Recursive.END
-            targetNode = parentNode
-            deleteNode(curNode, parentNode)
-        } else if (obj < curNode.elem) {
-            isRec = BalanceCase.Recursive.RECURSIVE_CALL
-            targetNode = parentNode
-            remove(curNode.left, curNode, obj)
-        } else {
-            isRec = BalanceCase.Recursive.RECURSIVE_CALL
-            targetNode = parentNode
-            remove(curNode.right, curNode, obj)
-        }
+        val res =
+            if (obj < curNode.elem) {
+                isRec = BalanceCase.Recursive.RECURSIVE_CALL
+                targetNode = parentNode
+                remove(curNode.left, curNode, obj)
+            } else if (obj > curNode.elem) {
+                isRec = BalanceCase.Recursive.RECURSIVE_CALL
+                targetNode = parentNode
+                remove(curNode.right, curNode, obj)
+            } else {
+                isRec = BalanceCase.Recursive.END
+                targetNode = parentNode
+                deleteNode(curNode, parentNode)
+            }
 
         if (res != null) {
             balance(targetNode, getDirectionChangedChild(targetNode, obj), getBalanceRemoveType(res), isRec)
