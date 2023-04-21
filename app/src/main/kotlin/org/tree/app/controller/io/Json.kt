@@ -66,69 +66,15 @@ class Json {
         }
     }
 
-    fun importAVLTree(fileName: String): NodeView<AVLNode<KVP<Int, String>>>? {  // when we have treeView, fun will be rewritten
+    fun importTree(file: File): NodeView<AVLNode<KVP<Int, String>>>? {
         val json = try {
-            File(dirPath, fileName).readText()
+            file.readText()
         } catch (_: FileNotFoundException) {
             return null
         }
 
         val jsonTree = Json.decodeFromString<JsonAVLTree>(json)
-        return parseAVLNodes(jsonTree)
-    }
-
-    private class NodeAndKeys(
-        val nv: NodeView<AVLNode<KVP<Int, String>>>,
-        val lkey: Int?,
-        val rkey: Int?
-    )
-
-    private fun parseAVLNodes(nodeAndKeysRecords: JsonAVLTree): NodeView<AVLNode<KVP<Int, String>>>? {
-        val key2nk = mutableMapOf<Int, NodeAndKeys>()
-        for (nkRecord in nodeAndKeysRecords.AVLTree) {
-            try {
-                val key = nkRecord?.key ?: throw IOException("Invalid nodes label in the database")
-                val value = nkRecord.value
-                val nv = NodeView(AVLNode(KVP(key, value)))
-
-                nv.x = nkRecord.x
-                nv.y = nkRecord.y
-                nv.node.height = nkRecord.height
-
-                val lkey = nkRecord.lkey
-                val rkey = nkRecord.rkey
-                key2nk[key] = NodeAndKeys(nv, lkey, rkey)
-            } catch (ex: Uncoercible) {
-                throw IOException("Invalid nodes label in the database", ex)
-            }
-        }
-        val nks = key2nk.values.toTypedArray()
-        if (nks.isEmpty()) { // if nodeAndKeysRecords was empty
-            return null
-        }
-
-        for (nk in nks) {
-            nk.lkey?.let {
-                nk.nv.l = key2nk[it]?.nv
-                key2nk.remove(it)
-            }
-            nk.nv.l?.let {
-                nk.nv.node.left = it.node
-            }
-
-            nk.rkey?.let {
-                nk.nv.r = key2nk[it]?.nv
-                key2nk.remove(it)
-            }
-            nk.nv.r?.let {
-                nk.nv.node.right = it.node
-            }
-        }
-        if (key2nk.values.size != 1) {
-            throw IOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
-        }
-        val root = key2nk.values.first().nv
-        return root
+        return jsonTree.root?.deserialize()
     }
 
     fun cleanDataBase(fileName: String) {
