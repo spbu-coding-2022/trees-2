@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.neo4j.driver.exceptions.value.Uncoercible
 import org.tree.app.view.NodeView
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
@@ -29,8 +28,6 @@ private data class JsonAVLTree(
     val root: JsonAVLNode?
 )
 class Json {
-    val dirPath = "json-saved"
-
     private fun NodeView<AVLNode<KVP<Int, String>>>.toJsonNode(): JsonAVLNode = JsonAVLNode(
         key = this.node.elem.key,
         value = this.node.elem.v,
@@ -77,7 +74,7 @@ class Json {
         return jsonTree.root?.deserialize()
     }
 
-    fun cleanDataBase(fileName: String) {
-        File(dirPath, "$fileName.json").delete()
+    fun cleanDataBase(file: File) {
+        file.delete()
     }
 }
