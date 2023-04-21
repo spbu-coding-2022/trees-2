@@ -4,6 +4,7 @@
 
 plugins {
     id("org.tree.kotlin-application-conventions")
+    kotlin("plugin.serialization") version "1.8.20"
 }
 
 dependencies {
