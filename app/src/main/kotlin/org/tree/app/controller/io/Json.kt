@@ -30,6 +30,27 @@ private data class JsonAVLTree(
 class Json {
     val dirPath = "json-saved"
 
+    private fun NodeView<AVLNode<KVP<Int, String>>>.toJsonNode(): JsonAVLNode = JsonAVLNode(
+        key = this.node.elem.key,
+        value = this.node.elem.v,
+        x = this.x,
+        y = this.y,
+        height = this.node.height,
+        left = l?.toJsonNode(),
+        right = r?.toJsonNode()
+    )
+
+    private fun JsonAVLNode.deserialize(): NodeView<AVLNode<KVP<Int, String>>> {
+        val nv = NodeView(AVLNode(KVP(key, value)))
+        nv.node.height = height
+        nv.x = x
+        nv.y = y
+        nv.l = left?.deserialize()
+        nv.r = right?.deserialize()
+
+        return nv
+    }
+
     fun exportAVLTree(root: NodeView<AVLNode<KVP<Int, String>>>) {
         val sb = StringBuilder()
         sb.append("{\"AVLTree\":[")
