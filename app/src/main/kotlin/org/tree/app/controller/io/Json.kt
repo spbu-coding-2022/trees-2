@@ -19,13 +19,13 @@ private data class JsonAVLNode(
     val x: Double,
     val y: Double,
     val height: Int,
-    val lkey: Int?,
-    val rkey: Int?
+    val left: JsonAVLNode?,
+    val right: JsonAVLNode?
 )
 
 @Serializable
 private data class JsonAVLTree(
-    val AVLTree: Array<JsonAVLNode?>
+    val root: JsonAVLNode?
 )
 class Json {
     val dirPath = "json-saved"
