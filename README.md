@@ -19,6 +19,10 @@ You can:
 
 ## Get started
 
+### Requirements
+
+- Java JDK version 11 or later
+
 ### Build
 
 To build and run this application locally, you'll need Git, Gradle and JDK installed on your computer. From your command
@@ -107,6 +111,7 @@ Also, there are 3 types of links:
 Using the `Tree` labels, we can store several trees in the database at once. But their nodes should not intersect
 (shouldn't have links between each other).
 ![neo4j-example](https://user-images.githubusercontent.com/66139162/233449145-15476b7d-d1c9-4dfa-b4a6-bd500d3a25d4.png)
+
 ---
 
 ## Library
