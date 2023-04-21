@@ -28,14 +28,14 @@ private data class JsonAVLTree(
     val root: JsonAVLNode?
 )
 class Json {
-    private fun NodeView<AVLNode<KVP<Int, String>>>.toJsonNode(): JsonAVLNode = JsonAVLNode(
+    private fun NodeView<AVLNode<KVP<Int, String>>>.serialize(): JsonAVLNode = JsonAVLNode(
         key = this.node.elem.key,
         value = this.node.elem.v,
         x = this.x,
         y = this.y,
         height = this.node.height,
-        left = l?.toJsonNode(),
-        right = r?.toJsonNode()
+        left = l?.serialize(),
+        right = r?.serialize()
     )
 
     private fun JsonAVLNode.deserialize(): NodeView<AVLNode<KVP<Int, String>>> {
@@ -55,7 +55,7 @@ class Json {
         } catch (ex: SecurityException) {
             throw IOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
-        val jsonTree = JsonAVLTree(root.toJsonNode())
+        val jsonTree = JsonAVLTree(root.serialize())
 
         file.run {
             createNewFile()
