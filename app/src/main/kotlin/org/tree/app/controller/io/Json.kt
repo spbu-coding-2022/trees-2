@@ -11,6 +11,7 @@ import org.tree.binaryTree.KVP
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.nio.file.Files
 
 @Serializable
 private data class JsonAVLNode(
@@ -51,44 +52,17 @@ class Json {
         return nv
     }
 
-    fun exportAVLTree(root: NodeView<AVLNode<KVP<Int, String>>>) {
-        val sb = StringBuilder()
-        sb.append("{\"AVLTree\":[")
-        traverseExportAVLNode(sb, root)
-        sb.append("]}")
-        File(dirPath).mkdirs()
-        File(dirPath, "output.json").run {
-            createNewFile()
-            writeText(sb.toString())
+    fun exportTree(root: NodeView<AVLNode<KVP<Int, String>>>, file: File) {
+        try {
+            Files.createDirectories(file.toPath().parent)
+        } catch (ex: SecurityException) {
+            throw IOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
-    }
+        val jsonTree = JsonAVLTree(root.toJsonNode())
 
-    private fun traverseExportAVLNode(
-        sb: StringBuilder,
-        nodeView: NodeView<AVLNode<KVP<Int, String>>>,
-    ) {
-
-        with(nodeView) {
-            val json = JsonAVLNode(
-                key = node.elem.key,
-                value = node.elem.v,
-                x = x,
-                y = y,
-                height = node.height,
-                lkey = l?.node?.elem?.key,
-                rkey = r?.node?.elem?.key
-            )
-
-            sb.append(Json.encodeToString(json))
-
-            l?.let {
-                sb.append(",")
-                traverseExportAVLNode(sb, it)
-            }
-            r?.let {
-                sb.append(",")
-                traverseExportAVLNode(sb, it)
-            }
+        file.run {
+            createNewFile()
+            writeText(Json.encodeToString(jsonTree))
         }
     }
 
