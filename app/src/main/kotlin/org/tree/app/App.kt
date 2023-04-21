@@ -3,10 +3,21 @@
  */
 package org.tree.app
 
+import androidx.compose.material.Text
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 
-import org.tree.binaryTree.Node
-
-fun main() {
-    val nd = Node(2)
-    println(nd.elem)
+fun main() = application {
+    val icon = painterResource("icon.png")
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Trees",
+        state = rememberWindowState(width = 300.dp, height = 300.dp),
+        icon = icon
+    ) {
+        Text("Cats are the best!")
+    }
 }
