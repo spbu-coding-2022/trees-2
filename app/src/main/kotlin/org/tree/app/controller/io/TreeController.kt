@@ -1,11 +1,14 @@
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
+import org.tree.binaryTree.Node
 import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.templates.TemplateBSTree
 import org.tree.binaryTree.templates.TemplateNode
 import kotlin.math.pow
+import kotlin.random.Random
 
 data class NodeExtension(var x: MutableState<Int>, var y: MutableState<Int>, var color: Color = Color.Gray)
 class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
@@ -17,15 +20,7 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     fun addNode(curNode: NODE_T, x: Int, y: Int, height: Int) {
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
-        val col = if (curNode is RBNode<*>) {
-            if (curNode.col == RBNode.Colour.BLACK) {
-                Color.DarkGray
-            } else {
-                Color.Red
-            }
-        } else {
-            Color.Gray
-        }
+        val col = getNodeCol(curNode)
         nodes[curNode] = NodeExtension(stateX, stateY, col)
         val deltaX = nodeSize * (2).toDouble().pow(height.toDouble()).toInt()
         curNode.left?.let {
@@ -35,6 +30,22 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
             addNode(it, x - deltaX, y + nodeSize, height - 1)
         }
 
+    }
+
+    private fun getNodeCol(curNode: NODE_T): Color {
+        return if (curNode is RBNode<*>) {
+            if (curNode.col == RBNode.Colour.BLACK) {
+                Color.DarkGray
+            } else {
+                Color.Red
+            }
+        } else if (curNode is AVLNode<*>) {
+            Color.Blue
+        } else if (curNode is Node<*>) {
+            Color.Yellow
+        } else {
+            Color.Gray
+        }
     }
 
     private fun height(curNode: NODE_T?): Int {
@@ -51,4 +62,14 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         }
     }
 
+}
+
+fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>, TREE_T : TemplateBSTree<KVP<Int, String>, NODE_T>> newTree(
+    emptyTree: TREE_T
+): TreeController<NODE_T> {
+    val rand = Random(0x1337)
+    for (i in 0..10) {
+        emptyTree.insert(KVP(rand.nextInt(100), "Num: $i"))
+    }
+    return TreeController(emptyTree)
 }

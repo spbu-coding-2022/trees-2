@@ -5,40 +5,79 @@ package org.tree.app
 
 import TreeController
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import newTree
 import org.tree.app.view.Tree
-import org.tree.binaryTree.KVP
+import org.tree.app.view.dialogs.io.ImportRBDialog
+import org.tree.binaryTree.trees.AVLTree
+import org.tree.binaryTree.trees.BinSearchTree
 import org.tree.binaryTree.trees.RBTree
-import kotlin.random.Random
 
+enum class DialogType {
+    EMPTY,
+    IMPORT_RB,
+    IMPORT_AVL,
+    IMPORT_BST
+}
 
 fun main() = application {
     val icon = painterResource("icon.png")
     Window(
         onCloseRequest = ::exitApplication,
         title = "Trees",
-        state = rememberWindowState(width = 300.dp, height = 300.dp),
+        state = rememberWindowState(width = 800.dp, height = 600.dp),
         icon = icon
     ) {
-        Box(Modifier.scale(1.0F)) {
+        var treeController by remember { mutableStateOf<TreeController<*>>(newTree(BinSearchTree())) }
+        var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
 
-            val t = RBTree<KVP<Int, String>>()
-            val rand = Random(0x33)
-            for (i in 0..10) {
-                t.insert(KVP(rand.nextInt(100), "good - $i"))
+        MenuBar {
+            Menu("File", mnemonic = 'F') {
+                Menu("New tree", mnemonic = 'N') {
+                    Item("Bin Search Tree", onClick = { treeController = newTree(BinSearchTree()) })
+                    Item("Red black Tree", onClick = { treeController = newTree(RBTree()) })
+                    Item("AVL Tree") { treeController = newTree(AVLTree()) }
+                }
+                Menu("Open", mnemonic = 'O') {
+                    Item("Bin Search Tree", onClick = { dialogType = DialogType.IMPORT_BST })
+                    Item("Red black Tree", onClick = { dialogType = DialogType.IMPORT_RB })
+                    Item("AVL Tree", onClick = { dialogType = DialogType.IMPORT_AVL })
+                }
+            }
+        }
+
+        Box(Modifier.scale(1.0F)) {
+            Tree(treeController)
+        }
+
+        when (dialogType) {
+            DialogType.EMPTY -> {
             }
 
-            val k = TreeController(t, 50)
-            Tree(k)
-            //Line(10.5.dp, 100.dp, 150.dp, 150.dp)
+            DialogType.IMPORT_AVL -> {
+                TODO("Implement")
+                dialogType = DialogType.EMPTY
+            }
 
+            DialogType.IMPORT_BST -> {
+                TODO("Implement")
+                dialogType = DialogType.EMPTY
+            }
 
+            DialogType.IMPORT_RB -> {
+                ImportRBDialog(onCloseRequest = { dialogType = DialogType.EMPTY }, onSuccess = { treeController = it })
+            }
         }
     }
 }
