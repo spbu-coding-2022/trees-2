@@ -3,12 +3,20 @@
  */
 package org.tree.app
 
-import androidx.compose.material.Text
+import TreeController
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import org.tree.app.view.Tree
+import org.tree.binaryTree.KVP
+import org.tree.binaryTree.trees.RBTree
+import kotlin.random.Random
+
 
 fun main() = application {
     val icon = painterResource("icon.png")
@@ -18,6 +26,19 @@ fun main() = application {
         state = rememberWindowState(width = 300.dp, height = 300.dp),
         icon = icon
     ) {
-        Text("Cats are the best!")
+        Box(Modifier.scale(1.0F)) {
+
+            val t = RBTree<KVP<Int, String>>()
+            val rand = Random(0x33)
+            for (i in 0..10) {
+                t.insert(KVP(rand.nextInt(100), "good - $i"))
+            }
+
+            val k = TreeController(t, 50)
+            Tree(k)
+            //Line(10.5.dp, 100.dp, 150.dp, 150.dp)
+
+
+        }
     }
 }
