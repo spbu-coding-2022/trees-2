@@ -51,7 +51,6 @@ fun Node(
     color: Color = Color.Gray,
     size: Int = 10,
 ) {
-    println("Compose $key")
     Box(modifier = Modifier.fillMaxSize()) {
         TooltipArea(
             tooltip = {
@@ -77,7 +76,7 @@ fun Node(
                 contentAlignment = Alignment.Center,
                 modifier = modifier
                     .size(size.dp).clip(CircleShape).background(color = color)
-                    .pointerInput(Unit) {
+                    .pointerInput(x, y) {
                         detectDragGestures { change, dragAmount ->
                             change.consume()
                             x.value += dragAmount.x.toInt()
