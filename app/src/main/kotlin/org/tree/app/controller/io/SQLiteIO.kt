@@ -5,8 +5,10 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.tree.app.view.NodeView
 import org.tree.binaryTree.KVP
@@ -34,16 +36,17 @@ class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with
 }
 
 class SQLiteIO {
+    private var amountOfNodesToHandle = 0
     fun importTree(file: File): NodeView<Node<KVP<Int, String>>>? {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         var root: NodeView<Node<KVP<Int, String>>>? = null
         try {
             transaction {
                 addLogger(StdOutSqlLogger)
-                val amountOfNodes = Nodes.selectAll().count()
+                val amountOfNodes = InstanceOfNode.all().count()
                 if (amountOfNodes > 0) {
-                    root = parseRootForImport()
-                    root?.let { exportTree(it, file) }
+                    val setOfNodes = InstanceOfNode.all().toMutableSet()
+                    root = parseRootForImport(setOfNodes)
                 }
             }
         } catch (ex: ExposedSQLException) {
@@ -58,9 +61,7 @@ class SQLiteIO {
         } catch (ex: SecurityException) {
             throw IOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
-
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
-
         transaction {
             addLogger(StdOutSqlLogger)
             try {
@@ -73,16 +74,81 @@ class SQLiteIO {
         }
     }
 
+
+    private fun parseRootForImport(
+        setOfNodeView: MutableSet<InstanceOfNode>
+    ): NodeView<Node<KVP<Int, String>>> {
+        try {
+            val nodeView = setOfNodeView.elementAt(0)
+            setOfNodeView.remove(nodeView)
+            val parsedKey = nodeView.key
+            val parsedValue = nodeView.value
+            val parsedX: Double = nodeView.x.toDouble()
+            val parsedY: Double = nodeView.y.toDouble()
+            val newNodeView = NodeView(Node(KVP(parsedKey, parsedValue)))
+            addCoordinatesForNodeView(newNodeView, parsedX, parsedY)
+            newNodeView.node = Node(KVP(parsedKey, parsedValue))
+            amountOfNodesToHandle = setOfNodeView.count()
+            parseNodesForImport(setOfNodeView, newNodeView)
+            return newNodeView
+        } catch (ex: NumberFormatException) {
+            throw IOException(
+                "Node keys must be integers, value must be string and coordinates must be doubles",
+                ex
+            )
+        }
+    }
+
+    private fun parseNodesForImport(
+        setOfNodeView: MutableSet<InstanceOfNode>,
+        curNode: NodeView<Node<KVP<Int, String>>>
+    ) {
+        if (amountOfNodesToHandle <= 0) {
+            return
+        }
+        val nodeView = setOfNodeView.elementAt(0)
+        val parsedKey = nodeView.key
+        val parsedParentKey: Int = nodeView.parentKey ?: throw IOException("Incorrect binary tree")
+        val parsedValue = nodeView.value
+        val parsedX: Double = nodeView.x.toDouble()
+        val parsedY: Double = nodeView.y.toDouble()
+        if (parsedParentKey == curNode.node.elem.key) {
+            val newNode = Node(KVP(parsedKey, parsedValue))
+            val newNodeView = NodeView(newNode)
+            addCoordinatesForNodeView(newNodeView, parsedX, parsedY)
+            setOfNodeView.remove(nodeView)
+            amountOfNodesToHandle--
+            if (parsedKey < parsedParentKey) {
+                curNode.node.left = newNode
+                curNode.l = newNodeView
+                val leftChild = curNode.l
+                if (leftChild != null) {
+                    parseNodesForImport(setOfNodeView, leftChild)
+                }
+                parseNodesForImport(setOfNodeView, curNode)
+            } else if (parsedKey > parsedParentKey) {
+                curNode.node.right = newNode
+                curNode.r = newNodeView
+                val rightChild = curNode.r
+                if (rightChild != null) {
+                    parseNodesForImport(setOfNodeView, rightChild)
+                }
+            } else {
+                throw IOException("Incorrect binary tree")
+            }
+        }
+    }
+
     private fun parseNodesForExport(
         curNode: NodeView<Node<KVP<Int, String>>>,
         parNode: NodeView<Node<KVP<Int, String>>>?
     ) {
-        Nodes.insert {
-            it[key] = curNode.node.elem.key
-            it[parentKey] = parNode?.node?.elem?.key
-            it[value] = curNode.node.elem.v.toString()
-            it[x] = curNode.x.toFloat()
-            it[y] = curNode.y.toFloat()
+        InstanceOfNode.new {
+            key = curNode.node.elem.key
+            parentKey = parNode?.node?.elem?.key
+            value = curNode.node.elem.v.toString()
+            x = curNode.x.toFloat()
+            y = curNode.y.toFloat()
         }
         val leftChild = curNode.l
         if (leftChild != null) {
@@ -92,75 +158,6 @@ class SQLiteIO {
         if (rightChild != null) {
             parseNodesForExport(rightChild, curNode)
         }
-    }
-
-    private fun parseRootForImport(): NodeView<Node<KVP<Int, String>>>? {
-        try {
-            for (node in Nodes.selectAll()) {
-                val parsedParentKey = node[Nodes.parentKey]
-                if (parsedParentKey != null) {
-                    continue
-                }
-                val parsedKey = node[Nodes.key]
-                val parsedValue = node[Nodes.value]
-                val parsedX: Double = node[Nodes.x].toDouble()
-                val parsedY: Double = node[Nodes.y].toDouble()
-                val nodeView = NodeView(Node(KVP(parsedKey, parsedValue)))
-                nodeView.x = parsedX
-                nodeView.y = parsedY
-                Nodes.deleteWhere { parentKey eq null }
-                parseNodesForImport(nodeView)
-                return nodeView
-            }
-        } catch (ex: NumberFormatException) {
-            throw IOException(
-                "Node keys must be integers, value must be string and coordinates must be doubles",
-                ex
-            )
-        }
-        return null
-    }
-
-    private fun parseNodesForImport(
-        curNode: NodeView<Node<KVP<Int, String>>>
-    ): NodeView<Node<KVP<Int, String>>> {
-        for (node in Nodes.selectAll()) {
-            val parsedKey = node[Nodes.key]
-            val parsedParentKey: Int = node[Nodes.parentKey] ?: throw IOException("Incorrect binary tree")
-            val parsedValue = node[Nodes.value]
-            val parsedX: Double = node[Nodes.x].toDouble()
-            val parsedY: Double = node[Nodes.y].toDouble()
-            if (parsedParentKey == curNode.node.elem.key){
-                Nodes.deleteWhere { key eq parsedKey }
-                val newNode: NodeView<Node<KVP<Int, String>>> = NodeView(Node(KVP(parsedKey, parsedValue)))
-                newNode.x = parsedX
-                newNode.y = parsedY
-                if (parsedKey < parsedParentKey) {
-                    curNode.l = newNode
-                    val leftChild = curNode.l
-                    if (leftChild != null) {
-                        parseNodesForImport(leftChild)
-                    }
-                    if (curNode.r == null){
-                        parseNodesForImport(curNode)
-                        break
-                    }
-                } else if (parsedKey > parsedParentKey) {
-                    curNode.r = newNode
-                    val rightChild = curNode.r
-                    if (rightChild != null) {
-                        parseNodesForImport(rightChild)
-                    }
-                    if (curNode.l == null){
-                        parseNodesForImport(curNode)
-                        break
-                    }
-                } else {
-                    throw IOException("Incorrect binary tree")
-                }
-            }
-        }
-        return curNode
     }
 
     private fun addCoordinatesForNodeView(nodeView: NodeView<Node<KVP<Int, String>>>, x: Double, y: Double) {
