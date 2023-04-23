@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.templates.TemplateNode
@@ -65,7 +64,7 @@ fun Node(
                     )
                 }
             },
-            modifier = Modifier.offset { IntOffset(x.value - size / 2, y.value - size / 2) },
+            modifier = Modifier.offset((x.value - size / 2).dp, (y.value - size / 2).dp),
             delayMillis = 600,
             tooltipPlacement = TooltipPlacement.CursorPoint(
                 alignment = Alignment.BottomEnd,
