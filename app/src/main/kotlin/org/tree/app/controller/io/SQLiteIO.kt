@@ -1,5 +1,9 @@
 package org.tree.app.controller.io
 
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -11,12 +15,22 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-object Nodes : Table("Nodes") {
+object Nodes : IntIdTable() {
     val key = integer("key")
     val parentKey = integer("parentKey").nullable()
     val value = text("value")
     val x = float("x")
     val y = float("y")
+}
+
+class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with data in SQLite
+    companion object : IntEntityClass<InstanceOfNode>(Nodes)
+
+    var key by Nodes.key
+    var parentKey by Nodes.parentKey
+    var value by Nodes.value
+    var x by Nodes.x
+    var y by Nodes.y
 }
 
 class SQLiteIO {
