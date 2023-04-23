@@ -21,8 +21,10 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
 import org.tree.app.view.Tree
+import org.tree.app.view.dialogs.io.ExportRBDialog
 import org.tree.app.view.dialogs.io.ImportRBDialog
 import org.tree.binaryTree.KVP
+import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.trees.AVLTree
 import org.tree.binaryTree.trees.BinSearchTree
 import org.tree.binaryTree.trees.RBTree
@@ -31,7 +33,10 @@ enum class DialogType {
     EMPTY,
     IMPORT_RB,
     IMPORT_AVL,
-    IMPORT_BST
+    IMPORT_BST,
+    EXPORT_RB,
+    EXPORT_AVL,
+    EXPORT_BST
 }
 
 @Composable
@@ -95,7 +100,6 @@ fun main() = application {
         val treeOffsetX = remember { mutableStateOf(100) }
         val treeOffsetY = remember { mutableStateOf(100) }
 
-
         MenuBar {
             Menu("File", mnemonic = 'F') {
                 Menu("New tree", mnemonic = 'N') {
@@ -141,7 +145,17 @@ fun main() = application {
                 dialogType = DialogType.EMPTY
             }
 
+            DialogType.EXPORT_AVL -> {
+                TODO("Implement")
+                dialogType = DialogType.EMPTY
+            }
+
             DialogType.IMPORT_BST -> {
+                TODO("Implement")
+                dialogType = DialogType.EMPTY
+            }
+
+            DialogType.EXPORT_BST -> {
                 TODO("Implement")
                 dialogType = DialogType.EMPTY
             }
@@ -150,6 +164,13 @@ fun main() = application {
                 ImportRBDialog(
                     onCloseRequest = { dialogType = DialogType.EMPTY },
                     onSuccess = { treeController = it })
+            }
+
+            DialogType.EXPORT_RB -> {
+                ExportRBDialog(
+                    onCloseRequest = { dialogType = DialogType.EMPTY },
+                    treeController as TreeController<RBNode<KVP<Int, String>>>
+                )
             }
         }
     }
