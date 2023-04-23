@@ -114,8 +114,8 @@ At neo4j database we store **RBTree**. There are 2 types of labels with the foll
   - `key` *int*
   - `value` *string*
   - `isBlack` *boolean* - node colour
-  - `x` *double* - node position at ui
-  - `y` *double* - node position at ui
+  - `x` *int* - node position at ui
+  - `y` *int* - node position at ui
 
 Also, there are 3 types of links:
 
