@@ -1,5 +1,7 @@
 package org.tree.app.controller.io
 
+import NodeExtension
+import TreeController
 import org.neo4j.driver.*
 import org.neo4j.driver.exceptions.SessionExpiredException
 import org.neo4j.driver.exceptions.value.Uncoercible
@@ -25,13 +27,14 @@ class Neo4jIO() : Closeable {
     }
 
     fun exportRBTree(
-        root: NodeView<RBNode<KVP<Int, String>>>,
+        treeController: TreeController<RBNode<KVP<Int, String>>>,
         treeName: String = "Tree"
     ) {   // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
+        val root = treeController.tree.root
         session.executeWrite { tx ->
             deleteTree(tx, treeName)
-            exportRBNode(tx, root)
+            exportRBNode(tx, root, treeController.nodes)
             tx.run(
                 "MATCH (p: $RBNODE) " +
                         "MATCH (l: $NEW_NODE {key: p.lkey}) " +
@@ -98,34 +101,35 @@ class Neo4jIO() : Closeable {
 
     private fun exportRBNode(
         tx: TransactionContext,
-        nodeView: NodeView<RBNode<KVP<Int, String>>>,
+        curNode: RBNode<KVP<Int, String>>?,
+        nodes: MutableMap<RBNode<KVP<Int, String>>, NodeExtension>
     ) {
-        with(nodeView) {
-            val lkey = l?.node?.elem?.key
-            val rkey = r?.node?.elem?.key
-
-            tx.run(
-                "CREATE (:$RBNODE:$NEW_NODE {key : \$key, " +
-                        "value: \$value, " +
-                        "x: \$x, y: \$y, " +
-                        "isBlack: \$isBlack, " +
-                        "lkey: \$lkey, " +
-                        "rkey: \$rkey" +
-                        "})",
-                mutableMapOf(
-                    "key" to node.elem.key,
-                    "value" to (node.elem.v ?: ""),
-                    "x" to x, "y" to y,
-                    "isBlack" to (node.col == RBNode.Colour.BLACK),
-                    "lkey" to lkey,
-                    "rkey" to rkey
-                ) as Map<String, Any>?
-            )
-            l?.let {
-                exportRBNode(tx, it)
-            }
-            r?.let {
-                exportRBNode(tx, it)
+        if (curNode != null) {
+            val lkey = curNode.left?.elem?.key
+            val rkey = curNode.right?.elem?.key
+            val ext = nodes[curNode]
+            if (ext == null) {
+                throw IOException("Can't find coordinates for node with key ${curNode.elem.key}")
+            } else {
+                tx.run(
+                    "CREATE (:$RBNODE:$NEW_NODE {key : \$key, " +
+                            "value: \$value, " +
+                            "x: \$x, y: \$y, " +
+                            "isBlack: \$isBlack, " +
+                            "lkey: \$lkey, " +
+                            "rkey: \$rkey" +
+                            "})",
+                    mutableMapOf(
+                        "key" to curNode.elem.key,
+                        "value" to (curNode.elem.v ?: ""),
+                        "x" to ext.x, "y" to ext.y,
+                        "isBlack" to (curNode.col == RBNode.Colour.BLACK),
+                        "lkey" to lkey,
+                        "rkey" to rkey
+                    ) as Map<String, Any>?
+                )
+                exportRBNode(tx, curNode.left, nodes)
+                exportRBNode(tx, curNode.right, nodes)
             }
         }
     }
