@@ -2,12 +2,14 @@ package org.tree.app.controller.io
 
 import NodeExtension
 import TreeController
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import org.neo4j.driver.*
 import org.neo4j.driver.exceptions.SessionExpiredException
 import org.neo4j.driver.exceptions.value.Uncoercible
-import org.tree.app.view.NodeView
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.RBNode
+import org.tree.binaryTree.trees.RBTree
 import java.io.Closeable
 import java.io.IOException
 
@@ -61,10 +63,13 @@ class Neo4jIO() : Closeable {
     }
 
 
-    fun importRBTree(treeName: String = "Tree"): NodeView<RBNode<KVP<Int, String>>>? {  // when we have treeView, fun will be rewritten
+    fun importRBTree(treeName: String = "Tree"): TreeController<RBNode<KVP<Int, String>>> {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
-        val res: NodeView<RBNode<KVP<Int, String>>>? = session.executeRead { tx ->
-            importRBNodes(tx, treeName)
+        val res: TreeController<RBNode<KVP<Int, String>>> = session.executeRead { tx ->
+            val tree = RBTree<KVP<Int, String>>()
+            val treeController = TreeController(tree)
+            importRBNodes(tx, treeController, treeName)
+            treeController
         }
         session.close()
         return res
@@ -122,7 +127,7 @@ class Neo4jIO() : Closeable {
                     mutableMapOf(
                         "key" to curNode.elem.key,
                         "value" to (curNode.elem.v ?: ""),
-                        "x" to ext.x, "y" to ext.y,
+                        "x" to ext.x.value, "y" to ext.y.value,
                         "isBlack" to (curNode.col == RBNode.Colour.BLACK),
                         "lkey" to lkey,
                         "rkey" to rkey
@@ -134,7 +139,11 @@ class Neo4jIO() : Closeable {
         }
     }
 
-    private fun importRBNodes(tx: TransactionContext, treeName: String): NodeView<RBNode<KVP<Int, String>>>? {
+    private fun importRBNodes(
+        tx: TransactionContext,
+        treeController: TreeController<RBNode<KVP<Int, String>>>,
+        treeName: String
+    ) {
         val nodeAndKeysRecords = tx.run(
             "MATCH (:$TREE {name: \$treeName})-[*]->(p: $RBNODE)" +
                     "OPTIONAL MATCH (p)-[: $LCHILD]->(l: $RBNODE) " +
@@ -145,32 +154,37 @@ class Neo4jIO() : Closeable {
                 "treeName" to treeName
             ) as Map<String, Any>?
         ) // for all nodes get their properties + keys of their children
-        return parseRBNodes(nodeAndKeysRecords)
+        return parseRBNodes(nodeAndKeysRecords, treeController)
     }
 
     private class NodeAndKeys(
-        val nv: NodeView<RBNode<KVP<Int, String>>>,
+        val nd: RBNode<KVP<Int, String>>,
         val lkey: Int?,
         val rkey: Int?
     )
 
-    private fun parseRBNodes(nodeAndKeysRecords: Result): NodeView<RBNode<KVP<Int, String>>>? {
+    private fun parseRBNodes(nodeAndKeysRecords: Result, treeController: TreeController<RBNode<KVP<Int, String>>>) {
         val key2nk = mutableMapOf<Int, NodeAndKeys>()
         for (nkRecord in nodeAndKeysRecords) {
             try {
                 val key = nkRecord["key"].asInt()
                 val value = nkRecord["value"].asString()
-                val nv = NodeView(RBNode(null, KVP(key, value)))
+                val node = RBNode(null, KVP(key, value))
 
-                nv.x = nkRecord["x"].asDouble()
-                nv.y = nkRecord["y"].asDouble()
+                val x = nkRecord["x"].asInt()
+                val y = nkRecord["y"].asInt()
 
+                val color: Color
                 val isBlack = nkRecord["isBlack"].asBoolean()
-                nv.node.col = if (isBlack) {
+                node.col = if (isBlack) {
+                    color = Color.DarkGray
                     RBNode.Colour.BLACK
                 } else {
+                    color = Color.Red
                     RBNode.Colour.RED
                 }
+
+                treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y), color)
 
                 val lkey = if (nkRecord["lKey"].isNull) {
                     null
@@ -183,40 +197,31 @@ class Neo4jIO() : Closeable {
                     nkRecord["rKey"].asInt()
                 }
 
-                key2nk[key] = NodeAndKeys(nv, lkey, rkey)
+                key2nk[key] = NodeAndKeys(node, lkey, rkey)
             } catch (ex: Uncoercible) {
                 throw IOException("Invalid nodes label in the database", ex)
             }
         }
         val nks = key2nk.values.toTypedArray()
-        if (nks.isEmpty()) { // if nodeAndKeysRecords was empty
-            return null
-        }
+
 
         for (nk in nks) {
             nk.lkey?.let {
-                nk.nv.l = key2nk[it]?.nv
+                nk.nd.left = key2nk[it]?.nd
+                nk.nd.left?.parent = nk.nd
                 key2nk.remove(it)
-            }
-            nk.nv.l?.let {
-                nk.nv.node.left = it.node
-                it.node.parent = nk.nv.node
             }
 
             nk.rkey?.let {
-                nk.nv.r = key2nk[it]?.nv
+                nk.nd.right = key2nk[it]?.nd
+                nk.nd.right?.parent = nk.nd
                 key2nk.remove(it)
-            }
-            nk.nv.r?.let {
-                nk.nv.node.right = it.node
-                it.node.parent = nk.nv.node
             }
         }
         if (key2nk.values.size != 1) {
             throw IOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
         }
-        val root = key2nk.values.first().nv
-        return root
+        treeController.tree.root = key2nk.values.first().nd
     }
 
     private fun parseNames(nameRecords: Result): MutableList<String> {
