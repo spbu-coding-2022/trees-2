@@ -5,6 +5,9 @@ import TreeController
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import org.neo4j.driver.*
+import org.neo4j.driver.exceptions.AuthenticationException
+import org.neo4j.driver.exceptions.ClientException
+import org.neo4j.driver.exceptions.ServiceUnavailableException
 import org.neo4j.driver.exceptions.SessionExpiredException
 import org.neo4j.driver.exceptions.value.Uncoercible
 import org.tree.binaryTree.KVP
@@ -34,30 +37,32 @@ class Neo4jIO() : Closeable {
     ) {   // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
         val root = treeController.tree.root
-        session.executeWrite { tx ->
-            deleteTree(tx, treeName)
-            exportRBNode(tx, root, treeController.nodes)
-            tx.run(
-                "MATCH (p: $RBNODE) " +
-                        "MATCH (l: $NEW_NODE {key: p.lkey}) " +
-                        "CREATE (p)-[: $LCHILD]->(l) " +
-                        "REMOVE p.lkey, l: $NEW_NODE"
-            ) // connect parent and left child
-            tx.run(
-                "MATCH (p: $RBNODE) " +
-                        "MATCH (r: $NEW_NODE {key: p.rkey}) " +
-                        "CREATE (p)-[: $RCHILD]->(r) " +
-                        "REMOVE p.rkey, r: $NEW_NODE"
-            )// connect parent and right child
+        handleTransactionException {
+            session.executeWrite { tx ->
+                deleteTree(tx, treeName)
+                exportRBNode(tx, root, treeController.nodes)
+                tx.run(
+                    "MATCH (p: $RBNODE) " +
+                            "MATCH (l: $NEW_NODE {key: p.lkey}) " +
+                            "CREATE (p)-[: $LCHILD]->(l) " +
+                            "REMOVE p.lkey, l: $NEW_NODE"
+                ) // connect parent and left child
+                tx.run(
+                    "MATCH (p: $RBNODE) " +
+                            "MATCH (r: $NEW_NODE {key: p.rkey}) " +
+                            "CREATE (p)-[: $RCHILD]->(r) " +
+                            "REMOVE p.rkey, r: $NEW_NODE"
+                )// connect parent and right child
 
-            tx.run(
-                "MATCH (r: $NEW_NODE) " +
-                        "CREATE (t: $TREE {name: \$treeName})-[:$ROOT]->(r) " +
-                        "REMOVE r:$NEW_NODE",
-                mutableMapOf(
-                    "treeName" to treeName
-                ) as Map<String, Any>?
-            )// connect tree and root
+                tx.run(
+                    "MATCH (r: $NEW_NODE) " +
+                            "CREATE (t: $TREE {name: \$treeName})-[:$ROOT]->(r) " +
+                            "REMOVE r:$NEW_NODE",
+                    mutableMapOf(
+                        "treeName" to treeName
+                    ) as Map<String, Any>?
+                )// connect tree and root
+            }
         }
         session.close()
     }
@@ -65,29 +70,36 @@ class Neo4jIO() : Closeable {
 
     fun importRBTree(treeName: String = "Tree"): TreeController<RBNode<KVP<Int, String>>> {  // when we have treeView, fun will be rewritten
         val session = driver?.session() ?: throw IOException("Driver is not open")
-        val res: TreeController<RBNode<KVP<Int, String>>> = session.executeRead { tx ->
-            val tree = RBTree<KVP<Int, String>>()
-            val treeController = TreeController(tree)
-            importRBNodes(tx, treeController, treeName)
-            treeController
-        }
+        val res: TreeController<RBNode<KVP<Int, String>>> =
+            handleTransactionException {
+                session.executeRead { tx ->
+                    val tree = RBTree<KVP<Int, String>>()
+                    val treeController = TreeController(tree)
+                    importRBNodes(tx, treeController, treeName)
+                    treeController
+                }
+            }
         session.close()
         return res
     }
 
     fun removeTree(treeName: String = "Tree") {
         val session = driver?.session() ?: throw IOException("Driver is not open")
-        session.executeWrite { tx ->
-            deleteTree(tx, treeName)
+        handleTransactionException {
+            session.executeWrite { tx ->
+                deleteTree(tx, treeName)
+            }
         }
         session.close()
     }
 
     fun getTreesNames(): MutableList<String> {
         val session = driver?.session() ?: throw IOException("Driver is not open")
-        val res: MutableList<String> = session.executeRead { tx ->
-            val nameRecords = tx.run("MATCH (t: $TREE) RETURN t.name AS name")
-            parseNames(nameRecords)
+        val res: MutableList<String> = handleTransactionException {
+            session.executeRead { tx ->
+                val nameRecords = tx.run("MATCH (t: $TREE) RETURN t.name AS name")
+                parseNames(nameRecords)
+            }
         }
         session.close()
         return res
@@ -241,13 +253,32 @@ class Neo4jIO() : Closeable {
         try {
             driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password))
         } catch (ex: IllegalArgumentException) {
-            throw IOException("Wrong URI", ex)
+            throw HandledIOException("Wrong URI", ex)
         } catch (ex: SessionExpiredException) {
-            throw IOException("Session failed, try restarting the app", ex)
+            throw HandledIOException("Session failed, try restarting the app", ex)
         }
+        sendTestQuery()
     }
 
     override fun close() {
         driver?.close()
     }
+
+    private fun sendTestQuery() {
+        getTreesNames()
+    }
+
+    private fun <T> handleTransactionException(transaction: () -> T): T {
+        try {
+            return transaction()
+        } catch (ex: AuthenticationException) {
+            throw HandledIOException("Wrong username or password", ex)
+        } catch (ex: ClientException) {
+            throw HandledIOException("Use the bolt:// URI scheme or some other expected labels", ex)
+        } catch (ex: ServiceUnavailableException) {
+            throw HandledIOException("Check your network connection", ex)
+        }
+    }
 }
+
+
