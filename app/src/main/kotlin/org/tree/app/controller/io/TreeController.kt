@@ -13,7 +13,7 @@ import kotlin.random.Random
 data class NodeExtension(var x: MutableState<Int>, var y: MutableState<Int>, var color: Color = Color.Gray)
 class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     val tree: TemplateBSTree<KVP<Int, String>, NODE_T>,
-    val nodeSize: Int = 20
+    val nodeSize: Int = 50
 ) {
     val nodes = mutableMapOf<NODE_T, NodeExtension>()
 
@@ -94,5 +94,5 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>, TREE_T : TemplateBSTree<KV
     for (i in 0..10) {
         emptyTree.insert(KVP(rand.nextInt(100), "Num: $i"))
     }
-    return TreeController(emptyTree, 50)
+    return TreeController(emptyTree)
 }
