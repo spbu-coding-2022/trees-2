@@ -162,4 +162,9 @@ class SQLiteIO {
         }
         return curNode
     }
+
+    private fun addCoordinatesForNodeView(nodeView: NodeView<Node<KVP<Int, String>>>, x: Double, y: Double) {
+        nodeView.x = x
+        nodeView.y = y
+    }
 }
