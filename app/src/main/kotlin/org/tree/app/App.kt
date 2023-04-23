@@ -5,10 +5,12 @@ package org.tree.app
 
 import TreeController
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
@@ -20,6 +22,7 @@ import androidx.compose.ui.window.rememberWindowState
 import newTree
 import org.tree.app.view.Tree
 import org.tree.app.view.dialogs.io.ImportRBDialog
+import org.tree.binaryTree.KVP
 import org.tree.binaryTree.trees.AVLTree
 import org.tree.binaryTree.trees.BinSearchTree
 import org.tree.binaryTree.trees.RBTree
@@ -31,6 +34,50 @@ enum class DialogType {
     IMPORT_BST
 }
 
+@Composable
+fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
+    var keyString by remember { mutableStateOf("123") }
+    var valueString by remember { mutableStateOf("value") }
+
+    Row {
+        Button(onClick = {
+            onClick(keyString.toInt(), valueString)
+        }) {
+            Text("Insert")
+        }
+        OutlinedTextField(value = keyString, onValueChange = { keyString = it })
+        OutlinedTextField(value = valueString, onValueChange = { valueString = it })
+    }
+}
+
+@Composable
+fun RemoveRow(onClick: (key: Int) -> Unit) {
+    var keyString by remember { mutableStateOf("123") }
+
+    Row {
+        Button(onClick = {
+            onClick(keyString.toInt())
+        }) {
+            Text("Remove")
+        }
+        OutlinedTextField(value = keyString, onValueChange = { keyString = it })
+    }
+}
+
+@Composable
+fun FindRow(onClick: (key: Int) -> (Unit)) {
+    var keyString by remember { mutableStateOf("123") }
+
+    Row {
+        Button(onClick = {
+            onClick(keyString.toInt())
+        }) {
+            Text("Find")
+        }
+        OutlinedTextField(value = keyString, onValueChange = { keyString = it })
+    }
+}
+
 fun main() = application {
     val icon = painterResource("icon.png")
     Window(
@@ -39,8 +86,15 @@ fun main() = application {
         state = rememberWindowState(width = 800.dp, height = 600.dp),
         icon = icon
     ) {
-        var treeController by remember { mutableStateOf<TreeController<*>>(newTree(BinSearchTree())) }
+        var treeController by remember {
+            mutableStateOf<TreeController<*>>(
+                newTree(BinSearchTree())
+            )
+        }
         var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
+        val treeOffsetX = remember { mutableStateOf(100) }
+        val treeOffsetY = remember { mutableStateOf(100) }
+
 
         MenuBar {
             Menu("File", mnemonic = 'F') {
@@ -57,8 +111,25 @@ fun main() = application {
             }
         }
 
-        Box(Modifier.scale(1.0F)) {
-            Tree(treeController)
+        Row {
+            Column {
+                InsertRow(onClick = { key, value ->
+                    treeController = treeController.insert(KVP(key, value))
+                })
+                RemoveRow(onClick = { key ->
+                    treeController = treeController.remove(KVP(key))
+                })
+                FindRow(onClick = { key ->
+                    val a = treeController.find(KVP(key))
+                    if (a != null) {
+                        treeOffsetX.value = -a.x.value
+                        treeOffsetY.value = -a.y.value
+                    }
+                })
+            }
+            Box(Modifier.scale(1.0F)) {
+                Tree(treeController, treeOffsetX, treeOffsetY)
+            }
         }
 
         when (dialogType) {
@@ -76,7 +147,9 @@ fun main() = application {
             }
 
             DialogType.IMPORT_RB -> {
-                ImportRBDialog(onCloseRequest = { dialogType = DialogType.EMPTY }, onSuccess = { treeController = it })
+                ImportRBDialog(
+                    onCloseRequest = { dialogType = DialogType.EMPTY },
+                    onSuccess = { treeController = it })
             }
         }
     }
