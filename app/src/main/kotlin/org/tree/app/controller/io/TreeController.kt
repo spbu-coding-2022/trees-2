@@ -17,6 +17,12 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
 ) {
     val nodes = mutableMapOf<NODE_T, NodeExtension>()
 
+    init {
+        tree.root?.let {
+            addNode(it, 0, 0, height(it) - 2)
+        }
+    }
+
     fun addNode(curNode: NODE_T, x: Int, y: Int, height: Int) {
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
@@ -29,7 +35,29 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         curNode.right?.let {
             addNode(it, x - deltaX, y + nodeSize, height - 1)
         }
+    }
 
+    fun insert(obj: KVP<Int, String>): TreeController<NODE_T> {
+        var res = this
+        val isChanged = tree.insert(obj)
+        if (isChanged) {
+            res = TreeController(tree, nodeSize)
+        }
+        return res
+    }
+
+    fun remove(obj: KVP<Int, String>): TreeController<NODE_T> {
+        var res = this
+        val isChanged = tree.remove(obj)
+        if (isChanged) {
+            res = TreeController(tree, nodeSize)
+        }
+        return res
+    }
+
+    fun find(obj: KVP<Int, String>): NodeExtension? {
+        val node = tree.find(obj)
+        return nodes[node]
     }
 
     private fun getNodeCol(curNode: NODE_T): Color {
@@ -56,11 +84,6 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         }
     }
 
-    init {
-        tree.root?.let {
-            addNode(it, 100, 100, height(it) - 2)
-        }
-    }
 
 }
 
@@ -71,5 +94,5 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>, TREE_T : TemplateBSTree<KV
     for (i in 0..10) {
         emptyTree.insert(KVP(rand.nextInt(100), "Num: $i"))
     }
-    return TreeController(emptyTree)
+    return TreeController(emptyTree, 50)
 }
