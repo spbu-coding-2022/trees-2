@@ -24,14 +24,7 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     }
 
     private fun childrenCount(node: NODE_T?): Int {
-        var count = 0
-        if (node?.left != null) {
-            count++
-        }
-        if (node?.right != null) {
-            count++
-        }
-        return count
+        return (2 - (node?.countNullChildren() ?: 2))
     }
 
     private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
