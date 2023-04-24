@@ -224,24 +224,27 @@ class Neo4jIO() : Closeable {
         }
         val nks = key2nk.values.toTypedArray()
 
+        if (key2nk.isEmpty()) { // tree was empty
+            treeController.tree.root = null
+        } else {
+            for (nk in nks) {
+                nk.lkey?.let {
+                    nk.nd.left = key2nk[it]?.nd
+                    nk.nd.left?.parent = nk.nd
+                    key2nk.remove(it)
+                }
 
-        for (nk in nks) {
-            nk.lkey?.let {
-                nk.nd.left = key2nk[it]?.nd
-                nk.nd.left?.parent = nk.nd
-                key2nk.remove(it)
+                nk.rkey?.let {
+                    nk.nd.right = key2nk[it]?.nd
+                    nk.nd.right?.parent = nk.nd
+                    key2nk.remove(it)
+                }
             }
-
-            nk.rkey?.let {
-                nk.nd.right = key2nk[it]?.nd
-                nk.nd.right?.parent = nk.nd
-                key2nk.remove(it)
+            if (key2nk.values.size != 1) {
+                throw IOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
             }
+            treeController.tree.root = key2nk.values.first().nd
         }
-        if (key2nk.values.size != 1) {
-            throw IOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
-        }
-        treeController.tree.root = key2nk.values.first().nd
     }
 
     private fun parseNames(nameRecords: Result): MutableList<String> {
