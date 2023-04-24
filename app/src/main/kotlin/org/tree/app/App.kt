@@ -4,15 +4,19 @@
 package org.tree.app
 
 import TreeController
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
@@ -47,13 +51,16 @@ fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
     var valueString by remember { mutableStateOf("value") }
 
     Row {
-        Button(onClick = {
-            onClick(keyString.toInt(), valueString)
-        }) {
+        Button(
+            onClick = {
+                onClick(keyString.toInt(), valueString)
+            },
+            modifier = Modifier.weight(0.3f).defaultMinSize(minWidth = 100.dp)
+        ) {
             Text("Insert")
         }
-        OutlinedTextField(value = keyString, onValueChange = { keyString = it })
-        OutlinedTextField(value = valueString, onValueChange = { valueString = it })
+        OutlinedTextField(value = keyString, onValueChange = { keyString = it }, modifier = Modifier.weight(0.35f))
+        OutlinedTextField(value = valueString, onValueChange = { valueString = it }, modifier = Modifier.weight(0.35f))
     }
 }
 
@@ -62,12 +69,16 @@ fun RemoveRow(onClick: (key: Int) -> Unit) {
     var keyString by remember { mutableStateOf("123") }
 
     Row {
-        Button(onClick = {
-            onClick(keyString.toInt())
-        }) {
+        Button(
+            onClick = {
+                onClick(keyString.toInt())
+            },
+            modifier = Modifier.weight(0.3f)
+        ) {
             Text("Remove")
         }
-        OutlinedTextField(value = keyString, onValueChange = { keyString = it })
+
+        OutlinedTextField(value = keyString, onValueChange = { keyString = it }, modifier = Modifier.weight(0.7f))
     }
 }
 
@@ -78,10 +89,10 @@ fun FindRow(onClick: (key: Int) -> (Unit)) {
     Row {
         Button(onClick = {
             onClick(keyString.toInt())
-        }) {
+        }, modifier = Modifier.weight(0.3f)) {
             Text("Find")
         }
-        OutlinedTextField(value = keyString, onValueChange = { keyString = it })
+        OutlinedTextField(value = keyString, onValueChange = { keyString = it }, modifier = Modifier.weight(0.7f))
     }
 }
 
@@ -98,6 +109,7 @@ fun main() = application {
                 newTree(BinSearchTree())
             )
         }
+        var widthOfPanel by remember { mutableStateOf(400) }
         var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
         val treeOffsetX = remember { mutableStateOf(100) }
         val treeOffsetY = remember { mutableStateOf(100) }
@@ -134,8 +146,8 @@ fun main() = application {
             }
         }
 
-        Row {
-            Column {
+        Row(modifier = Modifier.background(Color.LightGray)) {
+            Column(Modifier.width(widthOfPanel.dp)) {
                 InsertRow(onClick = { key, value ->
                     treeController = treeController.insert(KVP(key, value))
                 })
@@ -150,6 +162,19 @@ fun main() = application {
                     }
                 })
             }
+            Spacer(modifier = Modifier.width(3.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
+                Box(Modifier.background(color = Color.Gray, shape = RoundedCornerShape(5.dp)).size(5.dp, 100.dp)
+                    .draggable(
+                        orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                        state = rememberDraggableState { delta ->
+                            widthOfPanel += delta.toInt()
+                            treeOffsetX.value -= delta.toInt() / 2
+                        }
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.width(3.dp))
             Box(Modifier.scale(1.0F)) {
                 TreeView(treeController, treeOffsetX, treeOffsetY)
             }
