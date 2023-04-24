@@ -87,7 +87,22 @@ We have functions:
 
 ### SQLite
 
-TODO: write
+At SQLite database we store BinSearchTree. There are 2 types of objects with the following struct:
+
+- `Tree`
+  - `root` *Node*
+- `Node`
+  - `key` *int*
+  - `parentKey` *int*
+  - `value` *string*
+  - `x` *int* - node position at ui
+  - `y` *int* - node position at ui
+
+We have functions:
+
+- `exportTree(TreeController, file)` - writes information stored in TreeController object  to a `file`
+- `importTree(file)` - reads the tree stored in the `file` and returns TreeController object
+
 
 ### Neo4j
 
