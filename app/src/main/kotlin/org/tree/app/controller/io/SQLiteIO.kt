@@ -1,5 +1,8 @@
 package org.tree.app.controller.io
 
+import NodeExtension
+import TreeController
+import androidx.compose.runtime.mutableStateOf
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -10,9 +13,9 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.tree.app.view.NodeView
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
+import org.tree.binaryTree.trees.BinSearchTree
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -21,8 +24,8 @@ object Nodes : IntIdTable() {
     val key = integer("key")
     val parentKey = integer("parentKey").nullable()
     val value = text("value")
-    val x = float("x")
-    val y = float("y")
+    val x = integer("x")
+    val y = integer("y")
 }
 
 class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with data in SQLite
@@ -37,25 +40,26 @@ class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with
 
 class SQLiteIO {
     private var amountOfNodesToHandle = 0
-    fun importTree(file: File): NodeView<Node<KVP<Int, String>>>? {
+    private lateinit var treeController : TreeController<Node<KVP<Int, String>>>
+    fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
-        var root: NodeView<Node<KVP<Int, String>>>? = null
         try {
             transaction {
                 addLogger(StdOutSqlLogger)
-                val amountOfNodes = InstanceOfNode.all().count()
+                val setOfNodes = InstanceOfNode.all().toMutableSet()
+                val amountOfNodes = setOfNodes.count()
                 if (amountOfNodes > 0) {
-                    val setOfNodes = InstanceOfNode.all().toMutableSet()
-                    root = parseRootForImport(setOfNodes)
+                    treeController = TreeController(BinSearchTree())
+                    parseRootForImport(setOfNodes)
                 }
             }
         } catch (ex: ExposedSQLException) {
             throw IOException("File is not a database", ex)
         }
-        return root
+        return treeController
     }
 
-    fun exportTree(rootOfBinTree: NodeView<Node<KVP<Int, String>>>, file: File) {
+    fun exportTree(treeController_: TreeController<Node<KVP<Int, String>>>, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
@@ -70,27 +74,33 @@ class SQLiteIO {
             } catch (ex: ExposedSQLException) {
                 throw IOException("File is not a database", ex)
             }
-            parseNodesForExport(rootOfBinTree, null)
+            treeController = treeController_
+            val root = treeController.tree.root
+            if (root != null) {
+                parseNodesForExport(root, null)
+            }
         }
     }
 
 
     private fun parseRootForImport(
-        setOfNodeView: MutableSet<InstanceOfNode>
-    ): NodeView<Node<KVP<Int, String>>> {
+        setOfNodes: MutableSet<InstanceOfNode>
+    ) {
         try {
-            val nodeView = setOfNodeView.elementAt(0)
-            setOfNodeView.remove(nodeView)
-            val parsedKey = nodeView.key
-            val parsedValue = nodeView.value
-            val parsedX: Double = nodeView.x.toDouble()
-            val parsedY: Double = nodeView.y.toDouble()
-            val newNodeView = NodeView(Node(KVP(parsedKey, parsedValue)))
-            addCoordinatesForNodeView(newNodeView, parsedX, parsedY)
-            newNodeView.node = Node(KVP(parsedKey, parsedValue))
-            amountOfNodesToHandle = setOfNodeView.count()
-            parseNodesForImport(setOfNodeView, newNodeView)
-            return newNodeView
+            val node = setOfNodes.elementAt(0)
+            setOfNodes.remove(node)
+            val parsedKey = node.key
+            val parsedValue = node.value
+            val parsedX = node.x
+            val parsedY = node.y
+            val bst = treeController.tree
+            amountOfNodesToHandle = setOfNodes.count()
+            bst.insert(KVP(parsedKey, parsedValue))
+            val root = bst.root
+            if (root != null) {
+                addCoordinatesToNode(root, parsedX, parsedY)
+                parseNodesForImport(setOfNodes, root)
+            }
         } catch (ex: NumberFormatException) {
             throw IOException(
                 "Node keys must be integers, value must be string and coordinates must be doubles",
@@ -100,38 +110,35 @@ class SQLiteIO {
     }
 
     private fun parseNodesForImport(
-        setOfNodeView: MutableSet<InstanceOfNode>,
-        curNode: NodeView<Node<KVP<Int, String>>>
+        setOfNodes: MutableSet<InstanceOfNode>,
+        curNode: Node<KVP<Int, String>>
     ) {
         if (amountOfNodesToHandle <= 0) {
             return
         }
-        val nodeView = setOfNodeView.elementAt(0)
-        val parsedKey = nodeView.key
-        val parsedParentKey: Int = nodeView.parentKey ?: throw IOException("Incorrect binary tree")
-        val parsedValue = nodeView.value
-        val parsedX: Double = nodeView.x.toDouble()
-        val parsedY: Double = nodeView.y.toDouble()
-        if (parsedParentKey == curNode.node.elem.key) {
+        val nodes = setOfNodes.elementAt(0)
+        val parsedKey = nodes.key
+        val parsedParentKey: Int = nodes.parentKey ?: throw IOException("Incorrect binary tree")
+        val parsedValue = nodes.value
+        val parsedX = nodes.x
+        val parsedY = nodes.y
+        if (parsedParentKey == curNode.elem.key) {
             val newNode = Node(KVP(parsedKey, parsedValue))
-            val newNodeView = NodeView(newNode)
-            addCoordinatesForNodeView(newNodeView, parsedX, parsedY)
-            setOfNodeView.remove(nodeView)
+            addCoordinatesToNode(newNode, parsedX, parsedY)
+            setOfNodes.remove(nodes)
             amountOfNodesToHandle--
             if (parsedKey < parsedParentKey) {
-                curNode.node.left = newNode
-                curNode.l = newNodeView
-                val leftChild = curNode.l
+                curNode.left = newNode
+                val leftChild = curNode.left
                 if (leftChild != null) {
-                    parseNodesForImport(setOfNodeView, leftChild)
+                    parseNodesForImport(setOfNodes, leftChild)
                 }
-                parseNodesForImport(setOfNodeView, curNode)
+                parseNodesForImport(setOfNodes, curNode)
             } else if (parsedKey > parsedParentKey) {
-                curNode.node.right = newNode
-                curNode.r = newNodeView
-                val rightChild = curNode.r
+                curNode.right = newNode
+                val rightChild = curNode.right
                 if (rightChild != null) {
-                    parseNodesForImport(setOfNodeView, rightChild)
+                    parseNodesForImport(setOfNodes, rightChild)
                 }
             } else {
                 throw IOException("Incorrect binary tree")
@@ -140,28 +147,30 @@ class SQLiteIO {
     }
 
     private fun parseNodesForExport(
-        curNode: NodeView<Node<KVP<Int, String>>>,
-        parNode: NodeView<Node<KVP<Int, String>>>?
+        curNode: Node<KVP<Int, String>>,
+        parNode: Node<KVP<Int, String>>?
     ) {
         InstanceOfNode.new {
-            key = curNode.node.elem.key
-            parentKey = parNode?.node?.elem?.key
-            value = curNode.node.elem.v.toString()
-            x = curNode.x.toFloat()
-            y = curNode.y.toFloat()
+            key = curNode.elem.key
+            parentKey = parNode?.elem?.key
+            value = curNode.elem.v.toString()
+            x = treeController.nodes[curNode]?.x?.value ?: 0
+            y = treeController.nodes[curNode]?.y?.value ?: 0
         }
-        val leftChild = curNode.l
+        val leftChild = curNode.left
         if (leftChild != null) {
             parseNodesForExport(leftChild, curNode)
         }
-        val rightChild = curNode.r
+        val rightChild = curNode.right
         if (rightChild != null) {
             parseNodesForExport(rightChild, curNode)
         }
     }
 
-    private fun addCoordinatesForNodeView(nodeView: NodeView<Node<KVP<Int, String>>>, x: Double, y: Double) {
-        nodeView.x = x
-        nodeView.y = y
+    private fun addCoordinatesToNode(
+        node: Node<KVP<Int, String>>,
+        x: Int, y: Int
+    ) {
+        treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y))
     }
 }
