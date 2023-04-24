@@ -55,13 +55,21 @@ class Neo4jIO() : Closeable {
                 )// connect parent and right child
 
                 tx.run(
+                    "CREATE (t: $TREE {name: \$treeName})", mutableMapOf(
+                        "treeName" to treeName
+                    ) as Map<String, Any>?
+                ) // create tree label
+
+                tx.run(
                     "MATCH (r: $NEW_NODE) " +
-                            "CREATE (t: $TREE {name: \$treeName})-[:$ROOT]->(r) " +
+                            "MATCH (t: $TREE {name: \$treeName}) " +
+                            "CREATE (t)-[:$ROOT]->(r) " +
                             "REMOVE r:$NEW_NODE",
                     mutableMapOf(
                         "treeName" to treeName
                     ) as Map<String, Any>?
                 )// connect tree and root
+
             }
         }
         session.close()
@@ -274,6 +282,7 @@ class Neo4jIO() : Closeable {
         } catch (ex: AuthenticationException) {
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
+            println(ex.message)
             throw HandledIOException("Use the bolt:// URI scheme or some other expected labels", ex)
         } catch (ex: ServiceUnavailableException) {
             throw HandledIOException("Check your network connection", ex)
