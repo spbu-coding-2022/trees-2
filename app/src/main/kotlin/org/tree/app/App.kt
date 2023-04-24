@@ -20,7 +20,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
-import org.tree.app.view.Tree
+import org.tree.app.view.TreeView
 import org.tree.app.view.dialogs.io.ExportRBDialog
 import org.tree.app.view.dialogs.io.ImportRBDialog
 import org.tree.binaryTree.AVLNode
@@ -151,7 +151,7 @@ fun main() = application {
                 })
             }
             Box(Modifier.scale(1.0F)) {
-                Tree(treeController, treeOffsetX, treeOffsetY)
+                TreeView(treeController, treeOffsetX, treeOffsetY)
             }
         }
 
