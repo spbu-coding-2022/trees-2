@@ -4,11 +4,13 @@ import TreeController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.templates.TemplateNode
 
@@ -18,7 +20,7 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
     offsetX: MutableState<Int>,
     offsetY: MutableState<Int>,
 ) {
-    Box(modifier = Modifier.background(Color.Cyan).clipToBounds()
+    Box(modifier = Modifier.background(Color.White, shape = RoundedCornerShape(16.dp)).clipToBounds()
         .pointerInput(offsetX, offsetY) {
             detectDragGestures { change, dragAmount ->
                 change.consume()
@@ -26,8 +28,7 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
                 offsetY.value += dragAmount.y.toInt()
             }
         }) {
-        Box(
-        ) {
+        Box {
             for (n in t.nodes) {
                 val x by n.value.x
                 val y by n.value.y
