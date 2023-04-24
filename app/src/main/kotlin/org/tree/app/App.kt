@@ -9,14 +9,16 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
@@ -45,10 +47,15 @@ enum class DialogType {
     EXPORT_BST
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
     var keyString by remember { mutableStateOf("123") }
     var valueString by remember { mutableStateOf("value") }
+
+    fun execute() {
+        onClick(keyString.toInt(), valueString)
+    }
 
     Row {
         Button(
@@ -59,14 +66,43 @@ fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
         ) {
             Text("Insert")
         }
-        OutlinedTextField(value = keyString, onValueChange = { keyString = it }, modifier = Modifier.weight(0.35f))
-        OutlinedTextField(value = valueString, onValueChange = { valueString = it }, modifier = Modifier.weight(0.35f))
+        OutlinedTextField(
+            value = keyString,
+            onValueChange = { keyString = it },
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
+            modifier = Modifier.weight(0.35f).onKeyEvent {
+                if (it.key == Key.Enter) {
+                    execute()
+                    return@onKeyEvent true
+                }
+                return@onKeyEvent false
+            }
+        )
+        OutlinedTextField(
+            value = valueString,
+            onValueChange = { valueString = it },
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
+            modifier = Modifier.weight(0.35f).onKeyEvent {
+                if (it.key == Key.Enter) {
+                    execute()
+                    return@onKeyEvent true
+                }
+                return@onKeyEvent false
+            }
+        )
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RemoveRow(onClick: (key: Int) -> Unit) {
     var keyString by remember { mutableStateOf("123") }
+
+    fun execute() {
+        onClick(keyString.toInt())
+    }
 
     Row {
         Button(
@@ -78,21 +114,48 @@ fun RemoveRow(onClick: (key: Int) -> Unit) {
             Text("Remove")
         }
 
-        OutlinedTextField(value = keyString, onValueChange = { keyString = it }, modifier = Modifier.weight(0.7f))
+        OutlinedTextField(
+            value = keyString,
+            onValueChange = { keyString = it },
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
+            modifier = Modifier.weight(0.7f).onKeyEvent {
+                if (it.key == Key.Enter) {
+                    execute()
+                    return@onKeyEvent true
+                }
+                return@onKeyEvent false
+            }
+        )
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FindRow(onClick: (key: Int) -> (Unit)) {
     var keyString by remember { mutableStateOf("123") }
 
+    fun execute() {
+        onClick(keyString.toInt())
+    }
+
     Row {
-        Button(onClick = {
-            onClick(keyString.toInt())
-        }, modifier = Modifier.weight(0.3f)) {
+        Button(onClick = ::execute, modifier = Modifier.weight(0.3f)) {
             Text("Find")
         }
-        OutlinedTextField(value = keyString, onValueChange = { keyString = it }, modifier = Modifier.weight(0.7f))
+        OutlinedTextField(
+            value = keyString,
+            onValueChange = { keyString = it },
+            maxLines = 1,
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
+            modifier = Modifier.weight(0.7f).onKeyEvent {
+                if (it.key == Key.Enter) {
+                    execute()
+                    return@onKeyEvent true
+                }
+                return@onKeyEvent false
+            }
+        )
     }
 }
 
@@ -157,8 +220,8 @@ fun main() = application {
                 FindRow(onClick = { key ->
                     val a = treeController.find(KVP(key))
                     if (a != null) {
-                        treeOffsetX.value = -a.x.value
-                        treeOffsetY.value = -a.y.value
+                        treeOffsetX.value = 100 - a.x.value
+                        treeOffsetY.value = 100 - a.y.value
                     }
                 })
             }
