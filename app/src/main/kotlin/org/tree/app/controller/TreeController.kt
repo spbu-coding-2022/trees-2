@@ -23,6 +23,17 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         }
     }
 
+    private fun childrenCount(node: NODE_T?): Int{
+        var count = 0
+        if (node?.left != null) {
+            count++
+        }
+        if (node?.right != null) {
+            count++
+        }
+        return count
+    }
+
     fun addNode(curNode: NODE_T, x: Int, y: Int, height: Int) {
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
