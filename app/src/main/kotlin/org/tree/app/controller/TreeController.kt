@@ -7,7 +7,6 @@ import org.tree.binaryTree.Node
 import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.templates.TemplateBSTree
 import org.tree.binaryTree.templates.TemplateNode
-import kotlin.math.pow
 import kotlin.random.Random
 
 data class NodeExtension(var x: MutableState<Int>, var y: MutableState<Int>, var color: Color = Color.Gray)
@@ -19,11 +18,12 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
 
     init {
         tree.root?.let {
-            addNode(it, 0, 0, height(it) - 2)
+            drawLeft(it, 0, 0, height(it) - 2)
+            drawRight(it, 0, 0, height(it) - 2)
         }
     }
 
-    private fun childrenCount(node: NODE_T?): Int{
+    private fun childrenCount(node: NODE_T?): Int {
         var count = 0
         if (node?.left != null) {
             count++
@@ -34,18 +34,38 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         return count
     }
 
-    fun addNode(curNode: NODE_T, x: Int, y: Int, height: Int) {
+    private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
+        var count = 0
+        if (node?.right != null) {
+            count = 1 + (height)*childrenCount(node.right)
+        }
+        val x = parentX - nodeSize - (count*nodeSize)
+        val y = parentY + nodeSize
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
-        val col = getNodeCol(curNode)
-        nodes[curNode] = NodeExtension(stateX, stateY, col)
-        val deltaX = nodeSize * (2).toDouble().pow(height.toDouble()).toInt()
-        curNode.left?.let {
-            addNode(it, x + deltaX, y + nodeSize, height - 1)
+        if (node != null) {
+            val col = getNodeCol(node)
+            nodes[node] = NodeExtension(stateX, stateY, col)
         }
-        curNode.right?.let {
-            addNode(it, x - deltaX, y + nodeSize, height - 1)
+        if (node?.left != null) drawLeft(node.left, x, y, height - 1)
+        if (node?.right != null) drawRight(node.right, x, y, height - 1)
+    }
+
+    private fun drawRight(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
+        var count = 0
+        if (node?.left != null) {
+            count = 1 + (height)*childrenCount(node.left)
         }
+        val x = parentX + nodeSize + (count*nodeSize)
+        val y = parentY + nodeSize
+        val stateX = mutableStateOf(x)
+        val stateY = mutableStateOf(y)
+        if (node != null) {
+            val col = getNodeCol(node)
+            nodes[node] = NodeExtension(stateX, stateY, col)
+        }
+        if (node?.left != null) drawLeft(node.left, x, y, height - 1)
+        if (node?.right != null) drawRight(node.right, x, y, height - 1)
     }
 
     fun insert(obj: KVP<Int, String>): TreeController<NODE_T> {
