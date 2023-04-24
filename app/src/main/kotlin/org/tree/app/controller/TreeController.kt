@@ -84,6 +84,9 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         }
     }
 
+    fun nodeType(): NODE_T? {
+        return tree.root
+    }
 
 }
 
