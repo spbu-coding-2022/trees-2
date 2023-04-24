@@ -22,14 +22,24 @@ fun ImportRBDialog(
     onCloseRequest: () -> Unit,
     onSuccess: (TreeController<RBNode<KVP<Int, String>>>) -> Unit = {}
 ) {
+    var throwException by remember { mutableStateOf(false) }
+    var exceptionContent by remember { mutableStateOf("Nothing...") }
+
+    AlertDialog(exceptionContent, throwException, { throwException = false })
     Neo4jIODialog("Import RBTree", onCloseRequest = onCloseRequest) { enabled, closeRequest, db, treeName ->
         Button(
             enabled = enabled,
             onClick = {
-                val treeController = db.importRBTree(treeName)
-                db.close()
-                onSuccess(treeController)
-                closeRequest()
+                val treeController =
+                    handleIOException(onCatch = {
+                        exceptionContent = it.toString()
+                        throwException = true
+                    }) { db.importRBTree(treeName) }
+                if (treeController != null) {
+                    db.close()
+                    onSuccess(treeController)
+                    closeRequest()
+                }
             }
         ) {
             Text("Import")
@@ -43,13 +53,22 @@ fun ExportRBDialog(
     treeController: TreeController<RBNode<KVP<Int, String>>>
 ) {
 
+    var throwException by remember { mutableStateOf(false) }
+    var exceptionContent by remember { mutableStateOf("Nothing...") }
+
+    AlertDialog(exceptionContent, throwException, { throwException = false })
     Neo4jIODialog("Export RBTree", onCloseRequest = onCloseRequest) { enabled, closeRequest, db, treeName ->
         Button(
             enabled = enabled,
             onClick = {
-                db.exportRBTree(treeController, treeName)
-                db.close()
-                closeRequest()
+                handleIOException(onCatch = {
+                    exceptionContent = it.toString()
+                    throwException = true
+                }) { db.exportRBTree(treeController, treeName) }
+                if (!throwException) {
+                    db.close()
+                    closeRequest()
+                }
             }
         ) {
             Text("Export")
@@ -68,6 +87,10 @@ fun Neo4jIODialog(
     var isDBEnable by remember { mutableStateOf(false) }
     var expandMenu by remember { mutableStateOf(false) }
     var treeName by remember { mutableStateOf("Tree") }
+    var throwException by remember { mutableStateOf(false) }
+    var exceptionContent by remember { mutableStateOf("Nothing...") }
+
+    AlertDialog(exceptionContent, throwException, { throwException = false })
 
     var db = Neo4jIO()
 
@@ -107,12 +130,19 @@ fun Neo4jIODialog(
                         onDismissRequest = { expandMenu = false }
                     ) {
                         if (isDBEnable) {
-                            val names = db.getTreesNames()
-                            for (name in names) {
-                                Text(name, modifier = Modifier.padding(10.dp).clickable(onClick = {
-                                    treeName = name
-                                    expandMenu = false
-                                }))
+                            val names = handleIOException(
+                                onCatch = {
+                                    exceptionContent = it.toString()
+                                    throwException = true
+                                }
+                            ) { db.getTreesNames() }
+                            if (names != null) {
+                                for (name in names) {
+                                    Text(name, modifier = Modifier.padding(10.dp).clickable(onClick = {
+                                        treeName = name
+                                        expandMenu = false
+                                    }))
+                                }
                             }
                         }
                     }
