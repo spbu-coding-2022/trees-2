@@ -73,15 +73,15 @@ At plain text database we store AVLTree. We use json files. There are 2 types of
   - `key` *int*
   - `value` *string*
   - `height` *int* - node height
-  - `x` *double* - node position at ui
-  - `y` *double* - node position at ui
+  - `x` *int* - node position at ui
+  - `y` *int* - node position at ui
   - `left` *AVLNode* - node left child
   - `right` *AVLNode* - node right child
 
 We have functions:
 
-- `exportTree(root, file.json)` - writes a tree with root `root` to a file `file.json`.
-- `importTree(file.json)` - reads the tree stored in the file `file.json` and returns it`s root.
+- `exportTree(TreeController, file.json)` - writes information stored in TreeController object to a file `file.json`.
+- `importTree(file.json)` - reads the tree stored in the file `file.json` and returns TreeController object.
 - `cleanDataBase(file.json)` - deletes a file `file.json`.
 
 
