@@ -23,7 +23,9 @@ import newTree
 import org.tree.app.view.Tree
 import org.tree.app.view.dialogs.io.ExportRBDialog
 import org.tree.app.view.dialogs.io.ImportRBDialog
+import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
+import org.tree.binaryTree.Node
 import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.trees.AVLTree
 import org.tree.binaryTree.trees.BinSearchTree
@@ -111,6 +113,23 @@ fun main() = application {
                     Item("Bin Search Tree", onClick = { dialogType = DialogType.IMPORT_BST })
                     Item("Red black Tree", onClick = { dialogType = DialogType.IMPORT_RB })
                     Item("AVL Tree", onClick = { dialogType = DialogType.IMPORT_AVL })
+                }
+                Menu("Save", mnemonic = 'S') {
+                    Item(
+                        "Bin Search Tree",
+                        onClick = { dialogType = DialogType.EXPORT_BST },
+                        enabled = (treeController.nodeType() is Node<*>?)
+                    )
+                    Item(
+                        "Red black Tree",
+                        onClick = { dialogType = DialogType.EXPORT_RB },
+                        enabled = (treeController.nodeType() is RBNode<*>?)
+                    )
+                    Item(
+                        "AVL Tree",
+                        onClick = { dialogType = DialogType.EXPORT_AVL },
+                        enabled = (treeController.nodeType() is AVLNode<*>?)
+                    )
                 }
             }
         }
