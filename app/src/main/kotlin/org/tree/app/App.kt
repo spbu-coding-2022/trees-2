@@ -210,13 +210,15 @@ fun main() = application {
         }
 
         Row(modifier = Modifier.background(Color.LightGray)) {
-            Column(Modifier.width(widthOfPanel.dp)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(widthOfPanel.dp)) {
                 InsertRow(onClick = { key, value ->
                     treeController = treeController.insert(KVP(key, value))
                 })
+                Spacer(modifier = Modifier.size(10.dp))
                 RemoveRow(onClick = { key ->
                     treeController = treeController.remove(KVP(key))
                 })
+                Spacer(modifier = Modifier.size(10.dp))
                 FindRow(onClick = { key ->
                     val a = treeController.find(KVP(key))
                     if (a != null) {
@@ -224,6 +226,35 @@ fun main() = application {
                         treeOffsetY.value = 100 - a.y.value
                     }
                 })
+                Spacer(modifier = Modifier.size(10.dp))
+                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = { treeController = TreeController(treeController.tree) },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xffff5b79),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Reset coordinates")
+                    }
+                    Button(
+                        onClick = {
+                            treeController.tree.root?.let {
+                                val a = treeController.find(it.elem)
+                                if (a != null) {
+                                    treeOffsetX.value = 100 - a.x.value
+                                    treeOffsetY.value = 100 - a.y.value
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.Gray,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("To root")
+                    }
+                }
             }
             Spacer(modifier = Modifier.width(3.dp))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
