@@ -68,6 +68,16 @@ fun main() = application {
         val treeOffsetX = remember { mutableStateOf(100) }
         val treeOffsetY = remember { mutableStateOf(100) }
 
+        fun convertKey(keyString: String): Int? {
+            return try {
+                keyString.toInt()
+            } catch (ex: NumberFormatException) {
+                logString = "Can't convert \"$keyString\" to int."
+                logColor = Color.Red
+                null
+            }
+        }
+
         MenuBar {
             Menu("File", mnemonic = 'F') {
                 Menu("New tree", mnemonic = 'N') {
@@ -103,7 +113,8 @@ fun main() = application {
         Row(modifier = Modifier.background(Color.LightGray)) {
             Column(modifier = Modifier.width(widthOfPanel.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    InsertRow(onClick = { key, value ->
+                    InsertRow(onClick = { keyString, value ->
+                        val key = convertKey(keyString) ?: return@InsertRow
                         val rememd = treeController
                         treeController = treeController.insert(KVP(key, value))
                         if (rememd == treeController) {
@@ -115,7 +126,8 @@ fun main() = application {
                         }
                     })
                     Spacer(modifier = Modifier.size(5.dp))
-                    RemoveRow(onClick = { key ->
+                    RemoveRow(onClick = { keyString ->
+                        val key = convertKey(keyString) ?: return@RemoveRow
                         val rememd = treeController
                         treeController = treeController.remove(KVP(key))
                         if (rememd == treeController) {
@@ -127,7 +139,8 @@ fun main() = application {
                         }
                     })
                     Spacer(modifier = Modifier.size(5.dp))
-                    FindRow(onClick = { key ->
+                    FindRow(onClick = { keyString ->
+                        val key = convertKey(keyString) ?: return@FindRow
                         val node = treeController.find(KVP(key))
                         if (node != null) {
                             logString = "Found node with key = $key and value = \"${node.elem.v}\""
@@ -245,6 +258,7 @@ fun main() = application {
             }
 
             DialogType.EXPORT_RB -> {
+                @Suppress("UNCHECKED_CAST")
                 ExportRBDialog(
                     onCloseRequest = { dialogType = DialogType.EMPTY },
                     treeController as TreeController<RBNode<KVP<Int, String>>>

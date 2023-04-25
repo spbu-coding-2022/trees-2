@@ -16,12 +16,12 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
+fun InsertRow(onClick: (keyString: String, value: String) -> Unit) {
     var keyString by remember { mutableStateOf("") }
     var valueString by remember { mutableStateOf("") }
 
     fun execute() {
-        onClick(keyString.toInt(), valueString)
+        onClick(keyString, valueString)
         keyString = ""
         valueString = ""
     }
@@ -69,11 +69,11 @@ fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun RemoveRow(onClick: (key: Int) -> Unit) {
+fun RemoveRow(onClick: (key: String) -> Unit) {
     var keyString by remember { mutableStateOf("") }
 
     fun execute() {
-        onClick(keyString.toInt())
+        onClick(keyString)
         keyString = ""
     }
 
@@ -106,11 +106,11 @@ fun RemoveRow(onClick: (key: Int) -> Unit) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun FindRow(onClick: (key: Int) -> (Unit)) {
+fun FindRow(onClick: (key: String) -> (Unit)) {
     var keyString by remember { mutableStateOf("") }
 
     fun execute() {
-        onClick(keyString.toInt())
+        onClick(keyString)
         keyString = ""
     }
 
