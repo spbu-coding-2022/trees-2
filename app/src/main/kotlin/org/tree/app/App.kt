@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -222,9 +221,9 @@ fun main() = application {
                 )
             }
             Spacer(modifier = Modifier.width(3.dp))
-            Box(Modifier.scale(1.0F)) {
-                TreeView(treeController, treeOffsetX, treeOffsetY)
-            }
+
+            TreeView(treeController, treeOffsetX, treeOffsetY)
+
         }
 
         when (dialogType) {
