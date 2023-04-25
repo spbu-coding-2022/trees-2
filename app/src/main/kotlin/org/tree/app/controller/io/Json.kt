@@ -12,7 +12,6 @@ import NodeExtension
 import androidx.compose.runtime.mutableStateOf
 import org.tree.binaryTree.trees.AVLTree
 import java.io.FileNotFoundException
-import java.io.IOException
 import java.nio.file.Files
 
 @Serializable
@@ -65,7 +64,7 @@ class Json {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
-            throw IOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
+            throw HandledIOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
 
         treeController = treeController_
@@ -77,11 +76,11 @@ class Json {
         }
     }
 
-    fun importTree(file: File): TreeController<AVLNode<KVP<Int, String>>>? {
+    fun importTree(file: File): TreeController<AVLNode<KVP<Int, String>>> {
         val json = try {
             file.readText()
-        } catch (_: FileNotFoundException) {
-            return null
+        } catch (ex: FileNotFoundException) {
+            throw HandledIOException("File ${file.toPath().fileName} not found: no access", ex)
         }
 
         treeController = TreeController(AVLTree())
