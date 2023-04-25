@@ -16,9 +16,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
@@ -51,29 +49,33 @@ enum class DialogType {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
-    var keyString by remember { mutableStateOf("123") }
-    var valueString by remember { mutableStateOf("value") }
+    var keyString by remember { mutableStateOf("") }
+    var valueString by remember { mutableStateOf("") }
 
     fun execute() {
         onClick(keyString.toInt(), valueString)
+        keyString = ""
+        valueString = ""
     }
 
-    Row {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+
         Button(
             onClick = {
-                onClick(keyString.toInt(), valueString)
+                execute()
             },
             modifier = Modifier.weight(0.3f).defaultMinSize(minWidth = 100.dp)
         ) {
             Text("Insert")
         }
         OutlinedTextField(
+            label = { Text("Key") },
             value = keyString,
             onValueChange = { keyString = it },
-            maxLines = 1,
+            singleLine = true,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
             modifier = Modifier.weight(0.35f).onKeyEvent {
-                if (it.key == Key.Enter) {
+                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
                     execute()
                     return@onKeyEvent true
                 }
@@ -81,12 +83,13 @@ fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
             }
         )
         OutlinedTextField(
+            label = { Text("Value") },
             value = valueString,
             onValueChange = { valueString = it },
-            maxLines = 1,
+            singleLine = true,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
             modifier = Modifier.weight(0.35f).onKeyEvent {
-                if (it.key == Key.Enter) {
+                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
                     execute()
                     return@onKeyEvent true
                 }
@@ -99,16 +102,17 @@ fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RemoveRow(onClick: (key: Int) -> Unit) {
-    var keyString by remember { mutableStateOf("123") }
+    var keyString by remember { mutableStateOf("") }
 
     fun execute() {
         onClick(keyString.toInt())
+        keyString = ""
     }
 
-    Row {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Button(
             onClick = {
-                onClick(keyString.toInt())
+                execute()
             },
             modifier = Modifier.weight(0.3f)
         ) {
@@ -116,12 +120,13 @@ fun RemoveRow(onClick: (key: Int) -> Unit) {
         }
 
         OutlinedTextField(
+            label = { Text("Key") },
             value = keyString,
             onValueChange = { keyString = it },
-            maxLines = 1,
+            singleLine = true,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
             modifier = Modifier.weight(0.7f).onKeyEvent {
-                if (it.key == Key.Enter) {
+                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
                     execute()
                     return@onKeyEvent true
                 }
@@ -134,23 +139,25 @@ fun RemoveRow(onClick: (key: Int) -> Unit) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FindRow(onClick: (key: Int) -> (Unit)) {
-    var keyString by remember { mutableStateOf("123") }
+    var keyString by remember { mutableStateOf("") }
 
     fun execute() {
         onClick(keyString.toInt())
+        keyString = ""
     }
 
-    Row {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Button(onClick = ::execute, modifier = Modifier.weight(0.3f)) {
             Text("Find")
         }
         OutlinedTextField(
+            label = { Text("Key") },
             value = keyString,
             onValueChange = { keyString = it },
-            maxLines = 1,
+            singleLine = true,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
             modifier = Modifier.weight(0.7f).onKeyEvent {
-                if (it.key == Key.Enter) {
+                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
                     execute()
                     return@onKeyEvent true
                 }
@@ -316,8 +323,8 @@ fun main() = application {
                             state = rememberDraggableState { delta ->
                                 widthOfPanel += delta.toInt()
                                 treeOffsetX.value -= delta.toInt() / 2
-                        }
-                    )
+                            }
+                        )
                 )
             }
             Spacer(modifier = Modifier.width(3.dp))
