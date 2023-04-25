@@ -26,6 +26,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
+import org.tree.app.view.Logger
 import org.tree.app.view.TreeView
 import org.tree.app.view.dialogs.io.ExportRBDialog
 import org.tree.app.view.dialogs.io.ImportRBDialog
@@ -174,6 +175,8 @@ fun main() = application {
         }
         var widthOfPanel by remember { mutableStateOf(400) }
         var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
+        var logString by remember { mutableStateOf("Log string") }
+        var logColor by remember { mutableStateOf(Color.DarkGray) }
         val treeOffsetX = remember { mutableStateOf(100) }
         val treeOffsetY = remember { mutableStateOf(100) }
 
@@ -210,60 +213,109 @@ fun main() = application {
         }
 
         Row(modifier = Modifier.background(Color.LightGray)) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(widthOfPanel.dp)) {
-                InsertRow(onClick = { key, value ->
-                    treeController = treeController.insert(KVP(key, value))
-                })
-                Spacer(modifier = Modifier.size(10.dp))
-                RemoveRow(onClick = { key ->
-                    treeController = treeController.remove(KVP(key))
-                })
-                Spacer(modifier = Modifier.size(10.dp))
-                FindRow(onClick = { key ->
-                    val a = treeController.find(KVP(key))
-                    if (a != null) {
-                        treeOffsetX.value = 100 - a.x.value
-                        treeOffsetY.value = 100 - a.y.value
-                    }
-                })
-                Spacer(modifier = Modifier.size(10.dp))
-                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-                    Button(
-                        onClick = { treeController = TreeController(treeController.tree) },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xffff5b79),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Reset coordinates")
-                    }
-                    Button(
-                        onClick = {
-                            treeController.tree.root?.let {
-                                val a = treeController.find(it.elem)
-                                if (a != null) {
-                                    treeOffsetX.value = 100 - a.x.value
-                                    treeOffsetY.value = 100 - a.y.value
-                                }
+            Column(modifier = Modifier.width(widthOfPanel.dp)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    InsertRow(onClick = { key, value ->
+                        val rememd = treeController
+                        treeController = treeController.insert(KVP(key, value))
+                        if (rememd == treeController) {
+                            logString = "Node with key = $key already in tree. Nothing is done"
+                            logColor = Color.Yellow
+                        } else {
+                            logString = "Node with key = $key and value = $value inserted"
+                            logColor = Color.Green
+                        }
+                    })
+                    Spacer(modifier = Modifier.size(5.dp))
+                    RemoveRow(onClick = { key ->
+                        val rememd = treeController
+                        treeController = treeController.remove(KVP(key))
+                        if (rememd == treeController) {
+                            logString = "There isn't node with key = $key in tree. Nothing is done"
+                            logColor = Color.Yellow
+                        } else {
+                            logString = "Node with key = $key removed"
+                            logColor = Color.Green
+                        }
+                    })
+                    Spacer(modifier = Modifier.size(5.dp))
+                    FindRow(onClick = { key ->
+                        val node = treeController.find(KVP(key))
+                        if (node != null) {
+                            logString = "Found node with key = $key and value = ${node.elem.v}"
+                            logColor = Color.Green
+                            val coord = treeController.nodes[node]
+                            if (coord != null) {
+                                treeOffsetX.value = 100 - coord.x.value
+                                treeOffsetY.value = 100 - coord.y.value
                             }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Gray,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("To root")
+                        } else {
+                            logString = "No node with key = $key found"
+                            logColor = Color.Yellow
+                        }
+                    })
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = {
+                                treeController = TreeController(treeController.tree)
+                                logString = "Tree coordinates reset"
+                                logColor = Color.Green
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color(0xffff5b79),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Reset coordinates")
+                        }
+                        Button(
+                            onClick = {
+                                val treeRoot = treeController.tree.root
+                                if (treeRoot != null) {
+                                    val coord = treeController.nodes[treeController.find(treeRoot.elem)]
+                                    if (coord != null) {
+                                        logString = "Moved to root"
+                                        logColor = Color.Green
+                                        treeOffsetX.value = 100 - coord.x.value
+                                        treeOffsetY.value = 100 - coord.y.value
+                                    }
+                                } else {
+                                    logString = "Current tree is empty"
+                                    logColor = Color.Yellow
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Gray,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("To root")
+                        }
                     }
                 }
+                Spacer(Modifier.height(5.dp))
+                Row(horizontalArrangement = Arrangement.Center) {
+                    Spacer(Modifier.width(5.dp))
+                    Box(
+                        Modifier.background(color = Color.Gray.copy(alpha = 0.5f), shape = RoundedCornerShape(5.dp))
+                            .height(3.dp).fillMaxWidth()
+                    )
+                    Spacer(Modifier.width(5.dp))
+                }
+                Spacer(Modifier.height(5.dp))
+                Logger(logString, logColor)
             }
+
             Spacer(modifier = Modifier.width(3.dp))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
-                Box(Modifier.background(color = Color.Gray, shape = RoundedCornerShape(5.dp)).size(5.dp, 100.dp)
-                    .draggable(
-                        orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
-                        state = rememberDraggableState { delta ->
-                            widthOfPanel += delta.toInt()
-                            treeOffsetX.value -= delta.toInt() / 2
+                Box(
+                    Modifier.background(color = Color.Gray, shape = RoundedCornerShape(5.dp)).size(5.dp, 100.dp)
+                        .draggable(
+                            orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                            state = rememberDraggableState { delta ->
+                                widthOfPanel += delta.toInt()
+                                treeOffsetX.value -= delta.toInt() / 2
                         }
                     )
                 )

@@ -79,9 +79,8 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         return res
     }
 
-    fun find(obj: KVP<Int, String>): NodeExtension? {
-        val node = tree.find(obj)
-        return nodes[node]
+    fun find(obj: KVP<Int, String>): NODE_T? {
+        return tree.find(obj)
     }
 
     private fun getNodeCol(curNode: NODE_T): Color {
