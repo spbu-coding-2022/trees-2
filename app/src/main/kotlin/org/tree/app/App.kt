@@ -9,14 +9,17 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
@@ -24,8 +27,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
-import org.tree.app.view.Logger
-import org.tree.app.view.TreeView
+import org.tree.app.view.*
 import org.tree.app.view.dialogs.io.ExportRBDialog
 import org.tree.app.view.dialogs.io.ImportRBDialog
 import org.tree.binaryTree.AVLNode
@@ -44,127 +46,6 @@ enum class DialogType {
     EXPORT_RB,
     EXPORT_AVL,
     EXPORT_BST
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun InsertRow(onClick: (key: Int, value: String) -> Unit) {
-    var keyString by remember { mutableStateOf("") }
-    var valueString by remember { mutableStateOf("") }
-
-    fun execute() {
-        onClick(keyString.toInt(), valueString)
-        keyString = ""
-        valueString = ""
-    }
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-
-        Button(
-            onClick = {
-                execute()
-            },
-            modifier = Modifier.weight(0.3f).defaultMinSize(minWidth = 100.dp)
-        ) {
-            Text("Insert")
-        }
-        OutlinedTextField(
-            label = { Text("Key") },
-            value = keyString,
-            onValueChange = { keyString = it },
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
-            modifier = Modifier.weight(0.35f).onKeyEvent {
-                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
-                    execute()
-                    return@onKeyEvent true
-                }
-                return@onKeyEvent false
-            }
-        )
-        OutlinedTextField(
-            label = { Text("Value") },
-            value = valueString,
-            onValueChange = { valueString = it },
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
-            modifier = Modifier.weight(0.35f).onKeyEvent {
-                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
-                    execute()
-                    return@onKeyEvent true
-                }
-                return@onKeyEvent false
-            }
-        )
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun RemoveRow(onClick: (key: Int) -> Unit) {
-    var keyString by remember { mutableStateOf("") }
-
-    fun execute() {
-        onClick(keyString.toInt())
-        keyString = ""
-    }
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Button(
-            onClick = {
-                execute()
-            },
-            modifier = Modifier.weight(0.3f)
-        ) {
-            Text("Remove")
-        }
-
-        OutlinedTextField(
-            label = { Text("Key") },
-            value = keyString,
-            onValueChange = { keyString = it },
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
-            modifier = Modifier.weight(0.7f).onKeyEvent {
-                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
-                    execute()
-                    return@onKeyEvent true
-                }
-                return@onKeyEvent false
-            }
-        )
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun FindRow(onClick: (key: Int) -> (Unit)) {
-    var keyString by remember { mutableStateOf("") }
-
-    fun execute() {
-        onClick(keyString.toInt())
-        keyString = ""
-    }
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Button(onClick = ::execute, modifier = Modifier.weight(0.3f)) {
-            Text("Find")
-        }
-        OutlinedTextField(
-            label = { Text("Key") },
-            value = keyString,
-            onValueChange = { keyString = it },
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White.copy(alpha = 0.3f)),
-            modifier = Modifier.weight(0.7f).onKeyEvent {
-                if ((it.key == Key.Enter) && (it.type == KeyEventType.KeyDown)) {
-                    execute()
-                    return@onKeyEvent true
-                }
-                return@onKeyEvent false
-            }
-        )
-    }
 }
 
 fun main() = application {
@@ -229,7 +110,7 @@ fun main() = application {
                             logString = "Node with key = $key already in tree. Nothing is done"
                             logColor = Color.Yellow
                         } else {
-                            logString = "Node with key = $key and value = $value inserted"
+                            logString = "Node with key = $key and value = \"$value\" inserted"
                             logColor = Color.Green
                         }
                     })
@@ -249,7 +130,7 @@ fun main() = application {
                     FindRow(onClick = { key ->
                         val node = treeController.find(KVP(key))
                         if (node != null) {
-                            logString = "Found node with key = $key and value = ${node.elem.v}"
+                            logString = "Found node with key = $key and value = \"${node.elem.v}\""
                             logColor = Color.Green
                             val coord = treeController.nodes[node]
                             if (coord != null) {
