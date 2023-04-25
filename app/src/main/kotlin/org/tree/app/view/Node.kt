@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.templates.TemplateNode
 
@@ -83,7 +84,7 @@ fun Node(
                         }
                     }
             ) {
-                Text(key.toString())
+                AutoSizeText(fontSize = 16.sp, text = key.toString(), maxLines = 1, softWrap = false)
             }
         }
     }
