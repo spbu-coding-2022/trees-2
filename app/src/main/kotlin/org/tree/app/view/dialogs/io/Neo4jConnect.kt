@@ -2,22 +2,16 @@ package org.tree.app.view.dialogs.io
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import org.tree.app.controller.io.HandledIOException
 import org.tree.app.controller.io.Neo4jIO
+import org.tree.app.view.Logger
 
 
 @Composable
@@ -53,14 +47,7 @@ fun Neo4jConnect(onSuccess: (Neo4jIO) -> Unit, onFail: (Neo4jIO) -> Unit) {
             }) {
                 Text("Connect")
             }
-            Icon(
-                Icons.Default.AddCircle,
-                contentDescription = connectionStatus,
-                tint = iconColor,
-                modifier = Modifier.size(15.dp).padding(start = 10.dp),
-            )
-
-            Text(connectionStatus)
+            Logger(connectionStatus, iconColor)
         }
     }
 }
