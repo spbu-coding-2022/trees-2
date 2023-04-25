@@ -77,7 +77,7 @@ fun Node(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = modifier
-                    .size(size.dp).clip(CircleShape).background(color = color)
+                    .requiredSize(size.dp).clip(CircleShape).background(color = color)
                     .pointerInput(onDrag) {
                         detectDragGestures { change, dragAmount ->
                             onDrag(change, dragAmount)
