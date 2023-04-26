@@ -30,9 +30,9 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
         var count = 0
         if (node?.right != null) {
-            count = 1 + (height)*childrenCount(node.right)
+            count = 1 + (height) * childrenCount(node.right)
         }
-        val x = parentX - nodeSize - (count*nodeSize)
+        val x = parentX - nodeSize - (count * nodeSize)
         val y = parentY + nodeSize
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
@@ -47,9 +47,9 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     private fun drawRight(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
         var count = 0
         if (node?.left != null) {
-            count = 1 + (height)*childrenCount(node.left)
+            count = 1 + (height) * childrenCount(node.left)
         }
-        val x = parentX + nodeSize + (count*nodeSize)
+        val x = parentX + nodeSize + (count * nodeSize)
         val y = parentY + nodeSize
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
@@ -114,10 +114,11 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
 }
 
 fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>, TREE_T : TemplateBSTree<KVP<Int, String>, NODE_T>> newTree(
-    emptyTree: TREE_T
+    emptyTree: TREE_T,
+    nodesCount: Int = 10
 ): TreeController<NODE_T> {
     val rand = Random(0x1337)
-    for (i in 0..10) {
+    for (i in 1..nodesCount) {
         emptyTree.insert(KVP(rand.nextInt(100), "Num: $i"))
     }
     return TreeController(emptyTree)

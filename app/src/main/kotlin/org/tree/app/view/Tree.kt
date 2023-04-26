@@ -4,8 +4,11 @@ import TreeController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -20,15 +23,18 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
     offsetX: MutableState<Int>,
     offsetY: MutableState<Int>,
 ) {
-    Box(modifier = Modifier.background(Color.White, shape = RoundedCornerShape(16.dp)).clipToBounds()
-        .pointerInput(offsetX, offsetY) {
-            detectDragGestures { change, dragAmount ->
-                change.consume()
-                offsetX.value += dragAmount.x.toInt()
-                offsetY.value += dragAmount.y.toInt()
-            }
-        }) {
-        Box {
+    Box(contentAlignment = Alignment.Center,
+        modifier = Modifier.background(Color.White, shape = RoundedCornerShape(16.dp)).clipToBounds().fillMaxSize()
+            .pointerInput(offsetX, offsetY) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    offsetX.value += dragAmount.x.toInt()
+                    offsetY.value += dragAmount.y.toInt()
+                }
+            })
+    {
+        Box(modifier = Modifier.size(0.dp).background(Color.Green)) {
+            //Box {
             for (n in t.nodes) {
                 val x by n.value.x
                 val y by n.value.y
@@ -52,8 +58,7 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
                 val col = n.value.color
                 with(n.key.elem) {
                     key(key) {
-                        Node(
-                            x + offsetX.value,
+                        Node(x + offsetX.value,
                             y + offsetY.value,
                             key,
                             v ?: "",
