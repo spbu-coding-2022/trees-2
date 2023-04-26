@@ -67,7 +67,7 @@ fun Node(
                     )
                 }
             },
-            modifier = Modifier.offset((x - size / 2).dp, (y - size / 2).dp),
+            modifier = Modifier.offset((x).dp, (y).dp),
             delayMillis = 600,
             tooltipPlacement = TooltipPlacement.CursorPoint(
                 alignment = Alignment.BottomEnd,
