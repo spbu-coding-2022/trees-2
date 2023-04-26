@@ -64,8 +64,8 @@ fun main() = application {
         var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
         var logString by remember { mutableStateOf("Log string") }
         var logColor by remember { mutableStateOf(Color.DarkGray) }
-        val treeOffsetX = remember { mutableStateOf(100) }
-        val treeOffsetY = remember { mutableStateOf(100) }
+        val treeOffsetX = remember { mutableStateOf(0) }
+        val treeOffsetY = remember { mutableStateOf(0) }
 
         fun convertKey(keyString: String): Int? {
             if (keyString.isEmpty()) {
@@ -79,6 +79,24 @@ fun main() = application {
                 null
             }
         }
+
+        fun toTreeRoot() {
+            val treeRoot = treeController.tree.root
+            if (treeRoot != null) {
+                val coord = treeController.nodes[treeController.find(treeRoot.elem)]
+                if (coord != null) {
+                    logString = "Moved to root"
+                    logColor = Color.Green
+                    treeOffsetX.value = -coord.x.value
+                    treeOffsetY.value = -coord.y.value
+                }
+            } else {
+                logString = "Current tree is empty"
+                logColor = Color.Yellow
+            }
+        }
+
+        remember { toTreeRoot() } // will be removed in future
 
         MenuBar {
             Menu("File", mnemonic = 'F') {
@@ -149,8 +167,8 @@ fun main() = application {
                             logColor = Color.Green
                             val coord = treeController.nodes[node]
                             if (coord != null) {
-                                treeOffsetX.value = 100 - coord.x.value
-                                treeOffsetY.value = 100 - coord.y.value
+                                treeOffsetX.value = -coord.x.value
+                                treeOffsetY.value = -coord.y.value
                             }
                         } else {
                             logString = "No node with key = $key found"
@@ -174,19 +192,7 @@ fun main() = application {
                         }
                         Button(
                             onClick = {
-                                val treeRoot = treeController.tree.root
-                                if (treeRoot != null) {
-                                    val coord = treeController.nodes[treeController.find(treeRoot.elem)]
-                                    if (coord != null) {
-                                        logString = "Moved to root"
-                                        logColor = Color.Green
-                                        treeOffsetX.value = 100 - coord.x.value
-                                        treeOffsetY.value = 100 - coord.y.value
-                                    }
-                                } else {
-                                    logString = "Current tree is empty"
-                                    logColor = Color.Yellow
-                                }
+                                toTreeRoot()
                             },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.Gray,
@@ -218,7 +224,6 @@ fun main() = application {
                             orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                             state = rememberDraggableState { delta ->
                                 widthOfPanel += delta.toInt()
-                                treeOffsetX.value -= delta.toInt() / 2
                             }
                         )
                 )
