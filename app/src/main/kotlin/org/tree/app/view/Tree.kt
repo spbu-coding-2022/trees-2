@@ -33,8 +33,7 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
                 }
             })
     {
-        Box(modifier = Modifier.size(0.dp).background(Color.Green)) {
-            //Box {
+        Box(modifier = Modifier.size(t.nodeSize.dp)) {
             for (n in t.nodes) {
                 val x by n.value.x
                 val y by n.value.y
