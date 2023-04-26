@@ -68,6 +68,9 @@ fun main() = application {
         val treeOffsetY = remember { mutableStateOf(100) }
 
         fun convertKey(keyString: String): Int? {
+            if (keyString.isEmpty()) {
+                return null
+            }
             return try {
                 keyString.toInt()
             } catch (ex: NumberFormatException) {
