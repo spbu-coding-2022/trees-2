@@ -80,15 +80,15 @@ fun main() = application {
         fun toTreeRoot() {
             val treeRoot = treeController.tree.root
             if (treeRoot != null) {
-                val coord = treeController.nodes[treeController.find(treeRoot.elem)]
-                if (coord != null) {
-                    logString = "Moved to root"
+                val coordinates = treeController.nodes[treeController.find(treeRoot.elem)]
+                if (coordinates != null) {
+                    logString = "Moved to root."
                     logColor = Color.Green
-                    treeOffsetX.value = -coord.x.value
-                    treeOffsetY.value = -coord.y.value
+                    treeOffsetX.value = -coordinates.x.value
+                    treeOffsetY.value = -coordinates.y.value
                 }
             } else {
-                logString = "Current tree is empty"
+                logString = "Current tree is empty."
                 logColor = Color.Yellow
             }
         }
@@ -154,13 +154,13 @@ fun main() = application {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     InsertRow(onClick = { keyString, value ->
                         val key = convertKey(keyString) ?: return@InsertRow
-                        val rememd = treeController
+                        val treeBeforeInsert = treeController
                         treeController = treeController.insert(KVP(key, value))
-                        if (rememd == treeController) {
-                            logString = "Node with key = $key already in tree. Nothing is done"
+                        if (treeBeforeInsert == treeController) {
+                            logString = "The node with key = $key is already in the tree. Nothing has been done."
                             logColor = Color.Yellow
                         } else {
-                            logString = "Node with key = $key and value = \"$value\" inserted"
+                            logString = "The node with key = $key and value = \"$value\" has been inserted."
                             logColor = Color.Green
                         }
                     })
@@ -170,10 +170,10 @@ fun main() = application {
                         val rememd = treeController
                         treeController = treeController.remove(KVP(key))
                         if (rememd == treeController) {
-                            logString = "There isn't node with key = $key in tree. Nothing is done"
+                            logString = "There is no node with key = $key in the tree. Nothing has been done."
                             logColor = Color.Yellow
                         } else {
-                            logString = "Node with key = $key removed"
+                            logString = "The node with key = $key has been removed."
                             logColor = Color.Green
                         }
                     })
@@ -182,15 +182,15 @@ fun main() = application {
                         val key = convertKey(keyString) ?: return@FindRow
                         val node = treeController.find(KVP(key))
                         if (node != null) {
-                            logString = "Found node with key = $key and value = \"${node.elem.v}\""
+                                logString = "Node with key = $key and value = \"${node.elem.v}\" found."
                             logColor = Color.Green
-                            val coord = treeController.nodes[node]
-                            if (coord != null) {
-                                treeOffsetX.value = -coord.x.value
-                                treeOffsetY.value = -coord.y.value
+                            val coordinates = treeController.nodes[node]
+                            if (coordinates != null) {
+                                treeOffsetX.value = -coordinates.x.value
+                                treeOffsetY.value = -coordinates.y.value
                             }
                         } else {
-                            logString = "No node with key = $key found"
+                            logString = "Node with key = $key not found."
                             logColor = Color.Yellow
                         }
                     })
@@ -199,7 +199,7 @@ fun main() = application {
                         Button(
                             onClick = {
                                 treeController = TreeController(treeController.tree)
-                                logString = "Tree coordinates reset"
+                                logString = "Tree coordinates reset."
                                 logColor = Color.Green
                             },
                             colors = ButtonDefaults.buttonColors(

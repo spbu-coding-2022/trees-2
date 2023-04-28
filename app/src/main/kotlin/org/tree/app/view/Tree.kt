@@ -19,7 +19,7 @@ import org.tree.binaryTree.templates.TemplateNode
 
 @Composable
 fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
-    t: TreeController<NODE_T>,
+    treeController: TreeController<NODE_T>,
     offsetX: MutableState<Int>,
     offsetY: MutableState<Int>,
 ) {
@@ -33,25 +33,25 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
                 }
             })
     {
-        Box(modifier = Modifier.size(t.nodeSize.dp)) {
-            for (n in t.nodes) {
+        Box(modifier = Modifier.size(treeController.nodeSize.dp)) {
+            for (n in treeController.nodes) {
                 val x by n.value.x
                 val y by n.value.y
 
                 with(n.key) {
-                    val l = t.nodes[left]
+                    val l = treeController.nodes[left]
                     if (l != null) {
                         Line(x + offsetX.value, y + offsetY.value, l.x.value + offsetX.value, l.y.value + offsetY.value)
                     }
 
-                    val r = t.nodes[right]
+                    val r = treeController.nodes[right]
                     if (r != null) {
                         Line(x + offsetX.value, y + offsetY.value, r.x.value + offsetX.value, r.y.value + offsetY.value)
                     }
                 }
             }
 
-            for (n in t.nodes) {
+            for (n in treeController.nodes) {
                 var x by n.value.x
                 var y by n.value.y
                 val col = n.value.color
@@ -61,7 +61,7 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
                             y + offsetY.value,
                             key,
                             v ?: "",
-                            size = t.nodeSize,
+                            size = treeController.nodeSize,
                             color = col,
                             onDrag = { change, dragAmount ->
                                 change.consume()
