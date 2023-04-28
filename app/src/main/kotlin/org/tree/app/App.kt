@@ -121,6 +121,7 @@ fun main() = application {
                     Item(
                         "Bin Search Tree",
                         onClick = {
+                            @Suppress("UNCHECKED_CAST")
                             exportBST(
                                 ComposeWindow(),
                                 treeController as TreeController<Node<KVP<Int, String>>>
@@ -136,6 +137,7 @@ fun main() = application {
                     Item(
                         "AVL Tree",
                         onClick = {
+                            @Suppress("UNCHECKED_CAST")
                             exportAVLT(
                                 ComposeWindow(),
                                 treeController as TreeController<AVLNode<KVP<Int, String>>>
