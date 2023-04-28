@@ -41,11 +41,7 @@ import org.tree.binaryTree.trees.RBTree
 enum class DialogType {
     EMPTY,
     IMPORT_RB,
-    IMPORT_AVL,
-    IMPORT_BST,
-    EXPORT_RB,
-    EXPORT_AVL,
-    EXPORT_BST
+    EXPORT_RB
 }
 
 fun main() = application {
@@ -258,28 +254,9 @@ fun main() = application {
             DialogType.EMPTY -> {
             }
 
-            DialogType.IMPORT_AVL -> {
-                TODO("Implement")
-                dialogType = DialogType.EMPTY
-            }
-
-            DialogType.EXPORT_AVL -> {
-                TODO("Implement")
-                dialogType = DialogType.EMPTY
-            }
-
-            DialogType.IMPORT_BST -> {
-                dialogType = DialogType.EMPTY
-            }
-
-            DialogType.EXPORT_BST -> {
-                dialogType = DialogType.EMPTY
-            }
-
             DialogType.IMPORT_RB -> {
                 ImportRBDialog(
-                    onCloseRequest = { dialogType = DialogType.EMPTY },
-                    onSuccess = { treeController = it })
+                    onCloseRequest = { dialogType = DialogType.EMPTY }, onSuccess = { treeController = it })
             }
 
             DialogType.EXPORT_RB -> {
