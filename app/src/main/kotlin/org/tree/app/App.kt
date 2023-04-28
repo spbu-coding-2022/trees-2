@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,8 @@ import newTree
 import org.tree.app.view.*
 import org.tree.app.view.dialogs.io.ExportRBDialog
 import org.tree.app.view.dialogs.io.ImportRBDialog
+import org.tree.app.view.dialogs.io.exportBST
+import org.tree.app.view.dialogs.io.importBST
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
@@ -36,6 +39,7 @@ import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.trees.AVLTree
 import org.tree.binaryTree.trees.BinSearchTree
 import org.tree.binaryTree.trees.RBTree
+
 
 enum class DialogType {
     EMPTY,
@@ -106,14 +110,24 @@ fun main() = application {
                     Item("AVL Tree") { treeController = newTree(AVLTree()) }
                 }
                 Menu("Open", mnemonic = 'O') {
-                    Item("Bin Search Tree", onClick = { dialogType = DialogType.IMPORT_BST })
+                    Item("Bin Search Tree", onClick = {
+                        val tc = importBST(ComposeWindow())
+                        if (tc != null) {
+                            treeController = tc
+                        }
+                    })
                     Item("Red black Tree", onClick = { dialogType = DialogType.IMPORT_RB })
                     Item("AVL Tree", onClick = { dialogType = DialogType.IMPORT_AVL })
                 }
                 Menu("Save", mnemonic = 'S') {
                     Item(
                         "Bin Search Tree",
-                        onClick = { dialogType = DialogType.EXPORT_BST },
+                        onClick = {
+                            exportBST(
+                                ComposeWindow(),
+                                treeController as TreeController<Node<KVP<Int, String>>>
+                            )
+                        },
                         enabled = (treeController.nodeType() is Node<*>?)
                     )
                     Item(
@@ -229,7 +243,6 @@ fun main() = application {
                 )
             }
             Spacer(modifier = Modifier.width(3.dp))
-
             TreeView(treeController, treeOffsetX, treeOffsetY)
 
         }
@@ -249,12 +262,10 @@ fun main() = application {
             }
 
             DialogType.IMPORT_BST -> {
-                TODO("Implement")
                 dialogType = DialogType.EMPTY
             }
 
             DialogType.EXPORT_BST -> {
-                TODO("Implement")
                 dialogType = DialogType.EMPTY
             }
 
