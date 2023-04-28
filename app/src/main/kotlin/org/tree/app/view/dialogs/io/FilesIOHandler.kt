@@ -2,11 +2,29 @@ package org.tree.app.view.dialogs.io
 
 import TreeController
 import androidx.compose.ui.awt.ComposeWindow
+import org.tree.app.controller.io.Json
 import org.tree.app.controller.io.SQLiteIO
+import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
 import java.awt.FileDialog
 import java.io.File
+
+fun importAVLT(
+    window: ComposeWindow,
+): TreeController<AVLNode<KVP<Int, String>>>? {
+    val fileString = selectFile(window, "json") ?: return null
+    val file = File(fileString)
+    val db = Json()
+    return db.importTree(file)
+}
+
+fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String>>>) {
+    val fileString = selectFile(window, "json") ?: return
+    val file = File(fileString)
+    val db = Json()
+    db.exportTree(tc, file)
+}
 
 fun importBST(
     window: ComposeWindow,

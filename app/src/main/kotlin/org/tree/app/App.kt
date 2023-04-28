@@ -28,10 +28,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
 import org.tree.app.view.*
-import org.tree.app.view.dialogs.io.ExportRBDialog
-import org.tree.app.view.dialogs.io.ImportRBDialog
-import org.tree.app.view.dialogs.io.exportBST
-import org.tree.app.view.dialogs.io.importBST
+import org.tree.app.view.dialogs.io.*
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
@@ -117,7 +114,12 @@ fun main() = application {
                         }
                     })
                     Item("Red black Tree", onClick = { dialogType = DialogType.IMPORT_RB })
-                    Item("AVL Tree", onClick = { dialogType = DialogType.IMPORT_AVL })
+                    Item("AVL Tree", onClick = {
+                        val tc = importAVLT(ComposeWindow())
+                        if (tc != null) {
+                            treeController = tc
+                        }
+                    })
                 }
                 Menu("Save", mnemonic = 'S') {
                     Item(
@@ -137,7 +139,12 @@ fun main() = application {
                     )
                     Item(
                         "AVL Tree",
-                        onClick = { dialogType = DialogType.EXPORT_AVL },
+                        onClick = {
+                            exportAVLT(
+                                ComposeWindow(),
+                                treeController as TreeController<AVLNode<KVP<Int, String>>>
+                            )
+                        },
                         enabled = (treeController.nodeType() is AVLNode<*>?)
                     )
                 }
