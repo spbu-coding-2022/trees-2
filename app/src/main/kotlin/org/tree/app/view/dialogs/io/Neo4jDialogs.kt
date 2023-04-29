@@ -50,6 +50,7 @@ fun ImportRBDialog(
 @Composable
 fun ExportRBDialog(
     onCloseRequest: () -> Unit,
+    onSuccess: (treeName: String) -> Unit,
     treeController: TreeController<RBNode<KVP<Int, String>>>
 ) {
 
@@ -67,6 +68,7 @@ fun ExportRBDialog(
                 }) { db.exportRBTree(treeController, treeName) }
                 if (!throwException) {
                     db.close()
+                    onSuccess(treeName)
                     closeRequest()
                 }
             }
