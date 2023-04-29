@@ -107,6 +107,11 @@ fun main() = application {
                         val tc = importBST(ComposeWindow())
                         if (tc != null) {
                             treeController = tc
+                            logString = ""
+                        }
+                        else{
+                            logString = "Database has no Nodes table"
+                            logColor = Color.Red
                         }
                     })
                     Item("Red black Tree", onClick = { dialogType = DialogType.IMPORT_RB })
