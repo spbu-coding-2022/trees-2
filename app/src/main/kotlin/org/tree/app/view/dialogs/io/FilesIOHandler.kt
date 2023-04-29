@@ -2,6 +2,7 @@ package org.tree.app.view.dialogs.io
 
 import TreeController
 import androidx.compose.ui.awt.ComposeWindow
+import org.tree.app.controller.io.HandledIOException
 import org.tree.app.controller.io.Json
 import org.tree.app.controller.io.SQLiteIO
 import org.tree.binaryTree.AVLNode
@@ -32,7 +33,11 @@ fun importBST(
     val fileString = selectFile(window, "sqlite", "import") ?: return null
     val file = File(fileString)
     val db = SQLiteIO()
-    return db.importTree(file)
+    return try {
+        db.importTree(file)
+    } catch(ex: HandledIOException) {
+        null
+    }
 }
 
 fun exportBST(window: ComposeWindow, tc: TreeController<Node<KVP<Int, String>>>) {
