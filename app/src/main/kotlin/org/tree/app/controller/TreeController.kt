@@ -21,8 +21,8 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         tree.root?.let {
             nodes[it] = NodeExtension(mutableStateOf(0), mutableStateOf(0), getNodeCol(it))
             countWidth(it, nodesWithWidths)
-            drawLeft(it.left, 0, 0, height(it) - 2)
-            drawRight(it.right, 0, 0, height(it) - 2)
+            drawLeft(it.left, 0, 0, nodesWithWidths)
+            drawRight(it.right, 0, 0, nodesWithWidths)
         }
     }
 
@@ -39,10 +39,10 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         return Pair(leftWidth, rightWidth)
     }
 
-    private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
+    private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, mapOfWidths: MutableMap<NODE_T, Pair<Int, Int>>) {
         var count = 0
         if (node?.right != null) {
-            count = 1 + (height) * childrenCount(node.right)
+            count = mapOfWidths[node]?.second ?: 0
         }
         val x = parentX - nodeSize - (count * nodeSize)
         val y = parentY + nodeSize
@@ -52,14 +52,14 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
             val col = getNodeCol(node)
             nodes[node] = NodeExtension(stateX, stateY, col)
         }
-        if (node?.left != null) drawLeft(node.left, x, y, height - 1)
-        if (node?.right != null) drawRight(node.right, x, y, height - 1)
+        if (node?.left != null) drawLeft(node.left, x, y, mapOfWidths)
+        if (node?.right != null) drawRight(node.right, x, y, mapOfWidths)
     }
 
-    private fun drawRight(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
+    private fun drawRight(node: NODE_T?, parentX: Int, parentY: Int, mapOfWidths: MutableMap<NODE_T, Pair<Int, Int>>) {
         var count = 0
         if (node?.left != null) {
-            count = 1 + (height) * childrenCount(node.left)
+            count = mapOfWidths[node]?.first ?: 0
         }
         val x = parentX + nodeSize + (count * nodeSize)
         val y = parentY + nodeSize
@@ -69,8 +69,8 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
             val col = getNodeCol(node)
             nodes[node] = NodeExtension(stateX, stateY, col)
         }
-        if (node?.left != null) drawLeft(node.left, x, y, height - 1)
-        if (node?.right != null) drawRight(node.right, x, y, height - 1)
+        if (node?.left != null) drawLeft(node.left, x, y, mapOfWidths)
+        if (node?.right != null) drawRight(node.right, x, y, mapOfWidths)
     }
 
     fun insert(obj: KVP<Int, String>): TreeController<NODE_T> {
