@@ -41,7 +41,7 @@ class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with
 
 class SQLiteIO {
     private var amountOfNodesToHandle = 0
-    private lateinit var treeController : TreeController<Node<KVP<Int, String>>>
+    private lateinit var treeController: TreeController<Node<KVP<Int, String>>>
     fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         try {
@@ -101,6 +101,9 @@ class SQLiteIO {
             if (root != null) {
                 addCoordinatesToNode(root, parsedX, parsedY)
                 parseNodesForImport(setOfNodes, root)
+                if (setOfNodes.count() > 0) {
+                    throw IOException("Incorrect binary tree: there are at least two left/right children of some node")
+                }
             }
         } catch (ex: NumberFormatException) {
             throw IOException(
@@ -119,30 +122,32 @@ class SQLiteIO {
         }
         val nodes = setOfNodes.elementAt(0)
         val parsedKey = nodes.key
-        val parsedParentKey: Int = nodes.parentKey ?: throw IOException("Incorrect binary tree")
+        val parsedParentKey: Int =
+            nodes.parentKey ?: throw IOException("Incorrect binary tree: there are at least 2 roots")
         val parsedValue = nodes.value
         val parsedX = nodes.x
         val parsedY = nodes.y
+        if (parsedKey == parsedParentKey) throw IOException("Child with key = ${curNode.elem.key} is parent for himself")
         if (parsedParentKey == curNode.elem.key) {
             val newNode = Node(KVP(parsedKey, parsedValue))
             addCoordinatesToNode(newNode, parsedX, parsedY)
             setOfNodes.remove(nodes)
             amountOfNodesToHandle--
             if (parsedKey < parsedParentKey) {
+                if (curNode.left != null) throw IOException("Incorrect binary tree: there are at least two left children of node with key = ${curNode.elem.key}")
                 curNode.left = newNode
                 val leftChild = curNode.left
                 if (leftChild != null) {
                     parseNodesForImport(setOfNodes, leftChild)
                 }
                 parseNodesForImport(setOfNodes, curNode)
-            } else if (parsedKey > parsedParentKey) {
+            } else { // When parsedKey is greater than parsedParentKey
+                if (curNode.right != null) throw IOException("Incorrect binary tree: there are at least two right children of node with key = ${curNode.elem.key}")
                 curNode.right = newNode
                 val rightChild = curNode.right
                 if (rightChild != null) {
                     parseNodesForImport(setOfNodes, rightChild)
                 }
-            } else {
-                throw IOException("Incorrect binary tree")
             }
         }
     }
