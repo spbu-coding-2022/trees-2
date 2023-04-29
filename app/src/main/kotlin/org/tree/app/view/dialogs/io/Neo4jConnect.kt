@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import org.tree.app.appDataController
 import org.tree.app.controller.io.HandledIOException
 import org.tree.app.controller.io.Neo4jIO
 import org.tree.app.view.Logger
@@ -16,25 +17,31 @@ import org.tree.app.view.Logger
 
 @Composable
 fun Neo4jConnect(onSuccess: (Neo4jIO) -> Unit, onFail: (Neo4jIO) -> Unit) {
-    var urlString by remember { mutableStateOf("bolt://localhost:7687") }
-    var loginString by remember { mutableStateOf("neo4j") }
-    var passwordString by remember { mutableStateOf("qwertyui") }
     var connectionStatus by remember { mutableStateOf("Not connected") }
     var iconColor by remember { mutableStateOf(Color.Red) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        OutlinedTextField(value = urlString, onValueChange = { urlString = it })
-        OutlinedTextField(value = loginString, onValueChange = { loginString = it })
         OutlinedTextField(
-            value = passwordString,
-            onValueChange = { passwordString = it },
+            value = appDataController.data.neo4j.url,
+            onValueChange = { appDataController.data.neo4j.url = it })
+        OutlinedTextField(
+            value = appDataController.data.neo4j.login,
+            onValueChange = { appDataController.data.neo4j.login = it })
+        OutlinedTextField(
+            value = appDataController.data.neo4j.password,
+            onValueChange = { appDataController.data.neo4j.password = it },
             visualTransformation = PasswordVisualTransformation()
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = {
                 val db = Neo4jIO()
+                appDataController.saveData()
                 try {
-                    db.open(urlString, loginString, passwordString)
+                    db.open(
+                        appDataController.data.neo4j.url,
+                        appDataController.data.neo4j.login,
+                        appDataController.data.neo4j.password
+                    )
                 } catch (ex: HandledIOException) {
                     connectionStatus = ex.toString()
                     iconColor = Color.Yellow

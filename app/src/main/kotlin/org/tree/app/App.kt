@@ -27,6 +27,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
+import org.tree.app.controller.io.AppDataController
 import org.tree.app.view.*
 import org.tree.app.view.dialogs.io.*
 import org.tree.binaryTree.AVLNode
@@ -44,6 +45,7 @@ enum class DialogType {
     EXPORT_RB
 }
 
+val appDataController = AppDataController()
 fun main() = application {
     val icon = painterResource("icon.png")
     Window(
