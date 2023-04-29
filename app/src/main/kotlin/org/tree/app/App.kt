@@ -282,7 +282,11 @@ fun main() = application {
             DialogType.IMPORT_RB -> {
                 ImportRBDialog(
                     onCloseRequest = { dialogType = DialogType.EMPTY },
-                    onSuccess = { treeController = it })
+                    onSuccess = { newTreeController, treeName ->
+                        treeController = newTreeController
+                        appDataController.data.lastTree = SavedTree(SavedType.Neo4j, treeName)
+                        appDataController.saveData()
+                    })
             }
 
             DialogType.EXPORT_RB -> {

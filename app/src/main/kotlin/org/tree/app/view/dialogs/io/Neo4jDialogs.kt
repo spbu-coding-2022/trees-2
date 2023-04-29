@@ -20,7 +20,7 @@ import org.tree.binaryTree.RBNode
 @Composable
 fun ImportRBDialog(
     onCloseRequest: () -> Unit,
-    onSuccess: (TreeController<RBNode<KVP<Int, String>>>) -> Unit = {}
+    onSuccess: (newTreeController: TreeController<RBNode<KVP<Int, String>>>, treeName: String) -> Unit
 ) {
     var throwException by remember { mutableStateOf(false) }
     var exceptionContent by remember { mutableStateOf("Nothing...") }
@@ -37,7 +37,7 @@ fun ImportRBDialog(
                     }) { db.importRBTree(treeName) }
                 if (treeController != null) {
                     db.close()
-                    onSuccess(treeController)
+                    onSuccess(treeController, treeName)
                     closeRequest()
                 }
             }
