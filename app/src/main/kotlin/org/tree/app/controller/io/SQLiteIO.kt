@@ -3,6 +3,7 @@ package org.tree.app.controller.io
 import NodeExtension
 import TreeController
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -171,6 +172,6 @@ class SQLiteIO {
         node: Node<KVP<Int, String>>,
         x: Int, y: Int
     ) {
-        treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y))
+        treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y), Color.Yellow)
     }
 }
