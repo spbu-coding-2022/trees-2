@@ -11,6 +11,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
@@ -44,10 +45,15 @@ class SQLiteIO {
         treeController = TreeController(BinSearchTree())
         try {
             transaction {
-                val setOfNodes = InstanceOfNode.all().toMutableSet()
-                val amountOfNodes = setOfNodes.count()
-                if (amountOfNodes > 0) {
-                    parseRootForImport(setOfNodes)
+                if (Nodes.exists()) {
+                    val setOfNodes = InstanceOfNode.all().toMutableSet()
+                    val amountOfNodes = setOfNodes.count()
+                    if (amountOfNodes > 0) {
+                        parseRootForImport(setOfNodes)
+                    }
+                }
+                else{
+                    throw HandledIOException("Database without a node table")
                 }
             }
         } catch (ex: ExposedSQLException) {
