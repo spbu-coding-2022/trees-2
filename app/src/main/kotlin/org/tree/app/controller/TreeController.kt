@@ -83,7 +83,7 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         return tree.find(obj)
     }
 
-    private fun getNodeCol(curNode: NODE_T): Color {
+    fun getNodeCol(curNode: NODE_T): Color {
         return if (curNode is RBNode<*>) {
             if (curNode.col == RBNode.Colour.BLACK) {
                 Color.DarkGray
