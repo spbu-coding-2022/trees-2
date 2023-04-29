@@ -62,8 +62,6 @@ fun main() = application {
         var throwException by remember { mutableStateOf(false) }
         var exceptionContent by remember { mutableStateOf("Nothing...") }
 
-        AlertDialog(exceptionContent, throwException, { throwException = false })
-
         var widthOfPanel by remember { mutableStateOf(400) }
         var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
         var logString by remember { mutableStateOf("Log string") }
@@ -73,7 +71,7 @@ fun main() = application {
         var treeController by remember {
             mutableStateOf(
                 handleIOException(onCatch = { ex ->
-                    exceptionContent = ex.toString()
+                    exceptionContent = "Can't open last tree because: $ex"
                     throwException = true
                 }) {
                     appDataController.loadLastTree()
@@ -170,6 +168,8 @@ fun main() = application {
                 }
             }
         }
+        AlertDialog(exceptionContent, throwException, { throwException = false })
+
 
         Row(modifier = Modifier.background(Color.LightGray)) {
             Column(modifier = Modifier.width(widthOfPanel.dp)) {
