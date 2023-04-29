@@ -26,17 +26,17 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         }
     }
 
-    private fun countWidth(node: NODE_T?, map: MutableMap<NODE_T, Pair<Int, Int>>): Pair<Int, Int>{
+    private fun countWidth(node: NODE_T?, map: MutableMap<NODE_T, Pair<Int, Int>>): Int {
         var leftWidth = 0
         var rightWidth = 0
-        if (node?.left != null){
-            leftWidth = countWidth(node.left, map).first + countWidth(node.left, map).second + 1
+        if (node?.left != null) {
+            leftWidth = countWidth(node.left, map) + 1
         }
-        if (node?.right != null){
-            rightWidth = countWidth(node.right, map).first + countWidth(node.right, map).second + 1
+        if (node?.right != null) {
+            rightWidth = countWidth(node.right, map) + 1
         }
         if (node != null) map[node] = Pair(leftWidth, rightWidth)
-        return Pair(leftWidth, rightWidth)
+        return (leftWidth + rightWidth)
     }
 
     private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, mapOfWidths: MutableMap<NODE_T, Pair<Int, Int>>) {
