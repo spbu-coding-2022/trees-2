@@ -45,7 +45,6 @@ class SQLiteIO {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         try {
             transaction {
-                addLogger(StdOutSqlLogger)
                 val setOfNodes = InstanceOfNode.all().toMutableSet()
                 val amountOfNodes = setOfNodes.count()
                 if (amountOfNodes > 0) {
@@ -67,7 +66,6 @@ class SQLiteIO {
         }
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         transaction {
-            addLogger(StdOutSqlLogger)
             try {
                 SchemaUtils.drop(Nodes)
                 SchemaUtils.create(Nodes)
