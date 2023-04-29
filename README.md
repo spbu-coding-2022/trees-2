@@ -100,8 +100,9 @@ At SQLite database we store BinSearchTree. There are 2 types of objects with the
 
 We have functions:
 
-- `exportTree(TreeController, file)` - writes information stored in TreeController object  to a `file`
-- `importTree(file)` - reads the tree stored in the `file` and returns TreeController object
+- `exportTree(TreeController, file)` - writes information stored in TreeController object  to a `file` in preorder order. 
+- `importTree(file)` - reads the tree stored in the `file` and returns TreeController object. **Nodes must be stored in preorder order (check root -> then check left child -> then check right child).**
+If there are some extra tree nodes, that can't fit in the tree, then `importTree` will throw `HandledIOException`. 
 
 
 ### Neo4j
