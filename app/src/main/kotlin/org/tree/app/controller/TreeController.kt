@@ -17,15 +17,26 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     val nodes = mutableMapOf<NODE_T, NodeExtension>()
 
     init {
+        val nodesWithWidths = mutableMapOf<NODE_T, Pair<Int, Int>>()
         tree.root?.let {
             nodes[it] = NodeExtension(mutableStateOf(0), mutableStateOf(0), getNodeCol(it))
+            countWidth(it, nodesWithWidths)
             drawLeft(it.left, 0, 0, height(it) - 2)
             drawRight(it.right, 0, 0, height(it) - 2)
         }
     }
 
-    private fun childrenCount(node: NODE_T?): Int {
-        return (2 - (node?.countNullChildren() ?: 2))
+    private fun countWidth(node: NODE_T?, map: MutableMap<NODE_T, Pair<Int, Int>>): Pair<Int, Int>{
+        var leftWidth = 0
+        var rightWidth = 0
+        if (node?.left != null){
+            leftWidth = countWidth(node.left, map).first + countWidth(node.left, map).second + 1
+        }
+        if (node?.right != null){
+            rightWidth = countWidth(node.right, map).first + countWidth(node.right, map).second + 1
+        }
+        if (node != null) map[node] = Pair(leftWidth, rightWidth)
+        return Pair(leftWidth, rightWidth)
     }
 
     private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, height: Int) {
