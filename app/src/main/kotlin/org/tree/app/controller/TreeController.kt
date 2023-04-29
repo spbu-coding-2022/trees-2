@@ -18,8 +18,9 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
 
     init {
         tree.root?.let {
-            drawLeft(it, 0, 0, height(it) - 2)
-            drawRight(it, 0, 0, height(it) - 2)
+            nodes[it] = NodeExtension(mutableStateOf(0), mutableStateOf(0), getNodeCol(it))
+            drawLeft(it.left, 0, 0, height(it) - 2)
+            drawRight(it.right, 0, 0, height(it) - 2)
         }
     }
 
