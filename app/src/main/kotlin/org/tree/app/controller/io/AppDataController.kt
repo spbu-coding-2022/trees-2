@@ -1,5 +1,6 @@
 package org.tree.app.controller.io
 
+import TreeController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import newTree
+import org.tree.app.appDataController
+import org.tree.binaryTree.trees.BinSearchTree
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
@@ -95,6 +99,35 @@ class AppDataController {
             // Because it is bad to throw warning or exception at the start of app
             // throw HandledIOException("Directory ${file.toPath()} cannot be created: no access", ex)
         }
+    }
+
+    fun loadLastTree(): TreeController<*> {
+        var treeController: TreeController<*> = newTree(BinSearchTree())
+        data.lastTree?.let {
+            when (it.type) {
+                SavedType.SQLite -> {
+                    val db = SQLiteIO()
+                    treeController = db.importTree(File(it.path))
+                }
+
+                SavedType.Json -> {
+                    val db = Json()
+                    treeController = db.importTree(File(it.path))
+                }
+
+                SavedType.Neo4j -> {
+                    val db = Neo4jIO()
+                    db.open(
+                        appDataController.data.neo4j.url,
+                        appDataController.data.neo4j.login,
+                        appDataController.data.neo4j.password
+                    )
+                    treeController = db.importRBTree(it.path)
+                    db.close()
+                }
+            }
+        }
+        return treeController
     }
 
     private fun getAppDataFile(): File {
