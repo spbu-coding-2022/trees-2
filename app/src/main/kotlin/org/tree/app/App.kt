@@ -28,7 +28,13 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import newTree
 import org.tree.app.controller.io.AppDataController
+import org.tree.app.controller.io.SavedTree
+import org.tree.app.controller.io.SavedType
 import org.tree.app.view.*
+import org.tree.app.view.dialogs.io.AlertDialog
+import org.tree.app.view.dialogs.io.ExportRBDialog
+import org.tree.app.view.dialogs.io.ImportRBDialog
+import org.tree.app.view.dialogs.io.handleIOException
 import org.tree.app.view.dialogs.io.*
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
@@ -37,7 +43,6 @@ import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.trees.AVLTree
 import org.tree.binaryTree.trees.BinSearchTree
 import org.tree.binaryTree.trees.RBTree
-
 
 enum class DialogType {
     EMPTY,
@@ -54,17 +59,27 @@ fun main() = application {
         state = rememberWindowState(width = 800.dp, height = 600.dp),
         icon = icon
     ) {
-        var treeController by remember {
-            mutableStateOf<TreeController<*>>(
-                newTree(BinSearchTree())
-            )
-        }
+        var throwException by remember { mutableStateOf(false) }
+        var exceptionContent by remember { mutableStateOf("Nothing...") }
+
+        AlertDialog(exceptionContent, throwException, { throwException = false })
+
         var widthOfPanel by remember { mutableStateOf(400) }
         var dialogType by remember { mutableStateOf(DialogType.EMPTY) }
         var logString by remember { mutableStateOf("Log string") }
         var logColor by remember { mutableStateOf(Color.DarkGray) }
         val treeOffsetX = remember { mutableStateOf(0) }
         val treeOffsetY = remember { mutableStateOf(0) }
+        var treeController by remember {
+            mutableStateOf(
+                handleIOException(onCatch = { ex ->
+                    exceptionContent = ex.toString()
+                    throwException = true
+                }) {
+                    appDataController.loadLastTree()
+                } ?: newTree(BinSearchTree())
+            )
+        }
 
         fun convertKey(keyString: String): Int? {
             if (keyString.isEmpty()) {
@@ -255,6 +270,7 @@ fun main() = application {
                 )
             }
             Spacer(modifier = Modifier.width(3.dp))
+
             TreeView(treeController, treeOffsetX, treeOffsetY)
 
         }
@@ -265,13 +281,18 @@ fun main() = application {
 
             DialogType.IMPORT_RB -> {
                 ImportRBDialog(
-                    onCloseRequest = { dialogType = DialogType.EMPTY }, onSuccess = { treeController = it })
+                    onCloseRequest = { dialogType = DialogType.EMPTY },
+                    onSuccess = { treeController = it })
             }
 
             DialogType.EXPORT_RB -> {
                 @Suppress("UNCHECKED_CAST")
                 ExportRBDialog(
                     onCloseRequest = { dialogType = DialogType.EMPTY },
+                    onSuccess = { treeName ->
+                        appDataController.data.lastTree = SavedTree(SavedType.Neo4j, treeName)
+                        appDataController.saveData()
+                    },
                     treeController as TreeController<RBNode<KVP<Int, String>>>
                 )
             }
