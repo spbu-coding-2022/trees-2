@@ -18,7 +18,6 @@ import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
 import org.tree.binaryTree.trees.BinSearchTree
 import java.io.File
-import java.io.IOException
 import java.nio.file.Files
 
 object Nodes : IntIdTable() {
@@ -55,7 +54,7 @@ class SQLiteIO {
                 }
             }
         } catch (ex: ExposedSQLException) {
-            throw IOException("File is not a database", ex)
+            throw HandledIOException("File is not a database", ex)
         }
         return treeController
     }
@@ -64,7 +63,7 @@ class SQLiteIO {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
-            throw IOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
+            throw HandledIOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         transaction {
@@ -73,7 +72,7 @@ class SQLiteIO {
                 SchemaUtils.drop(Nodes)
                 SchemaUtils.create(Nodes)
             } catch (ex: ExposedSQLException) {
-                throw IOException("File is not a database", ex)
+                throw HandledIOException("File is not a database", ex)
             }
             treeController = treeController_
             val root = treeController.tree.root
@@ -101,12 +100,12 @@ class SQLiteIO {
             if (root != null) {
                 addCoordinatesToNode(root, parsedX, parsedY)
                 parseNodesForImport(setOfNodes, root)
-                if (setOfNodes.count() > 0) {
-                    throw IOException("Incorrect binary tree: there are at least two left/right children of some node")
+                if (setOfNodes.isNotEmpty()) {
+                    throw HandledIOException("Incorrect binary tree: there are at least two left/right children of some node")
                 }
             }
         } catch (ex: NumberFormatException) {
-            throw IOException(
+            throw HandledIOException(
                 "Node keys must be integers, value must be string and coordinates must be doubles",
                 ex
             )
@@ -123,18 +122,18 @@ class SQLiteIO {
         val nodes = setOfNodes.elementAt(0)
         val parsedKey = nodes.key
         val parsedParentKey: Int =
-            nodes.parentKey ?: throw IOException("Incorrect binary tree: there are at least 2 roots")
+            nodes.parentKey ?: throw HandledIOException("Incorrect binary tree: there are at least 2 roots")
         val parsedValue = nodes.value
         val parsedX = nodes.x
         val parsedY = nodes.y
-        if (parsedKey == parsedParentKey) throw IOException("Child with key = ${curNode.elem.key} is parent for himself")
+        if (parsedKey == parsedParentKey) throw HandledIOException("Child with key = ${curNode.elem.key} is parent for himself")
         if (parsedParentKey == curNode.elem.key) {
             val newNode = Node(KVP(parsedKey, parsedValue))
             addCoordinatesToNode(newNode, parsedX, parsedY)
             setOfNodes.remove(nodes)
             amountOfNodesToHandle--
             if (parsedKey < parsedParentKey) {
-                if (curNode.left != null) throw IOException("Incorrect binary tree: there are at least two left children of node with key = ${curNode.elem.key}")
+                if (curNode.left != null) throw HandledIOException("Incorrect binary tree: there are at least two left children of node with key = ${curNode.elem.key}")
                 curNode.left = newNode
                 val leftChild = curNode.left
                 if (leftChild != null) {
@@ -142,7 +141,7 @@ class SQLiteIO {
                 }
                 parseNodesForImport(setOfNodes, curNode)
             } else { // When parsedKey is greater than parsedParentKey
-                if (curNode.right != null) throw IOException("Incorrect binary tree: there are at least two right children of node with key = ${curNode.elem.key}")
+                if (curNode.right != null) throw HandledIOException("Incorrect binary tree: there are at least two right children of node with key = ${curNode.elem.key}")
                 curNode.right = newNode
                 val rightChild = curNode.right
                 if (rightChild != null) {
