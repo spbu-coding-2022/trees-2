@@ -41,12 +41,12 @@ class SQLiteIO {
     private lateinit var treeController: TreeController<Node<KVP<Int, String>>>
     fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
+        treeController = TreeController(BinSearchTree())
         try {
             transaction {
                 val setOfNodes = InstanceOfNode.all().toMutableSet()
                 val amountOfNodes = setOfNodes.count()
                 if (amountOfNodes > 0) {
-                    treeController = TreeController(BinSearchTree())
                     parseRootForImport(setOfNodes)
                 }
             }
@@ -63,6 +63,7 @@ class SQLiteIO {
             throw HandledIOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
+        treeController = treeController_
         transaction {
             try {
                 SchemaUtils.drop(Nodes)
@@ -70,7 +71,6 @@ class SQLiteIO {
             } catch (ex: ExposedSQLException) {
                 throw HandledIOException("File is not a database", ex)
             }
-            treeController = treeController_
             val root = treeController.tree.root
             if (root != null) {
                 parseNodesForExport(root, null)
