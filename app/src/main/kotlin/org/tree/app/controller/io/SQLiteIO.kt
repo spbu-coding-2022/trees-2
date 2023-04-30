@@ -17,6 +17,7 @@ import org.tree.binaryTree.Node
 import org.tree.binaryTree.trees.BinSearchTree
 import java.io.File
 import java.nio.file.Files
+import java.sql.SQLException
 
 object Nodes : IntIdTable() {
     val key = integer("key")
@@ -50,12 +51,13 @@ class SQLiteIO {
                     if (amountOfNodes > 0) {
                         parseRootForImport(setOfNodes)
                     }
-                }
-                else{
+                } else {
                     throw HandledIOException("Database without a node table")
                 }
             }
         } catch (ex: ExposedSQLException) {
+            throw HandledIOException("File is not a database", ex)
+        } catch (ex: SQLException) {
             throw HandledIOException("File is not a database", ex)
         }
         return treeController
@@ -177,6 +179,7 @@ class SQLiteIO {
         node: Node<KVP<Int, String>>,
         x: Int, y: Int
     ) {
-        treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y), treeController.getNodeCol(node))
+        treeController.nodes[node] =
+            NodeExtension(mutableStateOf(x), mutableStateOf(y), treeController.getNodeCol(node))
     }
 }
