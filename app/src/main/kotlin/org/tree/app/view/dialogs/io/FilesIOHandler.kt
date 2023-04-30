@@ -24,8 +24,8 @@ fun importAVLT(
     return treeController
 }
 
-fun exportAVLT(tc: TreeController<AVLNode<KVP<Int, String>>>) {
-    val fileString = selectFile("json", Mode.EXPORT) ?: return
+fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String>>>) {
+    val fileString = selectFile(window, "json", Mode.EXPORT) ?: return
     val file = File(fileString)
     val db = Json()
     db.exportTree(tc, file)
