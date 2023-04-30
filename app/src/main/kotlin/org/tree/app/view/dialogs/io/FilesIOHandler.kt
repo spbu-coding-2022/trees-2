@@ -14,9 +14,8 @@ import java.awt.FileDialog
 import java.io.File
 
 fun importAVLT(
-    window: ComposeWindow,
 ): TreeController<AVLNode<KVP<Int, String>>>? {
-    val fileString = selectFile(window, "json", Mode.IMPORT) ?: return null
+    val fileString = selectFile("json", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = Json()
     val treeController = db.importTree(file)
@@ -25,8 +24,8 @@ fun importAVLT(
     return treeController
 }
 
-fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String>>>) {
-    val fileString = selectFile(window, "json", Mode.EXPORT) ?: return
+fun exportAVLT(tc: TreeController<AVLNode<KVP<Int, String>>>) {
+    val fileString = selectFile("json", Mode.EXPORT) ?: return
     val file = File(fileString)
     val db = Json()
     db.exportTree(tc, file)
@@ -35,9 +34,8 @@ fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String
 }
 
 fun importBST(
-    window: ComposeWindow,
 ): TreeController<Node<KVP<Int, String>>>? {
-    val fileString = selectFile(window, "sqlite", Mode.IMPORT) ?: return null
+    val fileString = selectFile("sqlite", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = SQLiteIO()
     val treeController = db.importTree(file)
@@ -46,8 +44,8 @@ fun importBST(
     return treeController
 }
 
-fun exportBST(window: ComposeWindow, tc: TreeController<Node<KVP<Int, String>>>) {
-    val fileString = selectFile(window, "sqlite", Mode.EXPORT) ?: return
+fun exportBST(tc: TreeController<Node<KVP<Int, String>>>) {
+    val fileString = selectFile("sqlite", Mode.EXPORT) ?: return
     val file = File(fileString)
     val db = SQLiteIO()
     db.exportTree(tc, file)
@@ -60,14 +58,14 @@ enum class Mode {
     EXPORT
 }
 
-fun selectFile(window: ComposeWindow, fileFormant: String, mode: Mode): String? {
+fun selectFile(fileExtension: String, mode: Mode): String? {
     val fd = if (mode == Mode.IMPORT) {
-        FileDialog(window, "Choose .sqlite file to import", FileDialog.LOAD)
+        FileDialog(ComposeWindow(), "Choose .sqlite file to import", FileDialog.LOAD)
     } else {
-        FileDialog(window, "Choose .sqlite file to export", FileDialog.SAVE)
+        FileDialog(ComposeWindow(), "Choose .sqlite file to export", FileDialog.SAVE)
     }
     fd.directory = "C:\\"
-    fd.file = "*.$fileFormant"
+    fd.file = "*.$fileExtension"
     fd.isVisible = true
     val fileString = fd.directory + fd.file
     if (fileString != "nullnull") {
