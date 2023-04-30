@@ -14,14 +14,14 @@ import java.io.File
 fun importAVLT(
     window: ComposeWindow,
 ): TreeController<AVLNode<KVP<Int, String>>>? {
-    val fileString = selectFile(window, "json", "import") ?: return null
+    val fileString = selectFile(window, "json", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = Json()
     return db.importTree(file)
 }
 
 fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String>>>) {
-    val fileString = selectFile(window, "json", "export") ?: return
+    val fileString = selectFile(window, "json", Mode.EXPORT) ?: return
     val file = File(fileString)
     val db = Json()
     db.exportTree(tc, file)
@@ -30,7 +30,7 @@ fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String
 fun importBST(
     window: ComposeWindow,
 ): TreeController<Node<KVP<Int, String>>>? {
-    val fileString = selectFile(window, "sqlite", "import") ?: return null
+    val fileString = selectFile(window, "sqlite", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = SQLiteIO()
     return try {
@@ -41,14 +41,17 @@ fun importBST(
 }
 
 fun exportBST(window: ComposeWindow, tc: TreeController<Node<KVP<Int, String>>>) {
-    val fileString = selectFile(window, "sqlite", "export") ?: return
+    val fileString = selectFile(window, "sqlite", Mode.EXPORT) ?: return
     val file = File(fileString)
     val db = SQLiteIO()
     db.exportTree(tc, file)
 }
-
-fun selectFile(window: ComposeWindow, fileFormant: String, mode: String): String? {
-    val fd = if (mode == "import") {
+enum class Mode{
+    IMPORT,
+    EXPORT
+}
+fun selectFile(window: ComposeWindow, fileFormant: String, mode: Mode): String? {
+    val fd = if (mode == Mode.IMPORT) {
         FileDialog(window, "Choose .sqlite file to import", FileDialog.LOAD)
     } else {
         FileDialog(window, "Choose .sqlite file to export", FileDialog.SAVE)
