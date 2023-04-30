@@ -67,7 +67,7 @@ fun main() = application {
         var treeController by remember {
             mutableStateOf(
                 handleIOException(onCatch = { ex ->
-                    exceptionContent = "Can't open last tree because: $ex"
+                    exceptionContent = "Can't open the last tree because: $ex"
                     throwException = true
                 }) {
                     appDataController.loadLastTree()
@@ -115,18 +115,24 @@ fun main() = application {
                 }
                 Menu("Open", mnemonic = 'O') {
                     Item("Bin Search Tree", onClick = {
-                        val tc = importBST(ComposeWindow())
+                        val tc = handleIOException(onCatch = { ex ->
+                            exceptionContent = "Failed to import tree from file: ${ex.message}"
+                            throwException = true
+                        }) {
+                            importBST(ComposeWindow())
+                        }
                         if (tc != null) {
                             treeController = tc
-                            logString = ""
-                        } else {
-                            logString = "Database has no Nodes table"
-                            logColor = Color.Red
                         }
                     })
                     Item("Red black Tree", onClick = { dialogType = DialogType.IMPORT_RB })
                     Item("AVL Tree", onClick = {
-                        val tc = importAVLT(ComposeWindow())
+                        val tc = handleIOException(onCatch = { ex ->
+                            exceptionContent = "Failed to import tree from file: ${ex.message}"
+                            throwException = true
+                        }) {
+                            importAVLT(ComposeWindow())
+                        }
                         if (tc != null) {
                             treeController = tc
                         }
@@ -163,7 +169,7 @@ fun main() = application {
                 }
             }
         }
-        AlertDialog(exceptionContent, throwException, { throwException = false })
+        AlertDialog(exceptionContent, throwException) { throwException = false }
 
 
         Row(modifier = Modifier.background(Color.LightGray)) {

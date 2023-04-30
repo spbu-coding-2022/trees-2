@@ -3,7 +3,10 @@ package org.tree.app.view.dialogs.io
 import TreeController
 import androidx.compose.ui.awt.ComposeWindow
 import org.tree.app.appDataController
-import org.tree.app.controller.io.*
+import org.tree.app.controller.io.Json
+import org.tree.app.controller.io.SQLiteIO
+import org.tree.app.controller.io.SavedTree
+import org.tree.app.controller.io.SavedType
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
@@ -37,15 +40,9 @@ fun importBST(
     val fileString = selectFile(window, "sqlite", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = SQLiteIO()
-    val treeController = try {
-        db.importTree(file)
-    } catch (ex: HandledIOException) {
-        null
-    }
-    if (treeController != null) {
-        appDataController.data.lastTree = SavedTree(SavedType.SQLite, file.path)
-        appDataController.saveData()
-    }
+    val treeController = db.importTree(file)
+    appDataController.data.lastTree = SavedTree(SavedType.SQLite, file.path)
+    appDataController.saveData()
     return treeController
 }
 
@@ -78,4 +75,3 @@ fun selectFile(window: ComposeWindow, fileFormant: String, mode: Mode): String? 
     }
     return null
 }
-
