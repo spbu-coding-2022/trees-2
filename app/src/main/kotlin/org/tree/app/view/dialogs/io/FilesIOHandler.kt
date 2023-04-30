@@ -35,7 +35,7 @@ fun importBST(
     val db = SQLiteIO()
     return try {
         db.importTree(file)
-    } catch(ex: HandledIOException) {
+    } catch (ex: HandledIOException) {
         null
     }
 }
