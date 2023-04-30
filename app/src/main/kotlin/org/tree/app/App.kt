@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -119,7 +118,7 @@ fun main() = application {
                             exceptionContent = "Failed to import tree from file: ${ex.message}"
                             throwException = true
                         }) {
-                            importBST(ComposeWindow())
+                            importBST()
                         }
                         if (tc != null) {
                             treeController = tc
@@ -131,7 +130,7 @@ fun main() = application {
                             exceptionContent = "Failed to import tree from file: ${ex.message}"
                             throwException = true
                         }) {
-                            importAVLT(ComposeWindow())
+                            importAVLT()
                         }
                         if (tc != null) {
                             treeController = tc
@@ -144,7 +143,6 @@ fun main() = application {
                         onClick = {
                             @Suppress("UNCHECKED_CAST")
                             exportBST(
-                                ComposeWindow(),
                                 treeController as TreeController<Node<KVP<Int, String>>>
                             )
                         },
@@ -160,7 +158,6 @@ fun main() = application {
                         onClick = {
                             @Suppress("UNCHECKED_CAST")
                             exportAVLT(
-                                ComposeWindow(),
                                 treeController as TreeController<AVLNode<KVP<Int, String>>>
                             )
                         },
