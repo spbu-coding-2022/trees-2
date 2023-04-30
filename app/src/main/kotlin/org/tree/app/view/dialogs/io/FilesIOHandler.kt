@@ -2,9 +2,8 @@ package org.tree.app.view.dialogs.io
 
 import TreeController
 import androidx.compose.ui.awt.ComposeWindow
-import org.tree.app.controller.io.HandledIOException
-import org.tree.app.controller.io.Json
-import org.tree.app.controller.io.SQLiteIO
+import org.tree.app.appDataController
+import org.tree.app.controller.io.*
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
 import org.tree.binaryTree.Node
@@ -17,7 +16,10 @@ fun importAVLT(
     val fileString = selectFile(window, "json", "import") ?: return null
     val file = File(fileString)
     val db = Json()
-    return db.importTree(file)
+    val treeController = db.importTree(file)
+    appDataController.data.lastTree = SavedTree(SavedType.Json, file.path)
+    appDataController.saveData()
+    return treeController
 }
 
 fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String>>>) {
@@ -25,6 +27,8 @@ fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String
     val file = File(fileString)
     val db = Json()
     db.exportTree(tc, file)
+    appDataController.data.lastTree = SavedTree(SavedType.Json, file.path)
+    appDataController.saveData()
 }
 
 fun importBST(
@@ -33,11 +37,16 @@ fun importBST(
     val fileString = selectFile(window, "sqlite", "import") ?: return null
     val file = File(fileString)
     val db = SQLiteIO()
-    return try {
+    val treeController = try {
         db.importTree(file)
     } catch (ex: HandledIOException) {
         null
     }
+    if (treeController != null) {
+        appDataController.data.lastTree = SavedTree(SavedType.SQLite, file.path)
+        appDataController.saveData()
+    }
+    return treeController
 }
 
 fun exportBST(window: ComposeWindow, tc: TreeController<Node<KVP<Int, String>>>) {
@@ -45,6 +54,8 @@ fun exportBST(window: ComposeWindow, tc: TreeController<Node<KVP<Int, String>>>)
     val file = File(fileString)
     val db = SQLiteIO()
     db.exportTree(tc, file)
+    appDataController.data.lastTree = SavedTree(SavedType.SQLite, file.path)
+    appDataController.saveData()
 }
 
 fun selectFile(window: ComposeWindow, fileFormant: String, mode: String): String? {
