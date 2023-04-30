@@ -31,10 +31,6 @@ import org.tree.app.controller.io.AppDataController
 import org.tree.app.controller.io.SavedTree
 import org.tree.app.controller.io.SavedType
 import org.tree.app.view.*
-import org.tree.app.view.dialogs.io.AlertDialog
-import org.tree.app.view.dialogs.io.ExportRBDialog
-import org.tree.app.view.dialogs.io.ImportRBDialog
-import org.tree.app.view.dialogs.io.handleIOException
 import org.tree.app.view.dialogs.io.*
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
@@ -123,8 +119,7 @@ fun main() = application {
                         if (tc != null) {
                             treeController = tc
                             logString = ""
-                        }
-                        else{
+                        } else {
                             logString = "Database has no Nodes table"
                             logColor = Color.Red
                         }
@@ -204,7 +199,7 @@ fun main() = application {
                         val key = convertKey(keyString) ?: return@FindRow
                         val node = treeController.find(KVP(key))
                         if (node != null) {
-                                logString = "Node with key = $key and value = \"${node.elem.v}\" found."
+                            logString = "Node with key = $key and value = \"${node.elem.v}\" found."
                             logColor = Color.Green
                             val coordinates = treeController.nodes[node]
                             if (coordinates != null) {
