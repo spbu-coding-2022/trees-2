@@ -43,8 +43,8 @@ class SQLiteIO {
     fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         treeController = TreeController(BinSearchTree())
-        try {
-            transaction {
+        transaction {
+            try {
                 if (Nodes.exists()) {
                     val setOfNodes = InstanceOfNode.all().toMutableSet()
                     val amountOfNodes = setOfNodes.count()
@@ -52,17 +52,14 @@ class SQLiteIO {
                         parseRootForImport(setOfNodes)
                     }
                 } else {
-                    throw HandledIOException("Database without a node table")
+                    throw HandledIOException("Database without a Nodes table")
                 }
+            } catch (ex: SQLException) {
+                throw HandledIOException("File is not a SQLite database", ex)
             }
-        } catch (ex: ExposedSQLException) {
-            throw HandledIOException("File is not a database", ex)
-        } catch (ex: SQLException) {
-            throw HandledIOException("File is not a database", ex)
         }
         return treeController
     }
-
     fun exportTree(treeController_: TreeController<Node<KVP<Int, String>>>, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
