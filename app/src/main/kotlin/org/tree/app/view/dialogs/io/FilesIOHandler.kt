@@ -13,8 +13,7 @@ import org.tree.binaryTree.Node
 import java.awt.FileDialog
 import java.io.File
 
-fun importAVLT(
-): TreeController<AVLNode<KVP<Int, String>>>? {
+fun importAVLT(): TreeController<AVLNode<KVP<Int, String>>>? {
     val fileString = selectFile("json", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = Json()
@@ -24,8 +23,8 @@ fun importAVLT(
     return treeController
 }
 
-fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String>>>) {
-    val fileString = selectFile(window, "json", Mode.EXPORT) ?: return
+fun exportAVLT(tc: TreeController<AVLNode<KVP<Int, String>>>) {
+    val fileString = selectFile("json", Mode.EXPORT) ?: return
     val file = File(fileString)
     val db = Json()
     db.exportTree(tc, file)
@@ -33,8 +32,7 @@ fun exportAVLT(window: ComposeWindow, tc: TreeController<AVLNode<KVP<Int, String
     appDataController.saveData()
 }
 
-fun importBST(
-): TreeController<Node<KVP<Int, String>>>? {
+fun importBST(): TreeController<Node<KVP<Int, String>>>? {
     val fileString = selectFile("sqlite", Mode.IMPORT) ?: return null
     val file = File(fileString)
     val db = SQLiteIO()
