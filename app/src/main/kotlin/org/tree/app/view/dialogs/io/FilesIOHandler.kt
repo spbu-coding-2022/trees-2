@@ -35,7 +35,7 @@ fun importBST(
     val db = SQLiteIO()
     return try {
         db.importTree(file)
-    } catch(ex: HandledIOException) {
+    } catch (ex: HandledIOException) {
         null
     }
 }
@@ -46,10 +46,12 @@ fun exportBST(window: ComposeWindow, tc: TreeController<Node<KVP<Int, String>>>)
     val db = SQLiteIO()
     db.exportTree(tc, file)
 }
-enum class Mode{
+
+enum class Mode {
     IMPORT,
     EXPORT
 }
+
 fun selectFile(window: ComposeWindow, fileFormant: String, mode: Mode): String? {
     val fd = if (mode == Mode.IMPORT) {
         FileDialog(window, "Choose .sqlite file to import", FileDialog.LOAD)
