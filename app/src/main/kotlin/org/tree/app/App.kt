@@ -190,9 +190,9 @@ fun main() = application {
                     Spacer(modifier = Modifier.size(5.dp))
                     RemoveRow(onClick = { keyString ->
                         val key = convertKey(keyString) ?: return@RemoveRow
-                        val rememd = treeController
+                        val treeBeforeInsert = treeController
                         treeController = treeController.remove(KVP(key))
-                        if (rememd == treeController) {
+                        if (treeBeforeInsert == treeController) {
                             logString = "There is no node with key = $key in the tree. Nothing has been done."
                             logColor = Color.Yellow
                         } else {
