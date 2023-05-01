@@ -251,7 +251,7 @@ class Neo4jIO() : Closeable {
                 val name = nmRecord["name"].asString()
                 res.add(name)
             } catch (ex: Uncoercible) {
-                throw IOException("Invalid tree label in the database", ex)
+                throw HandledIOException("Invalid tree label in the database", ex)
             }
         }
         return res
