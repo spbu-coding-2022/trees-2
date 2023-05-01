@@ -66,7 +66,7 @@ class Neo4jIO() : Closeable {
                             "REMOVE r:$NEW_NODE",
                     mutableMapOf(
                         "treeName" to treeName
-                    ) as Map<String, Any>?
+                    ) as Map<String, Any>
                 )// connect tree and root
 
             }
@@ -119,7 +119,7 @@ class Neo4jIO() : Closeable {
                     "DETACH DELETE t, n",
             mutableMapOf(
                 "treeName" to treeName
-            ) as Map<String, Any>?
+            ) as Map<String, Any>
         ) // delete tree and all its nodes
     }
 
@@ -150,7 +150,7 @@ class Neo4jIO() : Closeable {
                         "isBlack" to (curNode.col == RBNode.Colour.BLACK),
                         "lkey" to lkey,
                         "rkey" to rkey
-                    ) as Map<String, Any>?
+                    ) as Map<String, Any?>
                 )
                 exportRBNode(tx, curNode.left, nodes)
                 exportRBNode(tx, curNode.right, nodes)
@@ -171,7 +171,7 @@ class Neo4jIO() : Closeable {
                     "   l.key AS lKey, r.key AS rKey",
             mutableMapOf(
                 "treeName" to treeName
-            ) as Map<String, Any>?
+            ) as Map<String, Any>
         ) // for all nodes get their properties + keys of their children
         return parseRBNodes(nodeAndKeysRecords, treeController)
     }
