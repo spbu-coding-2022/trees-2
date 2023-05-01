@@ -1,4 +1,4 @@
-package org.tree.app.view.dialogs.io
+package org.tree.app.view.dialogs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,16 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
-import org.tree.app.controller.io.HandledIOException
 
-fun <T> handleIOException(onCatch: (HandledIOException) -> Unit, handledCode: () -> T): T? {
-    try {
-        return handledCode()
-    } catch (ex: HandledIOException) {
-        onCatch(ex)
-        return null
-    }
-}
 
 @Composable
 fun AlertDialog(description: String, isOpen: Boolean, onCloseRequest: () -> Unit) {
