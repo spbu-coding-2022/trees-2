@@ -32,6 +32,7 @@ import org.tree.app.controller.io.SavedType
 import org.tree.app.controller.io.handleIOException
 import org.tree.app.view.*
 import org.tree.app.view.dialogs.AlertDialog
+import org.tree.app.view.dialogs.ExitDialog
 import org.tree.app.view.dialogs.io.*
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
@@ -50,8 +51,10 @@ enum class DialogType {
 val appDataController = AppDataController()
 fun main() = application {
     val icon = painterResource("icon.png")
+    var showExitDialog by remember { mutableStateOf(false) }
+
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = { showExitDialog = true },
         title = "Trees",
         state = rememberWindowState(width = 800.dp, height = 600.dp),
         icon = icon
@@ -168,7 +171,8 @@ fun main() = application {
                 }
             }
         }
-        AlertDialog(exceptionContent, throwException) { throwException = false }
+
+
 
 
         Row(modifier = Modifier.background(Color.LightGray)) {
@@ -299,6 +303,37 @@ fun main() = application {
                     },
                     treeController as TreeController<RBNode<KVP<Int, String>>>
                 )
+            }
+        }
+
+        AlertDialog(exceptionContent, throwException, onCloseRequest = { throwException = false })
+        ExitDialog(
+            showExitDialog,
+            onCloseRequest = { showExitDialog = false },
+            onExitRequest = ::exitApplication
+        ) {
+            if (treeController.nodeType() is Node<*>?) {
+                Button(onClick = {
+                    @Suppress("UNCHECKED_CAST")
+                    exportBST(treeController as TreeController<Node<KVP<Int, String>>>)
+                }) {
+                    Text("Save as Bin Search Tree")
+                }
+            }
+            if (treeController.nodeType() is AVLNode<*>?) {
+                Button(onClick = {
+                    @Suppress("UNCHECKED_CAST")
+                    exportAVLT(treeController as TreeController<AVLNode<KVP<Int, String>>>)
+                }) {
+                    Text("Save as AVL Tree")
+                }
+            }
+            if (treeController.nodeType() is RBNode<*>?) {
+                Button(onClick = {
+                    dialogType = DialogType.EXPORT_RB
+                }) {
+                    Text("Save as RB Tree")
+                }
             }
         }
     }
