@@ -22,15 +22,23 @@ fun Neo4jConnect(onSuccess: (Neo4jIO) -> Unit, onFail: (Neo4jIO) -> Unit) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         OutlinedTextField(
+            label = { Text("Url") },
             value = appDataController.data.neo4j.url,
-            onValueChange = { appDataController.data.neo4j.url = it })
+            onValueChange = { appDataController.data.neo4j.url = it },
+            singleLine = true
+        )
         OutlinedTextField(
+            label = { Text("Username") },
             value = appDataController.data.neo4j.login,
-            onValueChange = { appDataController.data.neo4j.login = it })
+            onValueChange = { appDataController.data.neo4j.login = it },
+            singleLine = true
+        )
         OutlinedTextField(
+            label = { Text("Password") },
             value = appDataController.data.neo4j.password,
             onValueChange = { appDataController.data.neo4j.password = it },
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = {
