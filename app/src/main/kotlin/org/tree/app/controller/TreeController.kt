@@ -19,10 +19,8 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
     init {
         val nodesWithWidths = mutableMapOf<NODE_T, Pair<Int, Int>>()
         tree.root?.let {
-            nodes[it] = NodeExtension(mutableStateOf(0), mutableStateOf(0), getNodeCol(it))
             countWidth(it, nodesWithWidths)
-            drawLeft(it.left, 0, 0, nodesWithWidths)
-            drawRight(it.right, 0, 0, nodesWithWidths)
+            getCoordinatesOfNode(it, 0, 0, nodesWithWidths)
         }
     }
 
@@ -39,38 +37,21 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         return (leftWidth + rightWidth)
     }
 
-    private fun drawLeft(node: NODE_T?, parentX: Int, parentY: Int, mapOfWidths: MutableMap<NODE_T, Pair<Int, Int>>) {
-        var count = 0
-        if (node?.right != null) {
-            count = mapOfWidths[node]?.second ?: 0
-        }
-        val x = parentX - nodeSize - (count * nodeSize)
-        val y = parentY + nodeSize
+    private fun getCoordinatesOfNode(node: NODE_T, x: Int, y: Int, mapOfWidths: MutableMap<NODE_T, Pair<Int, Int>>) {
         val stateX = mutableStateOf(x)
         val stateY = mutableStateOf(y)
-        if (node != null) {
-            val col = getNodeCol(node)
-            nodes[node] = NodeExtension(stateX, stateY, col)
-        }
-        if (node?.left != null) drawLeft(node.left, x, y, mapOfWidths)
-        if (node?.right != null) drawRight(node.right, x, y, mapOfWidths)
-    }
+        val col = getNodeCol(node)
+        nodes[node] = NodeExtension(stateX, stateY, col)
 
-    private fun drawRight(node: NODE_T?, parentX: Int, parentY: Int, mapOfWidths: MutableMap<NODE_T, Pair<Int, Int>>) {
-        var count = 0
-        if (node?.left != null) {
-            count = mapOfWidths[node]?.first ?: 0
+        node.left?.let {
+            val count = mapOfWidths[it]?.second ?: 0
+            getCoordinatesOfNode(it, x - nodeSize - (count * nodeSize), y + nodeSize, mapOfWidths)
         }
-        val x = parentX + nodeSize + (count * nodeSize)
-        val y = parentY + nodeSize
-        val stateX = mutableStateOf(x)
-        val stateY = mutableStateOf(y)
-        if (node != null) {
-            val col = getNodeCol(node)
-            nodes[node] = NodeExtension(stateX, stateY, col)
+
+        node.right?.let {
+            val count = mapOfWidths[it]?.first ?: 0
+            getCoordinatesOfNode(it, x + nodeSize + (count * nodeSize), y + nodeSize, mapOfWidths)
         }
-        if (node?.left != null) drawLeft(node.left, x, y, mapOfWidths)
-        if (node?.right != null) drawRight(node.right, x, y, mapOfWidths)
     }
 
     fun insert(obj: KVP<Int, String>): TreeController<NODE_T> {
