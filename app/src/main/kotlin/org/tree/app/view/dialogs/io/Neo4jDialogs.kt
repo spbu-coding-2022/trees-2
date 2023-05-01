@@ -105,10 +105,21 @@ fun Neo4jIODialog(
                 isDialogOpen = false
             }) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Neo4jConnect(onSuccess = {
-                    db = it
-                    isDBEnable = true
-                },
+                Neo4jConnect(
+                    onSuccess = { dataBase ->
+                        db = dataBase
+                        isDBEnable = true
+                        val names = handleIOException(
+                            onCatch = {
+                                exceptionContent = it.toString()
+                                throwException = true
+                            }
+                        ) { db.getTreesNames() }
+                        if (names != null) {
+                            if (names.size > 0)
+                                treeName = names[0]
+                        }
+                    },
                     onFail = {
                         db = it
                         isDBEnable = false
