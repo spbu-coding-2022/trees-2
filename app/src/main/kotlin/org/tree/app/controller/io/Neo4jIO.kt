@@ -3,7 +3,6 @@ package org.tree.app.controller.io
 import NodeExtension
 import TreeController
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import org.neo4j.driver.*
 import org.neo4j.driver.exceptions.AuthenticationException
 import org.neo4j.driver.exceptions.ClientException
@@ -194,17 +193,15 @@ class Neo4jIO() : Closeable {
                 val x = nkRecord["x"].asInt()
                 val y = nkRecord["y"].asInt()
 
-                val color: Color
                 val isBlack = nkRecord["isBlack"].asBoolean()
                 node.col = if (isBlack) {
-                    color = Color.DarkGray
                     RBNode.Colour.BLACK
                 } else {
-                    color = Color.Red
                     RBNode.Colour.RED
                 }
 
-                treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y), color)
+                treeController.nodes[node] =
+                    NodeExtension(mutableStateOf(x), mutableStateOf(y), treeController.getNodeCol(node))
 
                 val lkey = if (nkRecord["lKey"].isNull) {
                     null
