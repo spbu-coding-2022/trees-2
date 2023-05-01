@@ -181,6 +181,7 @@ fun Neo4jIODialog(
             }
         }
     } else {
+        db.close()
         onCloseRequest()
     }
 }
