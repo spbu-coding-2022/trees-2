@@ -108,7 +108,6 @@ fun main() = application {
             }
         }
 
-        remember { toTreeRoot() } // will be removed in future
 
         MenuBar {
             Menu("File", mnemonic = 'F') {
