@@ -1,16 +1,17 @@
 package org.tree.app.controller.io
 
+import NodeExtension
+import TreeController
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import TreeController
 import org.tree.binaryTree.AVLNode
 import org.tree.binaryTree.KVP
-import java.io.File
-import NodeExtension
-import androidx.compose.runtime.mutableStateOf
 import org.tree.binaryTree.trees.AVLTree
+import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
 
@@ -76,7 +77,14 @@ class JsonIO {
         }
 
         val treeController = TreeController(AVLTree())
-        val jsonTree = Json.decodeFromString<JsonAVLTree>(json)
+        val jsonTree = try {
+            Json.decodeFromString<JsonAVLTree>(json)
+        } catch (ex: IllegalArgumentException) {
+            throw HandledIOException("This file is not json tree format", ex)
+        } catch (ex: SerializationException) {
+            throw HandledIOException("Something go wrong during tree import", ex)
+        }
+
         treeController.tree.root = jsonTree.root?.deserialize(treeController)
         return treeController
 
