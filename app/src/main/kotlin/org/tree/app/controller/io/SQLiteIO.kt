@@ -22,7 +22,7 @@ import java.sql.SQLException
 object Nodes : IntIdTable() {
     val key = integer("key")
     val parentKey = integer("parentKey").nullable()
-    val value = text("value")
+    val value = text("value", eagerLoading = true)
     val x = integer("x")
     val y = integer("y")
 }
@@ -62,22 +62,11 @@ class SQLiteIO {
     }
 
     fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
-        Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         val treeController = TreeController(BinSearchTree())
-        transaction {
-            try {
-                if (Nodes.exists()) {
-                    val setOfNodes = InstanceOfNode.all().toMutableSet()
-                    val amountOfNodes = setOfNodes.count()
-                    if (amountOfNodes > 0) {
-                        parseRootForImport(setOfNodes, treeController)
-                    }
-                } else {
-                    throw HandledIOException("Database without a Nodes table")
-                }
-            } catch (ex: SQLException) {
-                throw HandledIOException("File is not a SQLite database", ex)
-            }
+        val setOfNodes = getSetOfNodesFromDB(file)
+        val amountOfNodes = setOfNodes.count()
+        if (amountOfNodes > 0) {
+            parseRootForImport(setOfNodes, treeController)
         }
         return treeController
     }
@@ -101,6 +90,21 @@ class SQLiteIO {
         val rightChild = curNode.right
         if (rightChild != null) {
             parseNodesForExport(rightChild, curNode, treeController)
+        }
+    }
+
+    private fun getSetOfNodesFromDB(file: File): MutableSet<InstanceOfNode> {
+        Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
+        return transaction {
+            try {
+                if (Nodes.exists()) {
+                    InstanceOfNode.all().toMutableSet()
+                } else {
+                    throw HandledIOException("Database without a Nodes table")
+                }
+            } catch (ex: SQLException) {
+                throw HandledIOException("File is not a SQLite database", ex)
+            }
         }
     }
 
