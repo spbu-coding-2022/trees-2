@@ -39,26 +39,6 @@ class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with
 
 class SQLiteIO {
     private var amountOfNodesToHandle = 0
-    fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
-        Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
-        val treeController = TreeController(BinSearchTree())
-        transaction {
-            try {
-                if (Nodes.exists()) {
-                    val setOfNodes = InstanceOfNode.all().toMutableSet()
-                    val amountOfNodes = setOfNodes.count()
-                    if (amountOfNodes > 0) {
-                        parseRootForImport(setOfNodes, treeController)
-                    }
-                } else {
-                    throw HandledIOException("Database without a Nodes table")
-                }
-            } catch (ex: SQLException) {
-                throw HandledIOException("File is not a SQLite database", ex)
-            }
-        }
-        return treeController
-    }
 
     fun exportTree(treeController: TreeController<Node<KVP<Int, String>>>, file: File) {
         try {
@@ -81,6 +61,48 @@ class SQLiteIO {
         }
     }
 
+    fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
+        Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
+        val treeController = TreeController(BinSearchTree())
+        transaction {
+            try {
+                if (Nodes.exists()) {
+                    val setOfNodes = InstanceOfNode.all().toMutableSet()
+                    val amountOfNodes = setOfNodes.count()
+                    if (amountOfNodes > 0) {
+                        parseRootForImport(setOfNodes, treeController)
+                    }
+                } else {
+                    throw HandledIOException("Database without a Nodes table")
+                }
+            } catch (ex: SQLException) {
+                throw HandledIOException("File is not a SQLite database", ex)
+            }
+        }
+        return treeController
+    }
+
+    private fun parseNodesForExport(
+        curNode: Node<KVP<Int, String>>,
+        parNode: Node<KVP<Int, String>>?,
+        treeController: TreeController<Node<KVP<Int, String>>>
+    ) {
+        InstanceOfNode.new {
+            key = curNode.elem.key
+            parentKey = parNode?.elem?.key
+            value = curNode.elem.v.toString()
+            x = treeController.nodes[curNode]?.x?.value ?: 0
+            y = treeController.nodes[curNode]?.y?.value ?: 0
+        }
+        val leftChild = curNode.left
+        if (leftChild != null) {
+            parseNodesForExport(leftChild, curNode, treeController)
+        }
+        val rightChild = curNode.right
+        if (rightChild != null) {
+            parseNodesForExport(rightChild, curNode, treeController)
+        }
+    }
 
     private fun parseRootForImport(
         setOfNodes: MutableSet<InstanceOfNode>,
@@ -149,28 +171,6 @@ class SQLiteIO {
                     parseNodesForImport(setOfNodes, rightChild, treeController)
                 }
             }
-        }
-    }
-
-    private fun parseNodesForExport(
-        curNode: Node<KVP<Int, String>>,
-        parNode: Node<KVP<Int, String>>?,
-        treeController: TreeController<Node<KVP<Int, String>>>
-    ) {
-        InstanceOfNode.new {
-            key = curNode.elem.key
-            parentKey = parNode?.elem?.key
-            value = curNode.elem.v.toString()
-            x = treeController.nodes[curNode]?.x?.value ?: 0
-            y = treeController.nodes[curNode]?.y?.value ?: 0
-        }
-        val leftChild = curNode.left
-        if (leftChild != null) {
-            parseNodesForExport(leftChild, curNode, treeController)
-        }
-        val rightChild = curNode.right
-        if (rightChild != null) {
-            parseNodesForExport(rightChild, curNode, treeController)
         }
     }
 
