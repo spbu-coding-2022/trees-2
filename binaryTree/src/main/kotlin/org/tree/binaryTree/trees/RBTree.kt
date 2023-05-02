@@ -37,26 +37,26 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     override fun balance(
         curNode: RBNode<T>?,
         changedChild: BalanceCase.ChangedChild,
-        operationType: BalanceCase.OpType,
+        operationType: BalanceCase.OperationType,
         recursive: BalanceCase.Recursive
     ) {
         if (recursive == BalanceCase.Recursive.END) {
             if (curNode != null) {
                 when (operationType) {
-                    BalanceCase.OpType.INSERT -> { // curNode is parent Node of inserted Node
+                    BalanceCase.OperationType.INSERT -> { // curNode is parent Node of inserted Node
                         balanceInsert(curNode)
                     }
 
-                    BalanceCase.OpType.REMOVE_0 -> {
+                    BalanceCase.OperationType.REMOVE_0 -> {
                         // does nothing
                     }
 
-                    BalanceCase.OpType.REMOVE_1 -> {
+                    BalanceCase.OperationType.REMOVE_1 -> {
                         balanceRemove1(curNode, changedChild)
 
                     }
 
-                    BalanceCase.OpType.REMOVE_2 -> {
+                    BalanceCase.OperationType.REMOVE_2 -> {
                         balanceRemove2(curNode, changedChild)
                     }
                 }
