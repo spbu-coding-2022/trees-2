@@ -6,9 +6,9 @@ class Node<T : Comparable<T>>(v: T) : TemplateNode<T, Node<T>>(v)
 
 class RBNode<T : Comparable<T>>(p: RBNode<T>?, v: T) : TemplateNode<T, RBNode<T>>(v) {
     var parent: RBNode<T>? = p
-    var col: Colour = Colour.RED
+    var color: Color = Color.RED
 
-    enum class Colour { RED, BLACK }
+    enum class Color { RED, BLACK }
 }
 
 class AVLNode<T : Comparable<T>>(v: T) : TemplateNode<T, AVLNode<T>>(v) {

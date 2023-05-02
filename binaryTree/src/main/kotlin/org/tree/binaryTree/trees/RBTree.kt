@@ -26,7 +26,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         val newNode = RBNode(parentForObj, obj)
         if (parentForObj == null) { // in case of root insert | node already exist (nothing will be changed)
             if (root == null) {
-                newNode.col = RBNode.Colour.BLACK
+                newNode.color = RBNode.Color.BLACK
             } else {
                 return null
             }
@@ -69,7 +69,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     }
 
     private fun balanceInsert(parentNode: RBNode<T>) {
-        if (parentNode.col == RBNode.Colour.RED) {
+        if (parentNode.color == RBNode.Color.RED) {
             val grandParent = parentNode.parent
             if (grandParent != null) { // in case when grandparent is null, there is no need to balance a tree
                 val unclePosition: BalancePosition
@@ -81,7 +81,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                     grandParent.left
                 }
                 if (uncle != null) {
-                    if (uncle.col == RBNode.Colour.RED) {
+                    if (uncle.color == RBNode.Color.RED) {
                         balanceInsertCaseOfRedUncle(parentNode, grandParent, uncle)
                     } else {
                         balanceInsertCaseOfBLackUncle(parentNode, grandParent, unclePosition)
@@ -96,12 +96,12 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
 
     private fun balanceInsertCaseOfRedUncle(parentNode: RBNode<T>, grandParent: RBNode<T>, uncle: RBNode<T>) {
         val grandGrandParent = grandParent.parent
-        uncle.col = RBNode.Colour.BLACK
-        parentNode.col = RBNode.Colour.BLACK
+        uncle.color = RBNode.Color.BLACK
+        parentNode.color = RBNode.Color.BLACK
         if (grandGrandParent != null) {
-            grandParent.col = RBNode.Colour.RED
+            grandParent.color = RBNode.Color.RED
             // https://skr.sh/sJ9LBQU2IGg, when y is curNode
-            if (grandGrandParent.col == RBNode.Colour.RED) {
+            if (grandGrandParent.color == RBNode.Color.RED) {
                 balanceInsert(grandGrandParent)
             }
         }
@@ -114,27 +114,27 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     ) { // can be null uncle
         if (position == BalancePosition.LEFT_UNCLE) {
             val leftChild = parentNode.left
-            if (leftChild?.col == RBNode.Colour.RED) {
+            if (leftChild?.color == RBNode.Color.RED) {
                 rotateRight(parentNode, grandParent)
                 parentNode.parent?.let { balanceInsert(it) }
             } else {
                 val rightChild = parentNode.right
                 if (rightChild != null) {
-                    parentNode.col = RBNode.Colour.BLACK
-                    grandParent.col = RBNode.Colour.RED
+                    parentNode.color = RBNode.Color.BLACK
+                    grandParent.color = RBNode.Color.RED
                     rotateLeft(grandParent, grandParent.parent)
                 }
             }
         } else {
             val leftChild = parentNode.left
-            if (leftChild?.col == RBNode.Colour.RED) {
-                parentNode.col = RBNode.Colour.BLACK
-                grandParent.col = RBNode.Colour.RED
+            if (leftChild?.color == RBNode.Color.RED) {
+                parentNode.color = RBNode.Color.BLACK
+                grandParent.color = RBNode.Color.RED
                 rotateRight(grandParent, grandParent.parent)
             } else {
                 val rightChild = parentNode.right
                 if (rightChild != null) {
-                    if (rightChild.col == RBNode.Colour.RED) {
+                    if (rightChild.color == RBNode.Color.RED) {
                         rotateLeft(parentNode, grandParent)
                         parentNode.parent?.let { balanceInsert(it) }
                     }
@@ -148,20 +148,20 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         if (removedChild == BalanceCase.ChangedChild.RIGHT) {
             val rightChild = parentNode?.right
             if (rightChild != null) {
-                rightChild.col = RBNode.Colour.BLACK
+                rightChild.color = RBNode.Color.BLACK
             }
         } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
             val leftChild = parentNode?.left
             if (leftChild != null) {
-                leftChild.col = RBNode.Colour.BLACK
+                leftChild.color = RBNode.Color.BLACK
             }
         }
     }
 
     private fun balanceRemove2(parentNode: RBNode<T>, removedChild: BalanceCase.ChangedChild) {
         // balanced remove with 2 null children
-        if (getColourOfRemovedNode(parentNode) == RBNode.Colour.BLACK) { // red => no need to balance
-            if (parentNode.col == RBNode.Colour.RED) { // then other child is black
+        if (getColourOfRemovedNode(parentNode) == RBNode.Color.BLACK) { // red => no need to balance
+            if (parentNode.color == RBNode.Color.RED) { // then other child is black
                 if (removedChild == BalanceCase.ChangedChild.RIGHT) {
                     balanceRemove2InRightChildWithRedParent(parentNode)
                 } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
@@ -182,18 +182,18 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         if (otherChild != null) {
             val leftChildOfOtherChild = otherChild.left
             val rightChildOfOtherChild = otherChild.right
-            if (leftChildOfOtherChild?.col == RBNode.Colour.RED) {
-                otherChild.col = RBNode.Colour.RED
-                parentNode.col = RBNode.Colour.BLACK
-                leftChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (leftChildOfOtherChild?.color == RBNode.Color.RED) {
+                otherChild.color = RBNode.Color.RED
+                parentNode.color = RBNode.Color.BLACK
+                leftChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateRight(parentNode, parentNode.parent)
-            } else if (rightChildOfOtherChild?.col == RBNode.Colour.RED) {
-                parentNode.col = RBNode.Colour.BLACK
+            } else if (rightChildOfOtherChild?.color == RBNode.Color.RED) {
+                parentNode.color = RBNode.Color.BLACK
                 rotateLeft(otherChild, parentNode)
                 rotateRight(parentNode, parentNode.parent)
             } else {
-                otherChild.col = RBNode.Colour.RED
-                parentNode.col = RBNode.Colour.BLACK
+                otherChild.color = RBNode.Color.RED
+                parentNode.color = RBNode.Color.BLACK
             }
         }
     }
@@ -203,18 +203,18 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         if (otherChild != null) {
             val leftChildOfOtherChild = otherChild.left
             val rightChildOfOtherChild = otherChild.right
-            if (leftChildOfOtherChild?.col == RBNode.Colour.RED) {
-                parentNode.col = RBNode.Colour.BLACK
+            if (leftChildOfOtherChild?.color == RBNode.Color.RED) {
+                parentNode.color = RBNode.Color.BLACK
                 rotateRight(otherChild, parentNode)
                 rotateLeft(parentNode, parentNode.parent)
-            } else if (rightChildOfOtherChild?.col == RBNode.Colour.RED) {
-                otherChild.col = RBNode.Colour.RED
-                parentNode.col = RBNode.Colour.BLACK
-                rightChildOfOtherChild.col = RBNode.Colour.BLACK
+            } else if (rightChildOfOtherChild?.color == RBNode.Color.RED) {
+                otherChild.color = RBNode.Color.RED
+                parentNode.color = RBNode.Color.BLACK
+                rightChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateLeft(parentNode, parentNode.parent)
             } else {
-                otherChild.col = RBNode.Colour.RED
-                parentNode.col = RBNode.Colour.BLACK
+                otherChild.color = RBNode.Color.RED
+                parentNode.color = RBNode.Color.BLACK
             }
         }
     }
@@ -222,7 +222,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun balanceRemove2InRightChildWithBlackParent(parentNode: RBNode<T>) {
         val otherChild = parentNode.left
         if (otherChild != null) {
-            if (otherChild.col == RBNode.Colour.RED) {
+            if (otherChild.color == RBNode.Color.RED) {
                 balanceRemove2InRightChildWithBlackParentRedOtherChild(parentNode, otherChild)
             } else {
                 balanceRemove2InRightChildWithBlackParentBlackOtherChild(parentNode, otherChild)
@@ -233,7 +233,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun balanceRemove2InLeftChildWithBlackParent(parentNode: RBNode<T>) {
         val otherChild = parentNode.right
         if (otherChild != null) {
-            if (otherChild.col == RBNode.Colour.RED) {
+            if (otherChild.color == RBNode.Color.RED) {
                 balanceRemove2InLeftChildWithBlackParentRedOtherChild(parentNode, otherChild)
             } else {
                 balanceRemove2InLeftChildWithBlackParentBlackOtherChild(parentNode, otherChild)
@@ -251,19 +251,19 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 rightChildOfOtherChild.left // https://skr.sh/sJD6DQ2ML5B
             val rightChildOfRightChildOfOtherChild = rightChildOfOtherChild.right
 
-            if (leftChildOfRightChildOfOtherChild?.col == RBNode.Colour.RED) {
-                leftChildOfRightChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (leftChildOfRightChildOfOtherChild?.color == RBNode.Color.RED) {
+                leftChildOfRightChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateLeft(otherChild, parentNode)
                 rotateRight(parentNode, parentNode.parent)
-            } else if (rightChildOfRightChildOfOtherChild?.col == RBNode.Colour.RED) {
-                rightChildOfOtherChild.col = RBNode.Colour.RED
-                rightChildOfRightChildOfOtherChild.col = RBNode.Colour.BLACK
+            } else if (rightChildOfRightChildOfOtherChild?.color == RBNode.Color.RED) {
+                rightChildOfOtherChild.color = RBNode.Color.RED
+                rightChildOfRightChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateLeft(rightChildOfOtherChild, otherChild)
                 balanceRemove2InRightChildWithBlackParentRedOtherChild(parentNode, otherChild)
                 // case: leftChildOfRightChildOfOtherChild?.col == RBNode.Colour.RED
             } else {
-                otherChild.col = RBNode.Colour.BLACK
-                rightChildOfOtherChild.col = RBNode.Colour.RED
+                otherChild.color = RBNode.Color.BLACK
+                rightChildOfOtherChild.color = RBNode.Color.RED
                 rotateRight(parentNode, parentNode.parent)
             }
         }
@@ -279,19 +279,19 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 leftChildOfOtherChild.right // https://skr.sh/sJD6DQ2ML5B (inverted)
             val leftChildOfLeftChildOfOtherChild = leftChildOfOtherChild.left
 
-            if (rightChildOfLeftChildOfOtherChild?.col == RBNode.Colour.RED) {
-                rightChildOfLeftChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (rightChildOfLeftChildOfOtherChild?.color == RBNode.Color.RED) {
+                rightChildOfLeftChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateRight(otherChild, parentNode)
                 rotateLeft(parentNode, parentNode.parent)
-            } else if (leftChildOfLeftChildOfOtherChild?.col == RBNode.Colour.RED) {
-                leftChildOfOtherChild.col = RBNode.Colour.RED
-                leftChildOfLeftChildOfOtherChild.col = RBNode.Colour.BLACK
+            } else if (leftChildOfLeftChildOfOtherChild?.color == RBNode.Color.RED) {
+                leftChildOfOtherChild.color = RBNode.Color.RED
+                leftChildOfLeftChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateRight(leftChildOfOtherChild, otherChild)
                 balanceRemove2InLeftChildWithBlackParentRedOtherChild(parentNode, otherChild)
                 // case: rightChildOfLeftChildOfOtherChild?.col == RBNode.Colour.RED
             } else {
-                otherChild.col = RBNode.Colour.BLACK
-                leftChildOfOtherChild.col = RBNode.Colour.RED
+                otherChild.color = RBNode.Color.BLACK
+                leftChildOfOtherChild.color = RBNode.Color.RED
                 rotateLeft(parentNode, parentNode.parent)
             }
         }
@@ -303,8 +303,8 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     ) {
         val rightChildOfOtherChild = otherChild.right
         if (rightChildOfOtherChild != null) {
-            if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
-                rightChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (rightChildOfOtherChild.color == RBNode.Color.RED) {
+                rightChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateLeft(otherChild, parentNode)
                 rotateRight(parentNode, parentNode.parent)
                 return
@@ -312,13 +312,13 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         }
         val leftChildOfOtherChild = otherChild.left
         if (leftChildOfOtherChild != null) {
-            if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
-                leftChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (leftChildOfOtherChild.color == RBNode.Color.RED) {
+                leftChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateRight(parentNode, parentNode.parent)
                 return
             }
         }
-        otherChild.col = RBNode.Colour.RED
+        otherChild.color = RBNode.Color.RED
         val grandParent = parentNode.parent
         if (grandParent != null) {
             if (parentNode.element < grandParent.element) {
@@ -337,8 +337,8 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     ){
         val leftChildOfOtherChild = otherChild.left
         if (leftChildOfOtherChild != null) {
-            if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
-                leftChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (leftChildOfOtherChild.color == RBNode.Color.RED) {
+                leftChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateRight(otherChild, parentNode)
                 rotateLeft(parentNode, parentNode.parent)
                 return
@@ -346,13 +346,13 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         }
         val rightChildOfOtherChild = otherChild.right
         if (rightChildOfOtherChild != null) {
-            if (rightChildOfOtherChild.col == RBNode.Colour.RED) {
-                rightChildOfOtherChild.col = RBNode.Colour.BLACK
+            if (rightChildOfOtherChild.color == RBNode.Color.RED) {
+                rightChildOfOtherChild.color = RBNode.Color.BLACK
                 rotateLeft(parentNode, parentNode.parent)
                 return
             }
         }
-        otherChild.col = RBNode.Colour.RED
+        otherChild.color = RBNode.Color.RED
         val grandParent = parentNode.parent
         if (grandParent != null) {
             if (parentNode.element < grandParent.element) {
@@ -364,18 +364,18 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         return
     }
 
-    private fun getColourOfRemovedNode(parentNode: RBNode<T>): RBNode.Colour {
+    private fun getColourOfRemovedNode(parentNode: RBNode<T>): RBNode.Color {
         return if (getBlackHeight(parentNode.left) != getBlackHeight(parentNode.right)) {
-            RBNode.Colour.BLACK
+            RBNode.Color.BLACK
         } else {
-            RBNode.Colour.RED
+            RBNode.Color.RED
         }
     }
 
     private fun getBlackHeight(curNode: RBNode<T>?, blackHeight: Int = 0): Int {
         var blackHeightVar = blackHeight
         if (curNode != null) {
-            if (curNode.col == RBNode.Colour.BLACK) {
+            if (curNode.color == RBNode.Color.BLACK) {
                 blackHeightVar += 1
             }
             return getBlackHeight(curNode.left, blackHeightVar)
@@ -387,7 +387,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         newNode?.parent = parentNode
         if (parentNode == null) {
             if (newNode != null) {
-                newNode.col = RBNode.Colour.BLACK
+                newNode.color = RBNode.Color.BLACK
             }
         }
         super.replaceNode(replacedNode, parentNode, newNode)
@@ -398,7 +398,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         curNode.left?.parent = parentNode
         curNode.left?.right?.parent = curNode
         if (curNode === root) {
-            curNode.left?.col = RBNode.Colour.BLACK
+            curNode.left?.color = RBNode.Color.BLACK
         }
         super.rotateRight(curNode, parentNode)
     }
@@ -408,7 +408,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         curNode.right?.parent = parentNode
         curNode.right?.left?.parent = curNode
         if (curNode === root) {
-            curNode.right?.col = RBNode.Colour.BLACK
+            curNode.right?.color = RBNode.Color.BLACK
         }
         super.rotateLeft(curNode, parentNode)
     }
