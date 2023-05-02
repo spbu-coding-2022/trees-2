@@ -129,11 +129,11 @@ class Neo4jIO() : Closeable {
         nodes: MutableMap<RBNode<KVP<Int, String>>, NodeExtension>
     ) {
         if (curNode != null) {
-            val lkey = curNode.left?.elem?.key
-            val rkey = curNode.right?.elem?.key
+            val lkey = curNode.left?.element?.key
+            val rkey = curNode.right?.element?.key
             val ext = nodes[curNode]
             if (ext == null) {
-                throw IOException("Can't find coordinates for node with key ${curNode.elem.key}")
+                throw IOException("Can't find coordinates for node with key ${curNode.element.key}")
             } else {
                 tx.run(
                     "CREATE (:$RBNODE:$NEW_NODE {key : \$key, " +
@@ -144,8 +144,8 @@ class Neo4jIO() : Closeable {
                             "rkey: \$rkey" +
                             "})",
                     mutableMapOf(
-                        "key" to curNode.elem.key,
-                        "value" to (curNode.elem.v ?: ""),
+                        "key" to curNode.element.key,
+                        "value" to (curNode.element.v ?: ""),
                         "x" to ext.x.value, "y" to ext.y.value,
                         "isBlack" to (curNode.col == RBNode.Colour.BLACK),
                         "lkey" to lkey,

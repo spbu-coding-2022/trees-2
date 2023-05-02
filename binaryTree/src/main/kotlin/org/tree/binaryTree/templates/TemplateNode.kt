@@ -5,11 +5,11 @@ package org.tree.binaryTree.templates
  * @param T the type of element stored in the node
  * @param NODE_T the type of your node
  *
- * @property elem the element stored in the node.
+ * @property element the element stored in the node.
  * @property left the left child node of this node, or null if this node does not have a left child node.
  * @property right the right child node of this node, or null if this node does not have a right child node.
  */
-abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>(var elem: T) {
+abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>(var element: T) {
     var left: NODE_T? = null
     var right: NODE_T? = null
 
@@ -26,15 +26,15 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
 
     private fun traverse(res: MutableList<T>, traversalOrder: Traversal) {
         if (traversalOrder == Traversal.PREORDER) {
-            res.add(elem)
+            res.add(element)
         }
         left?.traverse(res, traversalOrder)
         if (traversalOrder == Traversal.INORDER) {
-            res.add(elem)
+            res.add(element)
         }
         right?.traverse(res, traversalOrder)
         if (traversalOrder == Traversal.POSTORDER) {
-            res.add(elem)
+            res.add(element)
         }
     }
 
