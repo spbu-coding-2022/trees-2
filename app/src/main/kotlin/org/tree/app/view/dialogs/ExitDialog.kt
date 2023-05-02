@@ -15,12 +15,12 @@ import androidx.compose.ui.window.rememberDialogState
 
 @Composable
 fun ExitDialog(
-    isOpen: Boolean,
+    isDialogOpened: Boolean,
     onCloseRequest: () -> Unit,
     onExitRequest: () -> Unit,
     additionalButtons: @Composable () -> Unit
 ) {
-    if (isOpen) {
+    if (isDialogOpened) {
         Dialog(
             title = "Confirm exit",
             onCloseRequest = { onCloseRequest() },
