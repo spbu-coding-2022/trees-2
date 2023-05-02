@@ -29,7 +29,7 @@ private data class JsonAVLNode(
 private data class JsonAVLTree(
     val root: JsonAVLNode?
 )
-class Json {
+class JsonIO {
     private lateinit var treeController : TreeController<AVLNode<KVP<Int, String>>>
 
     private fun AVLNode<KVP<Int, String>>.serialize(): JsonAVLNode{
