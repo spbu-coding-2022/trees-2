@@ -23,9 +23,12 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
     offsetX: MutableState<Int>,
     offsetY: MutableState<Int>,
 ) {
-    Box(contentAlignment = Alignment.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier.background(Color.White, shape = RoundedCornerShape(16.dp)).clipToBounds().fillMaxSize()
-            .pointerInput(offsetX, offsetY) {
+            .pointerInput(
+                offsetX, offsetY
+            ) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
                     offsetX.value += dragAmount.x.toInt()

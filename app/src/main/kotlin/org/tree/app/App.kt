@@ -52,12 +52,12 @@ val appDataController = AppDataController()
 fun main() = application {
     val icon = painterResource("icon.png")
     var showExitDialog by remember { mutableStateOf(false) }
-
+    val windowState = rememberWindowState(width = 800.dp, height = 600.dp)
     Window(
         onCloseRequest = { showExitDialog = true },
         title = "Trees",
-        state = rememberWindowState(width = 800.dp, height = 600.dp),
-        icon = icon
+        state = windowState,
+        icon = icon,
     ) {
         var throwException by remember { mutableStateOf(false) }
         var exceptionContent by remember { mutableStateOf("Nothing...") }
@@ -267,7 +267,10 @@ fun main() = application {
                         .draggable(
                             orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                             state = rememberDraggableState { delta ->
-                                widthOfPanel += delta.toInt()
+                                val newWight = widthOfPanel + delta.toInt()
+                                if (windowState.size.width > (newWight + 10).dp) {
+                                    widthOfPanel = newWight
+                                }
                             }
                         )
                 )
