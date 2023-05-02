@@ -38,8 +38,6 @@ class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with
 }
 
 class SQLiteIO {
-    private var amountOfNodesToHandle = 0
-
     fun exportTree(treeController: TreeController<Node<KVP<Int, String>>>, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
@@ -120,7 +118,6 @@ class SQLiteIO {
             val parsedX = node.x
             val parsedY = node.y
             val bst = treeController.tree
-            amountOfNodesToHandle = setOfNodes.count()
             bst.insert(KVP(parsedKey, parsedValue))
             val root = bst.root
             if (root != null) {
@@ -143,7 +140,7 @@ class SQLiteIO {
         curNode: Node<KVP<Int, String>>,
         treeController: TreeController<Node<KVP<Int, String>>>
     ) {
-        if (amountOfNodesToHandle <= 0) {
+        if (setOfNodes.size == 0) {
             return
         }
         val nodes = setOfNodes.elementAt(0)
@@ -158,7 +155,6 @@ class SQLiteIO {
             val newNode = Node(KVP(parsedKey, parsedValue))
             addCoordinatesToNode(newNode, parsedX, parsedY, treeController)
             setOfNodes.remove(nodes)
-            amountOfNodesToHandle--
             if (parsedKey < parsedParentKey) {
                 if (curNode.left != null) throw HandledIOException("Incorrect binary tree: there are at least two left children of node with key = ${curNode.elem.key}")
                 curNode.left = newNode
