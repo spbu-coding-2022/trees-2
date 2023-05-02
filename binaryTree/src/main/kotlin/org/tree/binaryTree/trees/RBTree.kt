@@ -141,22 +141,22 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     }
 
     private fun balanceRemove1(parentNode: RBNode<T>?, removedChild: BalanceCase.ChangedChild) {
-        // balanced remove with 1 non-null child
-        if (removedChild == BalanceCase.ChangedChild.RIGHT) {
-            val rightChild = parentNode?.right
-            if (rightChild != null) {
-                rightChild.col = RBNode.Colour.BLACK
+        /** Balanced remove with 1 non-null child */
+        when (removedChild) {
+            BalanceCase.ChangedChild.RIGHT -> {
+                parentNode?.right?.run { col = RBNode.Colour.BLACK }
             }
-        } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
-            val leftChild = parentNode?.left
-            if (leftChild != null) {
-                leftChild.col = RBNode.Colour.BLACK
+
+            BalanceCase.ChangedChild.LEFT -> {
+                parentNode?.left?.run { col = RBNode.Colour.BLACK }
             }
+
+            else -> {}
         }
     }
 
     private fun balanceRemove2(parentNode: RBNode<T>, removedChild: BalanceCase.ChangedChild) {
-        // balanced remove with 2 null children
+        /** Balanced remove with 2 null children */
         if (getColourOfRemovedNode(parentNode) == RBNode.Colour.BLACK) { // red => no need to balance
             if (parentNode.col == RBNode.Colour.RED) { // then other child is black
                 if (removedChild == BalanceCase.ChangedChild.RIGHT) {
@@ -331,7 +331,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun balanceRemove2InLeftChildWithBlackParentBlackOtherChild(
         parentNode: RBNode<T>,
         otherChild: RBNode<T>
-    ){
+    ) {
         val leftChildOfOtherChild = otherChild.left
         if (leftChildOfOtherChild != null) {
             if (leftChildOfOtherChild.col == RBNode.Colour.RED) {
