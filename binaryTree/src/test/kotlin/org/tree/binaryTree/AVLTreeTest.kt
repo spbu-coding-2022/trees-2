@@ -28,8 +28,6 @@ class AVLTreeTest {
                 MatcherAssert.assertThat(act, Matchers.equalTo(exp))
                 checkAVLTree(tree, values.toTypedArray())
             }
-
-
         }
 
         companion object {
@@ -49,7 +47,6 @@ class AVLTreeTest {
                 return Arguments.of(seed, insertCount)
             }
         }
-
     }
 
 
@@ -68,14 +65,13 @@ class AVLTreeTest {
             }
 
             for (i in 1..removeCount * 2) {
-                val curVal = if ((i % 2 != 0) and (values.isNotEmpty())) {
+                val curVal = if (i % 2 != 0 && values.isNotEmpty()) {
                     values.random(randomizer)
                 } else {
                     randomizer.nextInt()
                 }
                 val exp = values.remove(curVal)
                 val act = tree.remove(curVal)
-
 
                 MatcherAssert.assertThat(act, Matchers.equalTo(exp))
                 checkAVLTree(tree, values.toTypedArray())
@@ -102,7 +98,5 @@ class AVLTreeTest {
                 return Arguments.of(seed, treeSize, removeCount)
             }
         }
-
     }
-
 }
