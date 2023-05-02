@@ -78,7 +78,7 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             }
 
             1 -> {
-                replaceNode(curNode, parentNode, curNode.getChild())
+                replaceNode(curNode, parentNode, curNode.left ?: curNode.right)
             }
 
             else -> {
