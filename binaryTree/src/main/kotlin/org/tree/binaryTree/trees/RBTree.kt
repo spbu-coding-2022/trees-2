@@ -368,14 +368,17 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     }
 
     private fun getBlackHeight(curNode: RBNode<T>?, blackHeight: Int = 0): Int {
-        var blackHeightVar = blackHeight
         if (curNode != null) {
-            if (curNode.col == RBNode.Colour.BLACK) {
-                blackHeightVar += 1
-            }
-            return getBlackHeight(curNode.left, blackHeightVar)
+            return getBlackHeight(
+                curNode.left,
+                if (curNode.col == RBNode.Colour.BLACK) {
+                    blackHeight + 1
+                } else {
+                    blackHeight
+                }
+            )
         }
-        return blackHeightVar
+        return blackHeight
     }
 
     override fun replaceNode(replacedNode: RBNode<T>, parentNode: RBNode<T>?, newNode: RBNode<T>?) {
