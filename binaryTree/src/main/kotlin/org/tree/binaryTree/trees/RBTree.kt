@@ -2,7 +2,9 @@ package org.tree.binaryTree.trees
 
 import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.templates.TemplateBalanceBSTree
+
 // algorithm source: https://www.youtube.com/watch?v=T70nn4EyTrs&ab_channel=%D0%9B%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B8%D0%B9%D0%A4%D0%9F%D0%9C%D0%98
+
 class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun findParentForNewNode(curNode: RBNode<T>?, obj: T): RBNode<T>? {
         if (curNode != null) {
@@ -145,16 +147,16 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
 
     private fun balanceRemove1(parentNode: RBNode<T>?, removedChild: BalanceCase.ChangedChild) {
         // balanced remove with 1 non-null child
-        if (removedChild == BalanceCase.ChangedChild.RIGHT) {
-            val rightChild = parentNode?.right
-            if (rightChild != null) {
-                rightChild.color = RBNode.Color.BLACK
+        when (removedChild) {
+            BalanceCase.ChangedChild.RIGHT -> {
+                parentNode?.right?.run { color = RBNode.Color.BLACK }
             }
-        } else if (removedChild == BalanceCase.ChangedChild.LEFT) {
-            val leftChild = parentNode?.left
-            if (leftChild != null) {
-                leftChild.color = RBNode.Color.BLACK
+
+            BalanceCase.ChangedChild.LEFT -> {
+                parentNode?.left?.run { color = RBNode.Color.BLACK }
             }
+
+            else -> {}
         }
     }
 
@@ -334,7 +336,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun balanceRemove2InLeftChildWithBlackParentBlackOtherChild(
         parentNode: RBNode<T>,
         otherChild: RBNode<T>
-    ){
+    ) {
         val leftChildOfOtherChild = otherChild.left
         if (leftChildOfOtherChild != null) {
             if (leftChildOfOtherChild.color == RBNode.Color.RED) {
