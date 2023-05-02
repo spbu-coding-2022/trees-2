@@ -76,8 +76,8 @@ fun <T : Comparable<T>> checkRBTreeNode(curNode: RBNode<T>?, parNode: RBNode<T>?
     var blackHeight = 0
     if (curNode != null) {
         // two red nodes in row
-        if (parNode?.col == RBNode.Colour.RED) {
-            assertThat(curNode.col, equalTo(RBNode.Colour.BLACK))
+        if (parNode?.color == RBNode.Color.RED) {
+            assertThat(curNode.color, equalTo(RBNode.Color.BLACK))
         }
 
         // right parent
@@ -101,7 +101,7 @@ fun <T : Comparable<T>> checkRBTreeNode(curNode: RBNode<T>?, parNode: RBNode<T>?
         assertThat(lBlackHeight, equalTo(rBlackHeight))
         blackHeight = lBlackHeight
 
-        if (curNode.col == RBNode.Colour.BLACK) {
+        if (curNode.color == RBNode.Color.BLACK) {
             blackHeight += 1
         }
     }

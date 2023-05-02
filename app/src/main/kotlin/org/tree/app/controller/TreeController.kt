@@ -78,7 +78,7 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
 
     fun getNodeCol(curNode: NODE_T): Color {
         return if (curNode is RBNode<*>) {
-            if (curNode.col == RBNode.Colour.BLACK) {
+            if (curNode.color == RBNode.Color.BLACK) {
                 Color.DarkGray
             } else {
                 Color.Red
