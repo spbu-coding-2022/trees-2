@@ -81,8 +81,4 @@ class JsonIO {
         return treeController
 
     }
-
-    fun cleanDataBase(file: File) {
-        file.delete()
-    }
 }
