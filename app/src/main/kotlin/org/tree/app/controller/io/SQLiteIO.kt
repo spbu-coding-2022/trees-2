@@ -39,17 +39,16 @@ class InstanceOfNode(id: EntityID<Int>) : IntEntity(id) { // A separate row with
 
 class SQLiteIO {
     private var amountOfNodesToHandle = 0
-    private lateinit var treeController: TreeController<Node<KVP<Int, String>>>
     fun importTree(file: File): TreeController<Node<KVP<Int, String>>> {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
-        treeController = TreeController(BinSearchTree())
+        val treeController = TreeController(BinSearchTree())
         transaction {
             try {
                 if (Nodes.exists()) {
                     val setOfNodes = InstanceOfNode.all().toMutableSet()
                     val amountOfNodes = setOfNodes.count()
                     if (amountOfNodes > 0) {
-                        parseRootForImport(setOfNodes)
+                        parseRootForImport(setOfNodes, treeController)
                     }
                 } else {
                     throw HandledIOException("Database without a Nodes table")
@@ -60,14 +59,14 @@ class SQLiteIO {
         }
         return treeController
     }
-    fun exportTree(treeController_: TreeController<Node<KVP<Int, String>>>, file: File) {
+
+    fun exportTree(treeController: TreeController<Node<KVP<Int, String>>>, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
             throw HandledIOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
-        treeController = treeController_
         transaction {
             try {
                 SchemaUtils.drop(Nodes)
@@ -77,14 +76,15 @@ class SQLiteIO {
             }
             val root = treeController.tree.root
             if (root != null) {
-                parseNodesForExport(root, null)
+                parseNodesForExport(root, null, treeController)
             }
         }
     }
 
 
     private fun parseRootForImport(
-        setOfNodes: MutableSet<InstanceOfNode>
+        setOfNodes: MutableSet<InstanceOfNode>,
+        treeController: TreeController<Node<KVP<Int, String>>>
     ) {
         try {
             val node = setOfNodes.elementAt(0)
@@ -98,8 +98,8 @@ class SQLiteIO {
             bst.insert(KVP(parsedKey, parsedValue))
             val root = bst.root
             if (root != null) {
-                addCoordinatesToNode(root, parsedX, parsedY)
-                parseNodesForImport(setOfNodes, root)
+                addCoordinatesToNode(root, parsedX, parsedY, treeController)
+                parseNodesForImport(setOfNodes, root, treeController)
                 if (setOfNodes.isNotEmpty()) {
                     throw HandledIOException("Incorrect binary tree: there are at least two left/right children of some node")
                 }
@@ -114,7 +114,8 @@ class SQLiteIO {
 
     private fun parseNodesForImport(
         setOfNodes: MutableSet<InstanceOfNode>,
-        curNode: Node<KVP<Int, String>>
+        curNode: Node<KVP<Int, String>>,
+        treeController: TreeController<Node<KVP<Int, String>>>
     ) {
         if (amountOfNodesToHandle <= 0) {
             return
@@ -129,7 +130,7 @@ class SQLiteIO {
         if (parsedKey == parsedParentKey) throw HandledIOException("Child with key = ${curNode.elem.key} is parent for himself")
         if (parsedParentKey == curNode.elem.key) {
             val newNode = Node(KVP(parsedKey, parsedValue))
-            addCoordinatesToNode(newNode, parsedX, parsedY)
+            addCoordinatesToNode(newNode, parsedX, parsedY, treeController)
             setOfNodes.remove(nodes)
             amountOfNodesToHandle--
             if (parsedKey < parsedParentKey) {
@@ -137,15 +138,15 @@ class SQLiteIO {
                 curNode.left = newNode
                 val leftChild = curNode.left
                 if (leftChild != null) {
-                    parseNodesForImport(setOfNodes, leftChild)
+                    parseNodesForImport(setOfNodes, leftChild, treeController)
                 }
-                parseNodesForImport(setOfNodes, curNode)
+                parseNodesForImport(setOfNodes, curNode, treeController)
             } else { // When parsedKey is greater than parsedParentKey
                 if (curNode.right != null) throw HandledIOException("Incorrect binary tree: there are at least two right children of node with key = ${curNode.elem.key}")
                 curNode.right = newNode
                 val rightChild = curNode.right
                 if (rightChild != null) {
-                    parseNodesForImport(setOfNodes, rightChild)
+                    parseNodesForImport(setOfNodes, rightChild, treeController)
                 }
             }
         }
@@ -153,7 +154,8 @@ class SQLiteIO {
 
     private fun parseNodesForExport(
         curNode: Node<KVP<Int, String>>,
-        parNode: Node<KVP<Int, String>>?
+        parNode: Node<KVP<Int, String>>?,
+        treeController: TreeController<Node<KVP<Int, String>>>
     ) {
         InstanceOfNode.new {
             key = curNode.elem.key
@@ -164,17 +166,17 @@ class SQLiteIO {
         }
         val leftChild = curNode.left
         if (leftChild != null) {
-            parseNodesForExport(leftChild, curNode)
+            parseNodesForExport(leftChild, curNode, treeController)
         }
         val rightChild = curNode.right
         if (rightChild != null) {
-            parseNodesForExport(rightChild, curNode)
+            parseNodesForExport(rightChild, curNode, treeController)
         }
     }
 
     private fun addCoordinatesToNode(
         node: Node<KVP<Int, String>>,
-        x: Int, y: Int
+        x: Int, y: Int, treeController: TreeController<Node<KVP<Int, String>>>
     ) {
         treeController.nodes[node] =
             NodeExtension(mutableStateOf(x), mutableStateOf(y), treeController.getNodeCol(node))
