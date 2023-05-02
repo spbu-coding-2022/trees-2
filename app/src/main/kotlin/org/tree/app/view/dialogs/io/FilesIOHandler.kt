@@ -58,9 +58,9 @@ enum class Mode {
 
 fun selectFile(fileExtension: String, mode: Mode): String? {
     val fd = if (mode == Mode.IMPORT) {
-        FileDialog(ComposeWindow(), "Choose .sqlite file to import", FileDialog.LOAD)
+        FileDialog(ComposeWindow(), "Choose .$fileExtension file to import", FileDialog.LOAD)
     } else {
-        FileDialog(ComposeWindow(), "Choose .sqlite file to export", FileDialog.SAVE)
+        FileDialog(ComposeWindow(), "Choose .$fileExtension file to export", FileDialog.SAVE)
     }
     fd.directory = "C:\\"
     fd.file = "*.$fileExtension"
