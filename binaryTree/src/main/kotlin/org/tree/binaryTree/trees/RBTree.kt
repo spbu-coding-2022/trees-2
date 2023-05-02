@@ -6,12 +6,12 @@ import org.tree.binaryTree.templates.TemplateBalanceBSTree
 class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
     private fun findParentForNewNode(curNode: RBNode<T>?, obj: T): RBNode<T>? {
         if (curNode != null) {
-            if (obj > curNode.elem) {
+            if (obj > curNode.element) {
                 if (curNode.right == null) {
                     return curNode
                 }
                 return findParentForNewNode(curNode.right, obj)
-            } else if (obj < curNode.elem) {
+            } else if (obj < curNode.element) {
                 if (curNode.left == null) {
                     return curNode
                 }
@@ -73,7 +73,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
             val grandParent = parentNode.parent
             if (grandParent != null) { // in case when grandparent is null, there is no need to balance a tree
                 val unclePosition: BalancePosition
-                val uncle = if (parentNode.elem < grandParent.elem) {
+                val uncle = if (parentNode.element < grandParent.element) {
                     unclePosition = BalancePosition.RIGHT_UNCLE
                     grandParent.right
                 } else {
@@ -321,7 +321,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         otherChild.col = RBNode.Colour.RED
         val grandParent = parentNode.parent
         if (grandParent != null) {
-            if (parentNode.elem < grandParent.elem) {
+            if (parentNode.element < grandParent.element) {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.LEFT)
             } else {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
@@ -355,7 +355,7 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         otherChild.col = RBNode.Colour.RED
         val grandParent = parentNode.parent
         if (grandParent != null) {
-            if (parentNode.elem < grandParent.elem) {
+            if (parentNode.element < grandParent.element) {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.LEFT)
             } else {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)

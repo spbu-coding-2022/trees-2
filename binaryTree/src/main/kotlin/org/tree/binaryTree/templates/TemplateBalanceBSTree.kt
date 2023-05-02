@@ -31,7 +31,7 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
     protected fun getDirectionChangedChild(curNode: NODE_T?, obj: T): BalanceCase.ChangedChild {
         return if (curNode == null) {
             BalanceCase.ChangedChild.ROOT
-        } else if (obj < curNode.elem) {
+        } else if (obj < curNode.element) {
             BalanceCase.ChangedChild.LEFT
         } else {
             BalanceCase.ChangedChild.RIGHT
@@ -53,14 +53,14 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
             if (curNode === parNode) {
                 balance(
                     curNode,
-                    getDirectionChangedChild(curNode, newNode.elem),
+                    getDirectionChangedChild(curNode, newNode.element),
                     BalanceCase.OpType.INSERT,
                     BalanceCase.Recursive.END
                 )
             } else {
                 balance(
                     curNode,
-                    getDirectionChangedChild(curNode, newNode.elem),
+                    getDirectionChangedChild(curNode, newNode.element),
                     BalanceCase.OpType.INSERT,
                     BalanceCase.Recursive.RECURSIVE_CALL
                 )
@@ -85,11 +85,11 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         val targetNode: NODE_T?
         val isRec: BalanceCase.Recursive
         val res =
-            if (obj < curNode.elem) {
+            if (obj < curNode.element) {
                 isRec = BalanceCase.Recursive.RECURSIVE_CALL
                 targetNode = parentNode
                 remove(curNode.left, curNode, obj)
-            } else if (obj > curNode.elem) {
+            } else if (obj > curNode.element) {
                 isRec = BalanceCase.Recursive.RECURSIVE_CALL
                 targetNode = parentNode
                 remove(curNode.right, curNode, obj)

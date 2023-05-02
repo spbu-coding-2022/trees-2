@@ -13,14 +13,14 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
                 throw IllegalArgumentException("Received a non-root null node")
             }
         } else {
-            if (newNode.elem < curNode.elem) {
+            if (newNode.element < curNode.element) {
                 if (curNode.left == null) {
                     curNode.left = newNode
                     return curNode
                 } else {
                     return insertNode(curNode.left, newNode)
                 }
-            } else if (newNode.elem > curNode.elem) {
+            } else if (newNode.element > curNode.element) {
                 if (curNode.right == null) {
                     curNode.right = newNode
                     return curNode
@@ -47,9 +47,9 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             return null
         }
 
-        if (obj < curNode.elem) {
+        if (obj < curNode.element) {
             return find(curNode.left, obj)
-        } else if (obj > curNode.elem) {
+        } else if (obj > curNode.element) {
             return find(curNode.right, obj)
         } else {
             return curNode
@@ -72,9 +72,9 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             0 -> {
                 val nxt =
                     findNext(curNode) ?: throw IllegalArgumentException("Got null as next than right child isn't null")
-                val buf = nxt.elem
-                remove(nxt.elem)
-                curNode.elem = buf
+                val buf = nxt.element
+                remove(nxt.element)
+                curNode.element = buf
             }
 
             1 -> {
@@ -93,9 +93,9 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
             return null
         }
 
-        if (obj < curNode.elem) {
+        if (obj < curNode.element) {
             return remove(curNode.left, curNode, obj)
-        } else if (obj > curNode.elem) {
+        } else if (obj > curNode.element) {
             return remove(curNode.right, curNode, obj)
         } else {
             return deleteNode(curNode, parentNode)
