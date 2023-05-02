@@ -1,9 +1,22 @@
 package org.tree.binaryTree.templates
 
+/**
+ * This class is template class for creating your own binary search trees.
+ * @param T the type of element stored in the tree's nodes
+ * @param NODE_T the type of nodes in the tree
+ *
+ * @property root the root node of the tree
+ */
 abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>> {
     var root: NODE_T? = null
 
     // Insert
+    /**
+     * Insert [newNode] into the subtree of the [curNode].
+     *
+     * @return the parent of the inserted node,
+     * null if node with the same element already in tree or if inserted node is root
+     */
     protected open fun insertNode(curNode: NODE_T?, newNode: NODE_T): NODE_T? {
         if (curNode == null) {
             if (root === curNode) {
@@ -28,40 +41,68 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
                     return insertNode(curNode.right, newNode)
                 }
             } else {
-                return null // STTK: 10%
+                return null
             }
         }
     }
 
-    protected abstract fun insert(curNode: NODE_T?, obj: T): NODE_T?
+    /**
+     * Insert [element] into the subtree of the [curNode].
+     *
+     * @return the parent of the inserted node,
+     * null if node with the same element already in tree or if inserted node is root
+     *
+     * @see insertNode
+     */
+    protected abstract fun insert(curNode: NODE_T?, element: T): NODE_T?
 
-    fun insert(obj: T): Boolean {
+    /**
+     * Insert [element] into tree.
+     *
+     * @return true if the element has been inserted, false if the element is already contained in the tree.
+     */
+    fun insert(element: T): Boolean {
         val rootInsert = root == null
         // insert returns null if the same element is found or when the root is inserted
-        return ((insert(root, obj) != null) or rootInsert)
+        return ((insert(root, element) != null) or rootInsert)
     }
 
-    //Find
-    protected fun find(curNode: NODE_T?, obj: T): NODE_T? {
+    // Find
+    /**
+     * Find node with the given [element] into subtree of the [curNode].
+     *
+     * @return the found node or null if the node was not found
+     */
+    protected fun find(curNode: NODE_T?, element: T): NODE_T? {
         if (curNode == null) {
             return null
         }
 
-        if (obj < curNode.element) {
-            return find(curNode.left, obj)
-        } else if (obj > curNode.element) {
-            return find(curNode.right, obj)
+        if (element < curNode.element) {
+            return find(curNode.left, element)
+        } else if (element > curNode.element) {
+            return find(curNode.right, element)
         } else {
             return curNode
         }
     }
 
-    fun find(obj: T): NODE_T? {
-        return find(root, obj)
+    /**
+     * Find node with the given [element] into tree.
+     *
+     * @return the found node or null if the node was not found
+     */
+    fun find(element: T): NODE_T? {
+        return find(root, element)
     }
 
-    //Remove
-    protected open fun deleteNode(curNode: NODE_T, parentNode: NODE_T?): Int {
+    // Remove
+    /**
+     * Delete [curNode] with [parentNode] as parent from tree.
+     *
+     * @return the count of null children of deleted node
+     */
+    protected fun deleteNode(curNode: NODE_T, parentNode: NODE_T?): Int {
         var res = 0
         if (curNode.left == null)
             res += 1
@@ -88,25 +129,41 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
         return res
     }
 
-    protected open fun remove(curNode: NODE_T?, parentNode: NODE_T?, obj: T): Int? {
+    /**
+     * Remove [element] from subtree of the [curNode] with [parentNode] as parent.
+     *
+     * @return the count of null children of deleted node or null if the node was not found
+     */
+    protected open fun remove(curNode: NODE_T?, parentNode: NODE_T?, element: T): Int? {
         if (curNode == null) {
             return null
         }
 
-        if (obj < curNode.element) {
-            return remove(curNode.left, curNode, obj)
-        } else if (obj > curNode.element) {
-            return remove(curNode.right, curNode, obj)
+        if (element < curNode.element) {
+            return remove(curNode.left, curNode, element)
+        } else if (element > curNode.element) {
+            return remove(curNode.right, curNode, element)
         } else {
             return deleteNode(curNode, parentNode)
         }
     }
 
-    fun remove(obj: T): Boolean {
-        return remove(root, null, obj) != null
+    /**
+     * Remove [element] from tree.
+     *
+     * @return true if the element has been successfully removed; false if it was not present in the tree.
+     */
+    fun remove(element: T): Boolean {
+        return remove(root, null, element) != null
     }
 
-    //Additional
+    // Additional
+    /**
+     * Find next node after [curNode]
+     *
+     * @return node with minimal element that greater than element of current node;
+     * null if element of current node is the greatest
+     */
     protected fun findNext(curNode: NODE_T): NODE_T? {
         var res = curNode.right
         if (res == null) {
@@ -121,6 +178,9 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
         }
     }
 
+    /**
+     * Replace [replacedNode] with [parentNode] as parent by [newNode].
+     */
     protected open fun replaceNode(replacedNode: NODE_T, parentNode: NODE_T?, newNode: NODE_T?) {
         if (parentNode == null) {
             if (root === replacedNode) {
@@ -139,6 +199,11 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
         }
     }
 
+    /**
+     * @param order specified traversal order
+     *
+     * @return a list of tree's elements in the specified order
+     */
     fun traversal(order: TemplateNode.Traversal): MutableList<T> {
         return root?.traverse(order) ?: mutableListOf()
     }
