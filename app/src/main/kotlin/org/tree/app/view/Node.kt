@@ -65,7 +65,13 @@ fun Node(
                         }
                     }
             ) {
-                AutoSizeText(fontSize = 16.sp, text = key.toString(), maxLines = 1, softWrap = false)
+                AutoSizeText(
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    text = key.toString(),
+                    maxLines = 1,
+                    softWrap = false
+                )
             }
         }
     }
