@@ -47,7 +47,7 @@ class JsonIO {
     private fun JsonAVLNode.deserialize(treeController: TreeController<AVLNode<KVP<Int, String>>>): AVLNode<KVP<Int, String>> {
         val nv = AVLNode(KVP(key, value))
         nv.height = height
-        treeController.nodes[nv] = NodeExtension(mutableStateOf(x), mutableStateOf(y))
+        treeController.nodes[nv] = NodeExtension(mutableStateOf(x), mutableStateOf(y), treeController.getNodeCol(nv))
         nv.left = left?.deserialize(treeController)
         nv.right = right?.deserialize(treeController)
         return nv
