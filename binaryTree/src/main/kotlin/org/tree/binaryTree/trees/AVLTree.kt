@@ -5,25 +5,25 @@ import org.tree.binaryTree.templates.TemplateBalanceBSTree
 import kotlin.math.max
 
 class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
-    private fun height(avlNode: AVLNode<T>?): Int {
+    private fun heightOrZero(avlNode: AVLNode<T>?): Int {
         return avlNode?.height ?: 0
     }
 
-    private fun bfactor(avlNode: AVLNode<T>?): Int {
-        fixheight(avlNode)
-        fixheight(avlNode?.left)
-        fixheight(avlNode?.right)
+    private fun balanceFactor(avlNode: AVLNode<T>?): Int {
+        fixHeight(avlNode)
+        fixHeight(avlNode?.left)
+        fixHeight(avlNode?.right)
         return if (avlNode != null) {
-            height(avlNode.right) - height(avlNode.left)
+            heightOrZero(avlNode.right) - heightOrZero(avlNode.left)
         } else {
             0
         }
     }
 
-    private fun fixheight(avlNode: AVLNode<T>?) {
+    private fun fixHeight(avlNode: AVLNode<T>?) {
         if (avlNode != null) {
-            val hl = height(avlNode.left)
-            val hr = height(avlNode.right)
+            val hl = heightOrZero(avlNode.left)
+            val hr = heightOrZero(avlNode.right)
             avlNode.height = max(hl, hr) + 1
         }
     }
@@ -31,15 +31,15 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     override fun rotateRight(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
         val replacementNode = curNode.left
         super.rotateRight(curNode, parentNode)
-        fixheight(curNode)
-        fixheight(replacementNode)
+        fixHeight(curNode)
+        fixHeight(replacementNode)
     }
 
     override fun rotateLeft(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
         val replacementNode = curNode.right
         super.rotateLeft(curNode, parentNode)
-        fixheight(replacementNode)
-        fixheight(curNode)
+        fixHeight(replacementNode)
+        fixHeight(curNode)
     }
 
     override fun insert(curNode: AVLNode<T>?, obj: T): AVLNode<T>? {
@@ -47,16 +47,16 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
     }
 
     private fun balanceNode(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
-        if (bfactor(curNode) == 2) {
-            if (bfactor(curNode.right) < 0) {
+        if (balanceFactor(curNode) == 2) {
+            if (balanceFactor(curNode.right) < 0) {
                 curNode.right?.let { rotateRight(it, curNode) }
             }
             rotateLeft(curNode, parentNode)
             return
         }
 
-        if (bfactor(curNode) == -2) {
-            if (bfactor(curNode.left) > 0) {
+        if (balanceFactor(curNode) == -2) {
+            if (balanceFactor(curNode.left) > 0) {
                 curNode.left?.let { rotateLeft(it, curNode) }
             }
             rotateRight(curNode, parentNode)
