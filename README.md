@@ -5,13 +5,15 @@
 Program for binary tree visualization.
 
 ---
+![gui-example](https://user-images.githubusercontent.com/66139162/235777850-84e8d881-cbc0-429d-a74e-b9b3cbf388fe.png)
 
 ## Features
 
 You can:
 
 - **Create** 3 different types of search trees: **AVL**, **RedBlack** and **Common binary tree**
-- **Save** it with 3 different ways: **Neo4j**, **Plain text** and **SQLite**
+- **Edit** trees: **insert** nodes, **move** nodes and **remove** them
+- **Save** it with 3 different ways: **Neo4j**, **Json** and **SQLite**
 - Or **load** your own tree from these "databases"
 - Use our [library](#Library) to **implement** binary search trees in your own project
 
@@ -25,7 +27,7 @@ You can:
 
 ### Build
 
-To build and run this application locally, you'll need Git, Gradle and JDK installed on your computer. From your command
+To build and run this application locally, you'll need Git and JDK installed on your computer. From your command
 line:
 
 ```bash
