@@ -84,9 +84,9 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
                 Color.Red
             }
         } else if (curNode is AVLNode<*>) {
-            Color.Cyan
+            Color(0xff875bff)
         } else if (curNode is Node<*>) {
-            Color.Yellow
+            Color(0xffffb74b)
         } else {
             Color.Gray
         }
