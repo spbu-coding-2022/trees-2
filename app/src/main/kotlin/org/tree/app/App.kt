@@ -95,7 +95,7 @@ fun main() = application {
         fun toTreeRoot() {
             val treeRoot = treeController.tree.root
             if (treeRoot != null) {
-                val coordinates = treeController.nodes[treeController.find(treeRoot.elem)]
+                val coordinates = treeController.nodes[treeController.find(treeRoot.element)]
                 if (coordinates != null) {
                     logString = "Moved to root."
                     logColor = Color.Green
@@ -208,7 +208,7 @@ fun main() = application {
                         val key = convertKey(keyString) ?: return@FindRow
                         val node = treeController.find(KVP(key))
                         if (node != null) {
-                            logString = "Node with key = $key and value = \"${node.elem.v}\" found."
+                            logString = "Node with key = $key and value = \"${node.element.v}\" found."
                             logColor = Color.Green
                             val coordinates = treeController.nodes[node]
                             if (coordinates != null) {

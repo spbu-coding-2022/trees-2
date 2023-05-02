@@ -185,7 +185,7 @@ class BinSearchTreeTest {
 
             assertThat(act != null, equalTo(exp))
             if (act != null) {
-                assertThat(act.elem, equalTo(fndVal))
+                assertThat(act.element, equalTo(fndVal))
             }
         }
 
@@ -248,7 +248,7 @@ class BinSearchTreeTest {
 
                 assertThat(act != null, equalTo(exp))
                 if (act != null) {
-                    assertThat(act.elem, equalTo(curVal))
+                    assertThat(act.element, equalTo(curVal))
                 }
             }
         }
