@@ -140,8 +140,8 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         }
     }
 
+    /** Balanced remove with 1 non-null child */
     private fun balanceRemove1(parentNode: RBNode<T>?, removedChild: BalanceCase.ChangedChild) {
-        /** Balanced remove with 1 non-null child */
         when (removedChild) {
             BalanceCase.ChangedChild.RIGHT -> {
                 parentNode?.right?.run { color = RBNode.Color.BLACK }
@@ -155,8 +155,8 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
         }
     }
 
+    /** Balanced remove with 2 null children */
     private fun balanceRemove2(parentNode: RBNode<T>, removedChild: BalanceCase.ChangedChild) {
-        /** Balanced remove with 2 null children */
         if (getColourOfRemovedNode(parentNode) == RBNode.Color.BLACK) { // red => no need to balance
             if (parentNode.color == RBNode.Color.RED) { // then other child is black
                 if (removedChild == BalanceCase.ChangedChild.RIGHT) {
