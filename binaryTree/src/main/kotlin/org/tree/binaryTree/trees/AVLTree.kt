@@ -9,16 +9,13 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         return avlNode?.height ?: 0
     }
 
-    private fun balanceFactor(avlNode: AVLNode<T>?): Int {
-        fixHeight(avlNode)
-        fixHeight(avlNode?.left)
-        fixHeight(avlNode?.right)
-        return if (avlNode != null) {
-            heightOrZero(avlNode.right) - heightOrZero(avlNode.left)
-        } else {
-            0
+    private fun balanceFactor(avlNode: AVLNode<T>): Int = //avl balance factor - difference in the heights of the right and left subtrees
+        avlNode.run {
+            fixHeight(this)
+            fixHeight(left)
+            fixHeight(right)
+            heightOrZero(right) - heightOrZero(left)
         }
-    }
 
     private fun fixHeight(avlNode: AVLNode<T>?) {
         if (avlNode != null) {
@@ -48,19 +45,22 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
 
     private fun balanceNode(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
         if (balanceFactor(curNode) == 2) {
-            if (balanceFactor(curNode.right) < 0) {
-                curNode.right?.let { rotateRight(it, curNode) }
+            curNode.right?.let {
+                if (balanceFactor(it) < 0) {
+                    rotateRight(it, curNode)
+                }
             }
             rotateLeft(curNode, parentNode)
             return
         }
 
         if (balanceFactor(curNode) == -2) {
-            if (balanceFactor(curNode.left) > 0) {
-                curNode.left?.let { rotateLeft(it, curNode) }
+            curNode.left?.let {
+                if (balanceFactor(it) > 0) {
+                    rotateLeft(it, curNode)
+                }
             }
             rotateRight(curNode, parentNode)
-            return
         }
     }
 
@@ -70,17 +70,12 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         operationType: BalanceCase.OpType,
         recursive: BalanceCase.Recursive
     ) {
-        when (operationType) {
-            BalanceCase.OpType.REMOVE_0 -> {}
-            else -> {
-                if (curNode == null) {
-                    root?.let { balanceNode(it, curNode) }
-                    return
-                }
-
-                curNode.right?.let { balanceNode(it, curNode) }
-                curNode.left?.let { balanceNode(it, curNode) }
-            }
+        if (operationType == BalanceCase.OpType.REMOVE_0) return
+        if (curNode == null) {
+            root?.let { balanceNode(it, curNode) }
+            return
         }
+        curNode.right?.let { balanceNode(it, curNode) }
+        curNode.left?.let { balanceNode(it, curNode) }
     }
 }
