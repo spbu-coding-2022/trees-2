@@ -13,7 +13,6 @@ import org.tree.binaryTree.KVP
 import org.tree.binaryTree.RBNode
 import org.tree.binaryTree.trees.RBTree
 import java.io.Closeable
-import java.io.IOException
 
 class Neo4jIO() : Closeable {
     private var driver: Driver? = null
@@ -33,8 +32,8 @@ class Neo4jIO() : Closeable {
     fun exportRBTree(
         treeController: TreeController<RBNode<KVP<Int, String>>>,
         treeName: String = "Tree"
-    ) {   // when we have treeView, fun will be rewritten
-        val session = driver?.session() ?: throw IOException("Driver is not open")
+    ) {
+        val session = driver?.session() ?: throw HandledIOException("Driver is not open")
         val root = treeController.tree.root
         handleTransactionException {
             session.executeWrite { tx ->
@@ -75,8 +74,8 @@ class Neo4jIO() : Closeable {
     }
 
 
-    fun importRBTree(treeName: String = "Tree"): TreeController<RBNode<KVP<Int, String>>> {  // when we have treeView, fun will be rewritten
-        val session = driver?.session() ?: throw IOException("Driver is not open")
+    fun importRBTree(treeName: String = "Tree"): TreeController<RBNode<KVP<Int, String>>> {
+        val session = driver?.session() ?: throw HandledIOException("Driver is not open")
         val res: TreeController<RBNode<KVP<Int, String>>> =
             handleTransactionException {
                 session.executeRead { tx ->
@@ -91,7 +90,7 @@ class Neo4jIO() : Closeable {
     }
 
     fun removeTree(treeName: String = "Tree") {
-        val session = driver?.session() ?: throw IOException("Driver is not open")
+        val session = driver?.session() ?: throw HandledIOException("Driver is not open")
         handleTransactionException {
             session.executeWrite { tx ->
                 deleteTree(tx, treeName)
@@ -101,7 +100,7 @@ class Neo4jIO() : Closeable {
     }
 
     fun getTreesNames(): MutableList<String> {
-        val session = driver?.session() ?: throw IOException("Driver is not open")
+        val session = driver?.session() ?: throw HandledIOException("Driver is not open")
         val res: MutableList<String> = handleTransactionException {
             session.executeRead { tx ->
                 val nameRecords = tx.run("MATCH (t: $TREE) RETURN t.name AS name")
@@ -133,7 +132,7 @@ class Neo4jIO() : Closeable {
             val rkey = curNode.right?.element?.key
             val ext = nodes[curNode]
             if (ext == null) {
-                throw IOException("Can't find coordinates for node with key ${curNode.element.key}")
+                throw HandledIOException("Can't find coordinates for node with key ${curNode.element.key}")
             } else {
                 tx.run(
                     "CREATE (:$RBNODE:$NEW_NODE {key : \$key, " +
@@ -216,7 +215,7 @@ class Neo4jIO() : Closeable {
 
                 key2nk[key] = NodeAndKeys(node, lkey, rkey)
             } catch (ex: Uncoercible) {
-                throw IOException("Invalid nodes label in the database", ex)
+                throw HandledIOException("Invalid nodes label in the database", ex)
             }
         }
         val nks = key2nk.values.toTypedArray()
@@ -238,7 +237,7 @@ class Neo4jIO() : Closeable {
                 }
             }
             if (key2nk.values.size != 1) {
-                throw IOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
+                throw HandledIOException("Found ${key2nk.values.size} nodes without parents in database, expected only 1 node")
             }
             treeController.tree.root = key2nk.values.first().nd
         }
