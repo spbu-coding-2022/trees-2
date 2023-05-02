@@ -39,8 +39,8 @@ class AVLTree<T : Comparable<T>> : TemplateBalanceBSTree<T, AVLNode<T>>() {
         fixHeight(curNode)
     }
 
-    override fun insert(curNode: AVLNode<T>?, obj: T): AVLNode<T>? {
-        return super.insertNode(curNode, AVLNode(obj))
+    override fun insert(curNode: AVLNode<T>?, element: T): AVLNode<T>? {
+        return super.insertNode(curNode, AVLNode(element))
     }
 
     private fun balanceNode(curNode: AVLNode<T>, parentNode: AVLNode<T>?) {
