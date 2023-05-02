@@ -92,14 +92,6 @@ class TreeController<NODE_T : TemplateNode<KVP<Int, String>, NODE_T>>(
         }
     }
 
-    private fun height(curNode: NODE_T?): Int {
-        return if (curNode == null) {
-            0
-        } else {
-            Integer.max(height(curNode.left), height(curNode.right)) + 1
-        }
-    }
-
     fun nodeType(): NODE_T? {
         return tree.root
     }
