@@ -62,7 +62,12 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
 
     //Remove
     protected open fun deleteNode(curNode: NODE_T, parentNode: NODE_T?): Int {
-        val res = curNode.countNullChildren()
+        var res = 0
+        if (curNode.left == null)
+            res += 1
+        if (curNode.right == null)
+            res += 1
+
         when (res) {
             0 -> {
                 val nxt =
