@@ -99,12 +99,13 @@ At SQLite database we store BinSearchTree. There are 2 types of objects with the
   - `x` *int* - node position at ui
   - `y` *int* - node position at ui
 
-We have functions:
+We have methods:
 
-- `exportTree(TreeController, file)` - writes information stored in TreeController object  to a `file` in preorder order. 
-- `importTree(file)` - reads the tree stored in the `file` and returns TreeController object. **Nodes must be stored in preorder order (check root -> then check left child -> then check right child).**
-If there are some extra tree nodes, that can't fit in the tree, then `importTree` will throw `HandledIOException`. 
-
+- `exportTree(TreeController, file.sqlite)` - writes information stored in TreeController object to a `file` in preorder
+  order.
+- `importTree(file.sqlite)` - reads the tree stored in the `file` and returns TreeController object. **Nodes must be
+  stored in preorder order (check root -> then check left child -> then check right child).**
+  If there are some extra tree nodes, that can't fit in the tree, then `importTree` will throw `HandledIOException`.
 
 ### Neo4j
 
@@ -208,7 +209,7 @@ class MyCoolTree<T : Comparable<T>> : TemplateBalanceBSTree<T, CoolNode<T>>() {
   override fun balance(
     curNode: CoolNode<T>?,
     changedChild: BalanceCase.ChangedChild,
-    operationType: BalanceCase.OpType,
+    operationType: BalanceCase.OperationType,
     recursive: BalanceCase.Recursive
   ) {
     when (changedChild) {
