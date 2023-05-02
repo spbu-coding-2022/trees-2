@@ -268,7 +268,7 @@ fun main() = application {
                             orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                             state = rememberDraggableState { delta ->
                                 val newWidth = widthOfPanel + delta.toInt()
-                                if (windowState.size.width > (newWidth + 10).dp) {
+                                if ((windowState.size.width > (newWidth + 10).dp) && (newWidth > 0)) {
                                     widthOfPanel = newWidth
                                 }
                             }
