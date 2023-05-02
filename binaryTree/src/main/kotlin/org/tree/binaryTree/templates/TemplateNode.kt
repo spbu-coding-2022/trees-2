@@ -24,17 +24,6 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
         return res
     }
 
-    fun countNullChildren(): Int {
-        var res = 0
-        if (left == null) {
-            res += 1
-        }
-        if (right == null) {
-            res += 1
-        }
-        return res
-    }
-
     /**
      * @property INORDER first the left child, then the parent and the right child
      * @property PREORDER first the parent, then the left child and the right child
