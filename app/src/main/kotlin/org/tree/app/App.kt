@@ -145,10 +145,14 @@ fun main() = application {
                     Item(
                         "Bin Search Tree",
                         onClick = {
-                            @Suppress("UNCHECKED_CAST")
-                            exportBST(
-                                treeController as TreeController<Node<KVP<Int, String>>>
-                            )
+                            handleIOException(onCatch = { ex ->
+                                exceptionContent = "Failed to import tree from file: ${ex.message}"
+                                throwException = true
+                            }) {
+                                @Suppress("UNCHECKED_CAST") exportBST(
+                                    treeController as TreeController<Node<KVP<Int, String>>>
+                                )
+                            }
                         },
                         enabled = (treeController.nodeType() is Node<*>?)
                     )
@@ -160,10 +164,14 @@ fun main() = application {
                     Item(
                         "AVL Tree",
                         onClick = {
-                            @Suppress("UNCHECKED_CAST")
-                            exportAVLT(
-                                treeController as TreeController<AVLNode<KVP<Int, String>>>
-                            )
+                            handleIOException(onCatch = { ex ->
+                                exceptionContent = "Failed to import tree from file: ${ex.message}"
+                                throwException = true
+                            }) {
+                                @Suppress("UNCHECKED_CAST") exportAVLT(
+                                    treeController as TreeController<AVLNode<KVP<Int, String>>>
+                                )
+                            }
                         },
                         enabled = (treeController.nodeType() is AVLNode<*>?)
                     )
@@ -316,16 +324,24 @@ fun main() = application {
         ) {
             if (treeController.nodeType() is Node<*>?) {
                 Button(onClick = {
-                    @Suppress("UNCHECKED_CAST")
-                    exportBST(treeController as TreeController<Node<KVP<Int, String>>>)
+                    handleIOException(onCatch = { ex ->
+                        exceptionContent = "Failed to import tree from file: ${ex.message}"
+                        throwException = true
+                    }) {
+                        @Suppress("UNCHECKED_CAST") exportBST(treeController as TreeController<Node<KVP<Int, String>>>)
+                    }
                 }) {
                     Text("Save as Bin Search Tree")
                 }
             }
             if (treeController.nodeType() is AVLNode<*>?) {
                 Button(onClick = {
-                    @Suppress("UNCHECKED_CAST")
-                    exportAVLT(treeController as TreeController<AVLNode<KVP<Int, String>>>)
+                    handleIOException(onCatch = { ex ->
+                        exceptionContent = "Failed to import tree from file: ${ex.message}"
+                        throwException = true
+                    }) {
+                        @Suppress("UNCHECKED_CAST") exportAVLT(treeController as TreeController<AVLNode<KVP<Int, String>>>)
+                    }
                 }) {
                     Text("Save as AVL Tree")
                 }
