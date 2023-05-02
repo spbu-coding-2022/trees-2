@@ -1,0 +1,44 @@
+version: 2
+mergeable:
+  - when: pull_request.*, pull_request_review.*
+    filter:
+      # ignore 'Feedback' PR
+      - do: payload
+        pull_request:
+          title:
+            must_exclude:
+              regex: '^Feedback$'
+
+    validate:
+      # Work in progress
+      - do: title
+        must_exclude:
+          regex: '^\[WIP\]'
+      - do: label
+        must_exclude:
+          regex: 'wip'
+
+      # No empty description
+      - do: description
+        no_empty:
+          enabled: true
+          message: Description matter and should not be empty.
+
+      # Some approve
+      - do: approvals
+        min:
+          count: 1
+        required:
+          assignees: true
+
+
+      # Pull request to main only from release and hotfix branches
+      - do: or
+        validate:
+          - do: baseRef
+            must_exclude:
+              regex: '^main$'
+          - do: headRef
+            must_include:
+              regex: '^(release|hotfix)\/.+$'
+        message: "Create PR to main only from release and hotfix branches"
