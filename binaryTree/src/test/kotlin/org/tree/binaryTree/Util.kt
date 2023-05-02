@@ -52,13 +52,13 @@ fun <T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>> checkTreeNode(curNode:
     if (curNode != null) {
         val l = curNode.left
         if (l != null) {
-            assertThat(curNode.elem, greaterThanOrEqualTo(l.elem))
+            assertThat(curNode.element, greaterThanOrEqualTo(l.element))
             checkTreeNode(l)
         }
 
         val r = curNode.right
         if (r != null) {
-            assertThat(curNode.elem, lessThanOrEqualTo(r.elem))
+            assertThat(curNode.element, lessThanOrEqualTo(r.element))
             checkTreeNode(r)
         }
     }
@@ -86,14 +86,14 @@ fun <T : Comparable<T>> checkRBTreeNode(curNode: RBNode<T>?, parNode: RBNode<T>?
         var lBlackHeight = 0
         val l = curNode.left
         if (l != null) {
-            assertThat(curNode.elem, greaterThanOrEqualTo(l.elem))
+            assertThat(curNode.element, greaterThanOrEqualTo(l.element))
             lBlackHeight = checkRBTreeNode(l, curNode)
         }
 
         var rBlackHeight = 0
         val r = curNode.right
         if (r != null) {
-            assertThat(curNode.elem, lessThanOrEqualTo(r.elem))
+            assertThat(curNode.element, lessThanOrEqualTo(r.element))
             rBlackHeight = checkRBTreeNode(r, curNode)
         }
 

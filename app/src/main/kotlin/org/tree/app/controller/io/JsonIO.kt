@@ -34,8 +34,8 @@ class JsonIO {
 
     private fun AVLNode<KVP<Int, String>>.serialize(treeController: TreeController<AVLNode<KVP<Int, String>>>): JsonAVLNode {
         return JsonAVLNode(
-            key = this.elem.key,
-            value = this.elem.v,
+            key = this.element.key,
+            value = this.element.v,
             x = treeController.nodes[this]?.x?.value ?: 0,
             y = treeController.nodes[this]?.y?.value ?: 0,
             height = this.height,

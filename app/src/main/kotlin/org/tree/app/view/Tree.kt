@@ -55,9 +55,10 @@ fun <NODE_T : TemplateNode<KVP<Int, String>, NODE_T>> TreeView(
                 var x by n.value.x
                 var y by n.value.y
                 val col = n.value.color
-                with(n.key.elem) {
+                with(n.key.element) {
                     key(key) {
-                        Node(x + offsetX.value,
+                        Node(
+                            x + offsetX.value,
                             y + offsetY.value,
                             key,
                             v ?: "",
