@@ -29,46 +29,38 @@ private data class JsonAVLNode(
 private data class JsonAVLTree(
     val root: JsonAVLNode?
 )
-class JsonIO {
-    private lateinit var treeController : TreeController<AVLNode<KVP<Int, String>>>
 
-    private fun AVLNode<KVP<Int, String>>.serialize(): JsonAVLNode{
+class JsonIO {
+
+    private fun AVLNode<KVP<Int, String>>.serialize(treeController: TreeController<AVLNode<KVP<Int, String>>>): JsonAVLNode {
         return JsonAVLNode(
             key = this.elem.key,
             value = this.elem.v,
             x = treeController.nodes[this]?.x?.value ?: 0,
             y = treeController.nodes[this]?.y?.value ?: 0,
             height = this.height,
-            left = this.left?.serialize(),
-            right = this.right?.serialize()
+            left = this.left?.serialize(treeController),
+            right = this.right?.serialize(treeController)
         )
     }
 
-    private fun JsonAVLNode.deserialize(): AVLNode<KVP<Int, String>> {
+    private fun JsonAVLNode.deserialize(treeController: TreeController<AVLNode<KVP<Int, String>>>): AVLNode<KVP<Int, String>> {
         val nv = AVLNode(KVP(key, value))
         nv.height = height
-        addCoordinatesToNode(nv, x, y)
-        nv.left = left?.deserialize()
-        nv.right = right?.deserialize()
+        treeController.nodes[nv] = NodeExtension(mutableStateOf(x), mutableStateOf(y))
+        nv.left = left?.deserialize(treeController)
+        nv.right = right?.deserialize(treeController)
         return nv
     }
 
-    private fun addCoordinatesToNode(
-        node: AVLNode<KVP<Int, String>>,
-        x: Int, y: Int
-    ) {
-        treeController.nodes[node] = NodeExtension(mutableStateOf(x), mutableStateOf(y))
-    }
-
-    fun exportTree(treeController_: TreeController<AVLNode<KVP<Int, String>>>, file: File) {
+    fun exportTree(treeController: TreeController<AVLNode<KVP<Int, String>>>, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
             throw HandledIOException("Directory ${file.toPath().parent} cannot be created: no access", ex)
         }
 
-        treeController = treeController_
-        val jsonTree = JsonAVLTree(treeController.tree.root?.serialize())
+        val jsonTree = JsonAVLTree(treeController.tree.root?.serialize(treeController))
 
         file.run {
             createNewFile()
@@ -83,9 +75,9 @@ class JsonIO {
             throw HandledIOException("File ${file.toPath().fileName} not found: no access", ex)
         }
 
-        treeController = TreeController(AVLTree())
+        val treeController = TreeController(AVLTree())
         val jsonTree = Json.decodeFromString<JsonAVLTree>(json)
-        treeController.tree.root = jsonTree.root?.deserialize()
+        treeController.tree.root = jsonTree.root?.deserialize(treeController)
         return treeController
 
     }

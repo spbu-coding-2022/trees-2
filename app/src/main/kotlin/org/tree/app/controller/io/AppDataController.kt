@@ -111,7 +111,7 @@ class AppDataController {
                 }
 
                 SavedType.Json -> {
-                    val db = Json()
+                    val db = JsonIO()
                     treeController = db.importTree(File(it.path))
                 }
 
