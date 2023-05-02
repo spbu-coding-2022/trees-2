@@ -147,7 +147,7 @@ class Neo4jIO() : Closeable {
                         "key" to curNode.element.key,
                         "value" to (curNode.element.v ?: ""),
                         "x" to ext.x.value, "y" to ext.y.value,
-                        "isBlack" to (curNode.col == RBNode.Colour.BLACK),
+                        "isBlack" to (curNode.color == RBNode.Color.BLACK),
                         "lkey" to lkey,
                         "rkey" to rkey
                     ) as Map<String, Any?>
@@ -194,10 +194,10 @@ class Neo4jIO() : Closeable {
                 val y = nkRecord["y"].asInt()
 
                 val isBlack = nkRecord["isBlack"].asBoolean()
-                node.col = if (isBlack) {
-                    RBNode.Colour.BLACK
+                node.color = if (isBlack) {
+                    RBNode.Color.BLACK
                 } else {
-                    RBNode.Colour.RED
+                    RBNode.Color.RED
                 }
 
                 treeController.nodes[node] =
