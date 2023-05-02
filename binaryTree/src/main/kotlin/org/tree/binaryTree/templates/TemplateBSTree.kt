@@ -135,6 +135,6 @@ abstract class TemplateBSTree<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T
     }
 
     fun traversal(order: TemplateNode.Traversal): MutableList<T> {
-        return root?.traversal(order) ?: mutableListOf()
+        return root?.traverse(order) ?: mutableListOf()
     }
 }
