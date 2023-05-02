@@ -13,17 +13,6 @@ abstract class TemplateNode<T : Comparable<T>, NODE_T : TemplateNode<T, NODE_T>>
     var left: NODE_T? = null
     var right: NODE_T? = null
 
-    fun getChild(): NODE_T? {
-        val res = if (left != null) {
-            left
-        } else if (right != null) {
-            right
-        } else {
-            null
-        }
-        return res
-    }
-
     /**
      * @property INORDER first the left child, then the parent and the right child
      * @property PREORDER first the parent, then the left child and the right child
