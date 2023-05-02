@@ -20,11 +20,12 @@ abstract class TemplateBalanceBSTree<T : Comparable<T>, NODE_T : TemplateNode<T,
         enum class OpType { INSERT, REMOVE_0, REMOVE_1, REMOVE_2 }
     }
 
-    protected fun getBalanceRemoveType(a: Int): BalanceCase.OpType {
-        return when (a) {
+    protected fun getBalanceRemoveType(nullChildrenCount: Int): BalanceCase.OperationType {
+        return when (nullChildrenCount) {
             2 -> BalanceCase.OpType.REMOVE_2
             1 -> BalanceCase.OpType.REMOVE_1
-            else -> BalanceCase.OpType.REMOVE_0
+            0 -> BalanceCase.OpType.REMOVE_0
+            else -> throw IllegalArgumentException("Expected number was <= 2, because in a binary tree a node can have no more than two children")
         }
     }
 
