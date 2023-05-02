@@ -329,7 +329,6 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
             }
         }
-        return
     }
 
 
@@ -363,7 +362,6 @@ class RBTree<T : Comparable<T>> : TemplateBalanceBSTree<T, RBNode<T>>() {
                 balanceRemove2(grandParent, BalanceCase.ChangedChild.RIGHT)
             }
         }
-        return
     }
 
     private fun getColourOfRemovedNode(parentNode: RBNode<T>): RBNode.Color {
