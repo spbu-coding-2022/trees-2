@@ -3,7 +3,7 @@ package org.tree.app.view.dialogs.io
 import TreeController
 import androidx.compose.ui.awt.ComposeWindow
 import org.tree.app.appDataController
-import org.tree.app.controller.io.Json
+import org.tree.app.controller.io.JsonIO
 import org.tree.app.controller.io.SQLiteIO
 import org.tree.app.controller.io.SavedTree
 import org.tree.app.controller.io.SavedType
@@ -16,7 +16,7 @@ import java.io.File
 fun importAVLT(): TreeController<AVLNode<KVP<Int, String>>>? {
     val fileString = selectFile("json", Mode.IMPORT) ?: return null
     val file = File(fileString)
-    val db = Json()
+    val db = JsonIO()
     val treeController = db.importTree(file)
     appDataController.data.lastTree = SavedTree(SavedType.Json, file.path)
     appDataController.saveData()
@@ -26,7 +26,7 @@ fun importAVLT(): TreeController<AVLNode<KVP<Int, String>>>? {
 fun exportAVLT(tc: TreeController<AVLNode<KVP<Int, String>>>) {
     val fileString = selectFile("json", Mode.EXPORT) ?: return
     val file = File(fileString)
-    val db = Json()
+    val db = JsonIO()
     db.exportTree(tc, file)
     appDataController.data.lastTree = SavedTree(SavedType.Json, file.path)
     appDataController.saveData()
