@@ -78,11 +78,10 @@ At plain text database we store AVLTree. We use json files. There are 2 types of
   - `left` *AVLNode* - node left child
   - `right` *AVLNode* - node right child
 
-We have functions:
+We have methods:
 
 - `exportTree(TreeController, file.json)` - writes information stored in TreeController object to a file `file.json`.
 - `importTree(file.json)` - reads the tree stored in the file `file.json` and returns TreeController object.
-- `cleanDataBase(file.json)` - deletes a file `file.json`.
 
 
 ### SQLite
